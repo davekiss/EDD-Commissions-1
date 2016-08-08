@@ -1,6 +1,13 @@
 <?php
 
 function eddc_user_paypal_email( $user ) {
+	
+	// Don't show PayPal field if user has no published products
+	if ( class_exists( 'FES_Vendors' ) ) {
+	        $vendor = new FES_Vendors;
+	        $products = $vendor->get_published_products();
+	        if ( $products == false ) return;
+	}
 	?>
 	<h3><?php _e('Easy Digital Downloads Commissions', 'eddc'); ?></h3>
 	<table class="form-table">
