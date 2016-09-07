@@ -21,8 +21,8 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 	if( edd_get_payment_gateway( $payment_id ) == 'manual_purchases' && ! isset( $_POST['commission'] ) )
 		return; // do not record commission on manual payments unless specified
 
-	if( edd_get_payment_meta( $payment_id, '_edd_completed_date' ) ) {
-		return;
+	if( edd_get_payment_meta( $payment_id, '_payment_has_commissions' ) ) {
+		return; // Ensure commissions only ever get recorded once
 	}
 
 	$payment_data = edd_get_payment_meta( $payment_id );
@@ -170,6 +170,10 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 					do_action( 'eddc_insert_commission', $recipient, $commission_amount, $rate, $download_id, $commission_id, $payment_id );
 				}
 			}
+		}
+
+		if( ! empty( $commission_id ) ) {
+			edd_update_payment_meta( $payment_id, '_payment_has_commissions', 1 );
 		}
 	}
 }
