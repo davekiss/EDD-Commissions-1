@@ -82,13 +82,25 @@ function eddc_settings_extensions( $settings ) {
 }
 add_filter( 'edd_settings_extensions', 'eddc_settings_extensions' );
 
+/**
+ * Add the Commissions Notifications emails subsection to the settings
+ *
+ * @since 3.2.12
+ * @param array $sections Sections for the emails settings tab
+ * @return array
+ */
+function eddc_settings_section_emails( $sections ) {
+	$sections['commissions'] = __( 'Commissions Notifications', 'eddc' );
+	return $sections;
+}
+
+add_filter( 'edd_settings_sections_emails', 'eddc_settings_section_emails' );
 
 /**
  * Registers the new Commissions options in Emails
  *
- * @access      private
  * @since       3.0
- * @param 		$settings array the existing plugin settings
+ * @param       $settings array the existing plugin settings
  * @return      array
 */
 function eddc_settings_emails( $settings ) {
@@ -122,6 +134,10 @@ function eddc_settings_emails( $settings ) {
 			'std'   => eddc_get_email_default_body()
 		)
 	);
+
+	if ( version_compare( EDD_VERSION, 2.5, '>=' ) ) {
+		$commission_settings = array( 'commissions' => $commission_settings );
+	}
 
 	return array_merge( $settings, $commission_settings );
 
