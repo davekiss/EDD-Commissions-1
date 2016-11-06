@@ -90,7 +90,7 @@ add_filter( 'edd_settings_extensions', 'eddc_settings_extensions' );
  * @return array
  */
 function eddc_settings_section_emails( $sections ) {
-	$sections['commissions'] = __( 'Commissions Notifications', 'eddc' );
+	$sections['commissions'] = __( 'Commission Notifications', 'eddc' );
 	return $sections;
 }
 
