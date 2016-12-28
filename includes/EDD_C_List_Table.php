@@ -56,9 +56,9 @@ class EDD_C_List_Table extends WP_List_Table {
 			case 'payment':
 				$payment = get_post_meta( $item['ID'], '_edd_commission_payment_id', true );
 				return $payment ? '<a href="' . esc_url( admin_url( 'edit.php?post_type=download&page=edd-payment-history&view=view-order-details&id=' . $payment ) ) . '" title="' . __( 'View payment details', 'eddc' ) . '">#' . $payment . '</a> - ' . edd_get_payment_status( get_post( $payment ), true  ) : '';
-			default:
-				return print_r( $item, true ); //Show the whole array for troubleshooting purposes
 		}
+
+		do_action( 'manage_edd_commissions_custom_column', $column_name, $item['ID'] );
 	}
 
 	function column_title( $item ) {
@@ -77,6 +77,7 @@ class EDD_C_List_Table extends WP_List_Table {
 		$actions['edit'] = sprintf( '<a href="%s&action=%s&commission=%s">' . __( 'Edit' ) . '</a>', $base, 'edit', $item['ID'] );
 		$actions['delete'] = sprintf( '<a href="%s&action=%s&commission=%s">' . __( 'Delete' ) . '</a>', $base, 'delete', $item['ID'] );
 
+		$actions = apply_filters( 'edd_commission_row_actions', $actions, $item );
 
 		$user = get_userdata( $item['user'] );
 
@@ -112,6 +113,9 @@ class EDD_C_List_Table extends WP_List_Table {
 			'status'    => __( 'Status', 'eddc' ),
 			'date'      => __( 'Date', 'eddc' )
 		);
+
+		$columns = apply_filters( 'manage_edd_commissions_columns', $columns );
+
 		return $columns;
 	}
 

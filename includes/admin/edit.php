@@ -7,6 +7,9 @@ $commission_info = get_post_meta( $commission, '_edd_commission_info', true);
 <form id="edit-field" method="post">
 	<table class="form-table">
 		<tbody>
+
+			<?php do_action( 'edd_commission_form_fields_top', $commission ); ?>
+
 			<tr class="form-field">
 				<th scope="row" valign="top">
 					<label for="user_id"><?php _e('User ID', 'eddc'); ?></label>
@@ -43,6 +46,9 @@ $commission_info = get_post_meta( $commission, '_edd_commission_info', true);
 					<p class="description"><?php _e('The total amount of this commission', 'eddc'); ?></p>
 				</td>
 			</tr>
+
+			<?php do_action( 'edd_commission_form_fields_bottom', $commission ); ?>
+
 		</tbody>
 	</table>
 	<p class="submit">
