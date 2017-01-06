@@ -66,6 +66,7 @@ include_once EDDC_PLUGIN_DIR . 'includes/post-type.php';
 include_once EDDC_PLUGIN_DIR . 'includes/user-meta.php';
 include_once EDDC_PLUGIN_DIR . 'includes/rest-api.php';
 include_once EDDC_PLUGIN_DIR . 'includes/short-codes.php';
+include_once EDDC_PLUGIN_DIR . 'includes/scripts.php';
 
 if ( is_admin() ) {
 
@@ -85,6 +86,7 @@ if ( is_admin() ) {
 	include_once EDDC_PLUGIN_DIR . 'includes/admin/upgrades.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/admin/customers.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/EDD_C_List_Table.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/admin/class.admin-notices.php';
 } else {
 	include_once EDDC_PLUGIN_DIR . 'includes/adaptive-payments.php';
 }

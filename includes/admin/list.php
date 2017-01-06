@@ -10,19 +10,6 @@
 
 
 function edd_commissions_page() {
-
-	$js_dir = EDD_PLUGIN_URL . 'assets/js/';
-	$css_dir = EDD_PLUGIN_URL . 'assets/css/';
-
-	// Use minified libraries if SCRIPT_DEBUG is turned off
-	$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-	wp_enqueue_script( 'jquery-ui-datepicker' );
-	wp_register_script( 'eddc-admin-scripts', EDDC_PLUGIN_URL . 'assets/js/admin-scripts' . $suffix . '.js', array( 'jquery' ), EDD_COMMISSIONS_VERSION, true );
-	wp_enqueue_script( 'eddc-admin-scripts' );
-
-	$ui_style = ( 'classic' == get_user_option( 'admin_color' ) ) ? 'classic' : 'fresh';
-	wp_enqueue_style( 'jquery-ui-css', $css_dir . 'jquery-ui-' . $ui_style . $suffix . '.css' );
-	wp_enqueue_style( 'eddc-admin-styles', EDDC_PLUGIN_URL . 'assets/css/admin-styles' . $suffix . '.css', EDD_COMMISSIONS_VERSION );
 	?>
 	<div class="wrap">
 

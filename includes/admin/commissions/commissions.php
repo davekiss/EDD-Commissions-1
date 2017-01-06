@@ -183,24 +183,55 @@ function eddc_commissions_view( $commission ) {
 			<div class="item-info">
 				<table class="widefat striped">
 					<tbody>
-						<tr>
-							<td class="row-title">
-								<label for="tablecell"><?php _e( 'Commission ID:', 'eddc' ); ?></label>
-							</td>
-							<td style="word-wrap: break-word">
-								<?php echo $commission_id; ?>
-							</td>
-						</tr>
+						<?php eddc_render_commission_info_rows( $commission_id ); ?>
 					</tbody>
 				</table>
-			</div>
-			<div id="item-edit-actions" class="edit-item" style="float: right; margin: 10px 0 0; display: block;">
-				<input type="submit" name="eddc_update_commission" id="eddc_update_commission" class="button button-primary" value="<?php _e( 'Update commission', 'eddc' ); ?>" />
-				<input type="hidden" name="commission_id" value="<?php echo absint( $commission->ID ); ?>" />
 			</div>
 		</form>
 	</div>
 
 	<?php
 	do_action( 'eddc_commission_card_bottom', $commission_id );
+}
+
+
+/**
+ * Delete a commission
+ *
+ * @since 3.3
+ * @param object $commission The commission being deleted
+ * @return void
+ */
+function eddc_commissions_delete_view( $commission ) {
+	$commission_id = $commission->ID;
+	?>
+
+	<div class="eddc-commission-delete-header">
+		<span><?php printf( __( 'Commission ID: %s', 'eddc' ), $commission_id ); ?></span>
+	</div>
+
+	<?php do_action( 'eddc_commissions_before_commission_delete', $commission_id ); ?>
+
+	<form id="delete-commission" method="post" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions&view=delete&commission=' . $commission_id ); ?>">
+		<div class="edd-item-info delete-commission">
+			<span class="delete-commission-options">
+				<p>
+					<?php echo EDD()->html->checkbox( array( 'name' => 'eddc-commission-delete-comfirm' ) ); ?>
+					<label for="eddc-commission-delete-comfirm"><?php _e( 'Are you sure you want to delete this commission?', 'eddc' ); ?></label>
+				</p>
+
+				<?php do_action( 'eddc_commissions_delete_inputs', $commission_id ); ?>
+			</span>
+
+			<span id="commission-edit-actions">
+				<input type="hidden" name="commission_id" value="<?php echo $commission_id; ?>" />
+				<?php wp_nonce_field( 'delete-commission', '_wpnonce', false, true ); ?>
+				<input type="hidden" name="edd_action" value="delete_commission" />
+				<input type="submit" disabled="disabled" id="eddc-delete-commission" class="button-primary" value="<?php _e( 'Delete Commission', 'eddc' ); ?>" />
+				<a id="eddc-delete-commission-cancel" href="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission_id ); ?>" class="delete"><?php _e( 'Cancel', 'eddc' ); ?></a>
+			</span>
+		</div>
+	</form>
+
+	<?php do_action( 'eddc_commissions_after_commission_delete', $commission_id );
 }

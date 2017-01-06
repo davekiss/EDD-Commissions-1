@@ -12,4 +12,13 @@ jQuery(document).ready(function($) {
 		window.scrollTo(0, 0);
 	});
 
+	$('#eddc-commission-delete-comfirm').change( function() {
+		var submit_button = $('#eddc-delete-commission');
+
+		if ( $(this).prop('checked') ) {
+			submit_button.attr('disabled', false);
+		} else {
+			submit_button.attr('disabled', true);
+		}
+	});
 });
