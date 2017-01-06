@@ -77,6 +77,9 @@ if ( is_admin() ) {
 	include_once EDDC_PLUGIN_DIR . 'includes/reports.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/settings.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/admin/list.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/admin/commissions/commissions.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/admin/commissions/commissions-actions.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/admin/commissions/commissions-functions.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/admin/metabox.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/admin/widgets.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/admin/upgrades.php';
