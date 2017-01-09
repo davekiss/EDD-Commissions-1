@@ -336,6 +336,7 @@ function eddc_commissions_view( $commission ) {
 				<input type="submit" name="eddc_update_commission" id="eddc_update_commission" class="button button-primary" value="<?php _e( 'Update Commission', 'eddc' ); ?>" />
 				<input type="hidden" name="commission_id" value="<?php echo absint( $commission_id ); ?>" />
 			</div>
+			<div class="clear"></div>
 		</form>
 	</div>
 
