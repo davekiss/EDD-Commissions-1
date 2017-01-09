@@ -149,7 +149,7 @@ function eddc_render_commission_view( $view, $callbacks ) {
 				</ul>
 			</div>
 
-			<div id="edd-item-card-wrapper" class="edd-sl-commission-card" style="float: left">
+			<div id="edd-item-card-wrapper" class="eddc-commission-card" style="float: left">
 				<?php $callbacks[$view]( $commission ) ?>
 			</div>
 		<?php endif; ?>
@@ -203,7 +203,7 @@ function eddc_commissions_view( $commission ) {
 					<tbody>
 						<tr>
 							<td class="row-title">
-								<label for="tablecell"><?php echo __( 'Commission ID', 'eddc' ); ?></label>
+								<label for="tablecell"><?php _e( 'Commission ID', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
 								<?php echo $commission_id; ?>
@@ -211,7 +211,7 @@ function eddc_commissions_view( $commission ) {
 						</tr>
 						<tr>
 							<td class="row-title">
-								<label for="tablecell"><?php echo __( 'Payment', 'eddc' ); ?></label>
+								<label for="tablecell"><?php _e( 'Payment', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
 								<?php echo $payment ? '<a href="' . esc_url( admin_url( 'edit.php?post_type=download&page=edd-payment-history&view=view-order-details&id=' . $payment ) ) . '" title="' . __( 'View payment details', 'eddc' ) . '">#' . $payment . '</a> - ' . edd_get_payment_status( get_post( $payment ), true  ) : ''; ?>
@@ -219,7 +219,7 @@ function eddc_commissions_view( $commission ) {
 						</tr>
 						<tr>
 							<td class="row-title">
-								<label for="tablecell"><?php echo __( 'Status', 'eddc' ); ?></label>
+								<label for="tablecell"><?php _e( 'Status', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
 								<?php echo eddc_get_commission_status( $commission_id ); ?>
@@ -227,7 +227,7 @@ function eddc_commissions_view( $commission ) {
 						</tr>
 						<tr>
 							<td class="row-title">
-								<label for="tablecell"><?php echo __( 'Purchase Date', 'eddc' ); ?></label>
+								<label for="tablecell"><?php _e( 'Purchase Date', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
 								<?php echo date_i18n( get_option( 'date_format' ), strtotime( get_post_field( 'post_date', $commission_id ) ) ); ?>
@@ -235,44 +235,61 @@ function eddc_commissions_view( $commission ) {
 						</tr>
 						<tr>
 							<td class="row-title">
-								<label for="tablecell"><?php echo __( 'User', 'eddc' ); ?></label>
+								<label for="tablecell"><?php _e( 'User', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
 								<?php
 								if ( false !== $user_data ) {
-									echo '<a href="' . esc_url( add_query_arg( 'user', $user_data->ID ) ) . '" title="' . __( 'View all commissions for this user', 'eddc' ) . '"">' . $user_data->display_name . '</a>';
+									echo '<a href="' . esc_url( add_query_arg( 'user', $user_data->ID ) ) . '" title="' . __( 'View all commissions for this user', 'eddc' ) . '"">' . $user_data->display_name . '</a>&nbsp;(' . __( 'ID:', 'eddc' ) . ' ' . $commission_info['user_id'] . ')';
 								} else {
 									echo '<em>' . __( 'Invalid User', 'eddc' ) . '</em>';
 								}
 								?>
+								<input type="text" name="eddc_user" class="hidden eddc-commission-user" value="<?php echo esc_attr( $commission_info['user_id'] ); ?>" />
+								<span>&nbsp;&ndash;&nbsp;</span>
+								<a href="#" class="eddc-edit-commission-user"><?php _e( 'Edit', 'eddc' ); ?></a>
 							</td>
 						</tr>
 						<tr>
 							<td class="row-title">
-								<label for="tablecell"><?php echo __( 'Download', 'eddc' ); ?></label>
+								<label for="tablecell"><?php _e( 'Download', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
 								<?php echo ! empty( $download ) ? '<a href="' . esc_url( add_query_arg( 'download', $download ) ) . '" title="' . __( 'View all commissions for this item', 'eddc' ) . '">' . get_the_title( $download ) . '</a>' . ( ! empty( $variation ) ? ' - ' . $variation : '') : '' ?>
+								<input type="text" name="eddc_download" class="hidden eddc-commission-download" value="<?php echo esc_attr( $download ); ?>" />
+								<span>&nbsp;&ndash;&nbsp;</span>
+								<a href="#" class="eddc-edit-commission-download"><?php _e( 'Edit', 'eddc' ); ?></a>
 							</td>
 						</tr>
 						<tr>
 							<td class="row-title">
-								<label for="tablecell"><?php echo __( 'Rate', 'eddc' ); ?></label>
+								<label for="tablecell"><?php _e( 'Rate', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
 								<?php echo $rate; ?>
+								<input type="text" name="eddc_rate" class="hidden eddc-commission-rate" value="<?php echo esc_attr( $commission_info['rate'] ); ?>" />
+								<span>&nbsp;&ndash;&nbsp;</span>
+								<a href="#" class="eddc-edit-commission-rate"><?php _e( 'Edit', 'eddc' ); ?></a>
 							</td>
 						</tr>
 						<tr>
 							<td class="row-title">
-								<label for="tablecell"><?php echo __( 'Amount', 'eddc' ); ?></label>
+								<label for="tablecell"><?php _e( 'Amount', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
 								<?php echo edd_currency_filter( edd_format_amount( $commission_info['amount'] ) ); ?>
+								<input type="text" name="eddc_amount" class="hidden eddc-commission-amount" value="<?php echo edd_format_amount( $commission_info['amount'] ); ?>" />
+								<span>&nbsp;&ndash;&nbsp;</span>
+								<a href="#" class="eddc-edit-commission-amount"><?php _e( 'Edit', 'eddc' ); ?></a>
 							</td>
 						</tr>
 					</tbody>
 				</table>
+			</div>
+			<div id="item-edit-actions" class="edit-item" style="float: right; margin: 10px 0 0; display: block;">
+				<?php wp_nonce_field( 'eddc_update_commission', 'eddc_update_commission_nonce' ); ?>
+				<input type="submit" name="eddc_update_commission" id="eddc_update_commission" class="button button-primary" value="<?php _e( 'Update Commission', 'eddc' ); ?>" />
+				<input type="hidden" name="commission_id" value="<?php echo absint( $commission_id ); ?>" />
 			</div>
 		</form>
 	</div>

@@ -35,6 +35,11 @@ class EDDC_Admin_Notices {
 
 				break;
 
+			case 'update' :
+
+				$message = __( 'Commission updated successfully', 'eddc' );
+
+				break;
 		}
 
 		if ( ! empty( $message ) ) {

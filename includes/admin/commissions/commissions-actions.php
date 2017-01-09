@@ -20,6 +20,49 @@ add_action( 'admin_menu', 'eddc_add_commissions_link', 10 );
 
 
 /**
+ * Update a commission
+ *
+ * @since 3.3
+ * @return void
+ */
+function eddc_update_commission() {
+	if ( ! current_user_can( 'edit_shop_payments' ) ) {
+		return;
+	}
+
+	if ( ! isset( $_POST['eddc_user'] ) && ! isset( $_POST['eddc_download'] ) && ! isset( $_POST['eddc_rate'] ) && ! isset( $_POST['eddc_amount'] ) ) {
+		return;
+	}
+
+	if ( ! wp_verify_nonce( $_POST['eddc_update_commission_nonce'], 'eddc_update_commission' ) ) {
+		wp_die( __( 'Nonce verification failed', 'eddc' ), __( 'Error', 'eddc' ), array( 'response' => 403 ) );
+	}
+
+	$commission_id   = (int) $_POST['commission_id'];
+	$commission_data = get_post_meta( $commission_id, '_edd_commission_info', true);
+
+	$rate = str_replace( '%', '', $_POST['eddc_rate'] );
+	if ( $rate < 1 ) {
+		$rate = $rate * 100;
+	}
+
+	$amount = str_replace( '%', '', $_POST['eddc_amount'] );
+
+	$commission_data['rate']    = (float) $rate;
+	$commission_data['amount']  = (float) $amount;
+	$commission_data['user_id'] = absint( $_POST['eddc_user'] );
+
+	update_post_meta( $commission_id, '_edd_commission_info', $commission_data );
+	update_post_meta( $commission_id, '_user_id', absint( $_POST['eddc_user'] ) );
+	update_post_meta( $commission_id, '_download_id', absint( $_POST['eddc_download'] ) );
+
+	wp_redirect( add_query_arg( array( 'edd-message' => 'update' ) ) );
+	exit;
+}
+add_action( 'admin_init', 'eddc_update_commission', 1 );
+
+
+/**
  * Delete a commission
  *
  * @since 3.3

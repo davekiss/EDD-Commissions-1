@@ -15,11 +15,7 @@ function edd_commissions_page() {
 
 		<?php
 
-		if( isset( $_GET['action'] ) && $_GET['action'] == 'edit' ) {
-
-			include( EDDC_PLUGIN_DIR . 'includes/admin/edit.php' );
-
-		} elseif( isset( $_GET['action'] ) && $_GET['action'] == 'add' ) {
+		if( isset( $_GET['action'] ) && $_GET['action'] == 'add' ) {
 
 			include( EDDC_PLUGIN_DIR . 'includes/admin/add.php' );
 
@@ -129,41 +125,6 @@ function edd_commissions_page() {
 	<?php
 
 }
-
-/**
- * Update a Commission
- *
- * @access      private
- * @since       1.2.0
- * @return      void
- */
-
-function eddc_update_commission( $data ) {
-	if ( wp_verify_nonce( $data['eddc_edit_nonce'], 'eddc_edit_nonce' ) ) {
-
-		$id = absint( $data['commission'] );
-
-		$commission_data = get_post_meta( $id, '_edd_commission_info', true );
-
-		$rate = str_replace( '%', '', $data['rate'] );
-		if ( $rate < 1 )
-			$rate = $rate * 100;
-
-		$amount = str_replace( '%', '', $data['amount'] );
-
-		$commission_data['rate'] = (float)$rate;
-		$commission_data['amount'] = (float) $amount;
-		$commission_data['user_id'] = absint( $data['user_id'] );
-
-		update_post_meta( $id, '_edd_commission_info', $commission_data );
-		update_post_meta( $id, '_user_id', absint( $data['user_id'] ) );
-		update_post_meta( $id, '_download_id', absint( $data['download_id'] ) );
-
-		wp_redirect( admin_url( 'edit.php?post_type=download&page=edd-commissions' ) ); exit;
-
-	}
-}
-add_action( 'edd_edit_commission', 'eddc_update_commission' );
 
 
 /**

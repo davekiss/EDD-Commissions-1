@@ -29,6 +29,10 @@ function eddc_admin_scripts() {
 	wp_enqueue_script( 'jquery-ui-datepicker' );
 	wp_register_script( 'eddc-admin-scripts', EDDC_PLUGIN_URL . 'assets/js/admin-scripts' . $suffix . '.js', array( 'jquery' ), EDD_COMMISSIONS_VERSION );
 	wp_enqueue_script( 'eddc-admin-scripts' );
+	wp_localize_script( 'eddc-admin-scripts', 'eddc_vars', array(
+		'action_edit'   => __( 'Edit', 'eddc' ),
+		'action_cancel' => __( 'Cancel', 'eddc' )
+	));
 
 	$ui_style = ( 'classic' == get_user_option( 'admin_color' ) ) ? 'classic' : 'fresh';
 	wp_enqueue_style( 'jquery-ui-css', $css_dir . 'jquery-ui-' . $ui_style . $suffix . '.css' );
