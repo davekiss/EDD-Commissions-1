@@ -20,7 +20,50 @@ add_action( 'admin_menu', 'eddc_add_commissions_link', 10 );
 
 
 /**
- * Update a commission
+ * Process commission actions for single view
+ *
+ * @since 3.3
+ * @return void
+ */
+function eddc_process_commission_update() {
+	if ( empty( $_GET['commission'] ) || empty( $_GET['action'] ) ) {
+		return;
+	}
+
+	if ( ! current_user_can( 'edit_shop_payments' ) ) {
+		return;
+	}
+
+	if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'eddc_commission_nonce' ) ) {
+		return;
+	}
+
+	$action = sanitize_text_field( $_GET['action'] );
+	$id     = absint( $_GET['commission'] );
+
+	switch( $action ) {
+		case 'mark_as_paid':
+			eddc_set_commission_status( $id, 'paid' );
+			break;
+		case 'mark_as_unpaid':
+			eddc_set_commission_status( $id, 'unpaid' );
+			break;
+		case 'mark_as_revoked':
+			eddc_set_commission_status( $id, 'revoked' );
+			break;
+		case 'mark_as_accepted':
+			eddc_set_commission_status( $id, 'unpaid' );
+			break;
+	}
+
+	wp_redirect( add_query_arg( array( 'action' => false, '_wpnonce' => false, 'edd-message' => $action ) ) );
+	exit;
+}
+add_action( 'admin_init', 'eddc_process_commission_update', 1 );
+
+
+/**
+ * Update commission data
  *
  * @since 3.3
  * @return void

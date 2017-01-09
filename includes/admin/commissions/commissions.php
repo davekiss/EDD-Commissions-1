@@ -179,6 +179,7 @@ function eddc_commissions_view( $commission ) {
 	$payment         = get_post_meta( $commission_id, '_edd_commission_payment_id', true );
 	$download        = get_post_meta( $commission_id, '_download_id', true );
 	$type            = eddc_get_commission_type( $download );
+	$status          = eddc_get_commission_status( $commission_id );
 
 	$child_args      = array(
 		'post_type'      => 'edd_commission',
@@ -227,7 +228,7 @@ function eddc_commissions_view( $commission ) {
 								<label for="tablecell"><?php _e( 'Status', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
-								<?php echo eddc_get_commission_status( $commission_id ); ?>
+								<?php echo $status; ?>
 							</td>
 						</tr>
 						<tr>
@@ -288,6 +289,45 @@ function eddc_commissions_view( $commission ) {
 								<a href="#" class="eddc-edit-commission-amount"><?php _e( 'Edit', 'eddc' ); ?></a>
 							</td>
 						</tr>
+						<tr>
+							<td class="row-title">
+								<label for="tablecell"><?php _e( 'Actions:', 'eddc' ); ?></label>
+							</td>
+							<td class="eddc-commission-card-actions">
+								<?php
+								$actions = array();
+								$base    = admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission_id );
+								$base    = wp_nonce_url( $base, 'eddc_commission_nonce' );
+
+								if ( $status == 'revoked' ) {
+									$actions['mark_as_accepted'] = sprintf( '<a href="%s&action=%s">' . __( 'Accept', 'eddc' ) . '</a>', $base, 'mark_as_accepted' );
+								} elseif ( $status == 'paid' ) {
+									$actions['mark_as_unpaid'] = sprintf( '<a href="%s&action=%s">' . __( 'Mark as Unpaid', 'eddc' ) . '</a>', $base, 'mark_as_unpaid' );
+								} else {
+									$actions['mark_as_paid'] = sprintf( '<a href="%s&action=%s">' . __( 'Mark as Paid', 'eddc' ) . '</a>', $base, 'mark_as_paid' );
+									$actions['mark_as_revoked'] = sprintf( '<a href="%s&action=%s">' . __( 'Revoke', 'eddc' ) . '</a>', $base, 'mark_as_revoked' );
+								}
+
+								$actions = apply_filters( 'eddc_commission_details_actions', $actions, $commission_id );
+
+								if ( ! empty( $actions ) ) {
+									$count = count( $actions );
+									$i     = 1;
+
+									foreach ( $actions as $action ) {
+										echo $action;
+
+										if ( $i < $count ) {
+											echo '&nbsp;|&nbsp;';
+											$i++;
+										}
+									}
+								} else {
+									_e( 'No actions available for this commission', 'eddc' );
+								}
+								?>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 			</div>
@@ -316,7 +356,7 @@ function eddc_commissions_delete_view( $commission ) {
 		echo '<div class="info-wrapper item-section">' . __( 'Invalid commission specified.', 'eddc' ) . '</div>';
 		return;
 	}
-	
+
 	$commission_id = $commission->ID;
 	?>
 

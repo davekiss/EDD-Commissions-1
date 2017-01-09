@@ -40,6 +40,30 @@ class EDDC_Admin_Notices {
 				$message = __( 'Commission updated successfully', 'eddc' );
 
 				break;
+
+			case 'mark_as_paid' :
+
+				$message = __( 'Commission marked as paid', 'eddc' );
+
+				break;
+
+			case 'mark_as_unpaid' :
+
+				$message = __( 'Commission marked as unpaid', 'eddc' );
+
+				break;
+
+			case 'mark_as_revoked' :
+
+				$message = __( 'Commission marked as revoked', 'eddc' );
+
+				break;
+
+			case 'mark_as_accepted' :
+
+				$message = __( 'Commission marked as accepted', 'eddc' );
+
+				break;
 		}
 
 		if ( ! empty( $message ) ) {
