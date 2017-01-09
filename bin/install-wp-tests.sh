@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ $# -lt 3 ]; then
-	echo "usage: $0 <db-name> <db-user> <db-pass> [db-host] [wp-version]"
+	echo "usage: $0 <db-name> <db-user> <db-pass> [db-host] [wp-version] [force download]"
 	exit 1
 fi
 
@@ -10,6 +10,7 @@ DB_USER=$2
 DB_PASS=$3
 DB_HOST=${4-localhost}
 WP_VERSION=${5-latest}
+FORCE=${6-false}
 
 WP_TESTS_DIR=${WP_TESTS_DIR-/tmp/wordpress-tests-lib}
 WP_CORE_DIR=${WP_CORE_DIR-/tmp/wordpress/}
@@ -36,9 +37,17 @@ else
 	WP_TESTS_TAG="tags/$LATEST_VERSION"
 fi
 
+if [[ $WP_TESTS_TAG == *"beta"* ]]
+then
+	WP_TESTS_TAG="trunk"
+fi
+
 set -ex
 
 install_wp() {
+	if [ $FORCE == 'true' ]; then
+		rm -Rf $WP_CORE_DIR
+	fi
 
 	if [ -d $WP_CORE_DIR ]; then
 		return;
@@ -59,6 +68,10 @@ install_wp() {
 }
 
 install_test_suite() {
+	if [ $FORCE == 'true' ]; then
+		rm -Rf $WP_TESTS_DIR
+	fi
+
 	# portable in-place argument for both GNU sed and Mac OSX sed
 	if [[ $(uname -s) == 'Darwin' ]]; then
 		local ioption='-i .bak'
@@ -108,8 +121,10 @@ install_db() {
 }
 
 install_edd() {
+	echo "Installing EDD"
+
 	wget -O /tmp/edd.zip https://github.com/easydigitaldownloads/Easy-Digital-Downloads/archive/master.zip
-	unzip -q /tmp/edd.zip -d $WP_CORE_DIR/wp-content/plugins/
+	unzip -qq /tmp/edd.zip -d $WP_CORE_DIR/wp-content/plugins/
 	mv $WP_CORE_DIR/wp-content/plugins/easy-digital-downloads-master $WP_CORE_DIR/wp-content/plugins/easy-digital-downloads
 }
 install_wp
