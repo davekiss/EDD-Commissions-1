@@ -133,7 +133,7 @@ function eddc_render_add_commission_view() {
 									</td>
 									<td style="word-wrap: break-word">
 										<?php echo EDD()->html->user_dropdown( array( 'id' => 'user_id', 'name' => 'user_id' ) ); ?>
-										<p class="description"><?php _e('The ID of the user that received this commission', 'eddc'); ?></p>
+										<p class="description"><?php _e('The ID of the user that received this commission.', 'eddc'); ?></p>
 									</td>
 								</tr>
 								<tr>
@@ -142,7 +142,7 @@ function eddc_render_add_commission_view() {
 									</td>
 									<td style="word-wrap: break-word">
 										<?php echo EDD()->html->product_dropdown( array( 'id' => 'download_id', 'name' => 'download_id', 'chosen' => true, 'variations' => true ) ); ?>
-										<p class="description"><?php _e('The ID of the product this commission was for', 'eddc'); ?></p>
+										<p class="description"><?php _e('The ID of the product this commission was for.', 'eddc'); ?></p>
 									</td>
 								</tr>
 								<tr>
@@ -160,7 +160,7 @@ function eddc_render_add_commission_view() {
 									</td>
 									<td style="word-wrap: break-word">
 										<input type="text" id="rate" name="rate" value=""/>
-										<p class="description"><?php _e('The percentage rate of this commission', 'eddc'); ?></p>
+										<p class="description"><?php _e('The percentage rate of this commission.', 'eddc'); ?></p>
 									</td>
 								</tr>
 								<tr>
@@ -169,7 +169,7 @@ function eddc_render_add_commission_view() {
 									</td>
 									<td style="word-wrap: break-word">
 										<input type="text" id="amount" name="amount" value=""/>
-										<p class="description"><?php _e('The total amount of this commission', 'eddc'); ?></p>
+										<p class="description"><?php _e('The total amount of this commission.', 'eddc'); ?></p>
 									</td>
 								</tr>
 							</table>
