@@ -29,6 +29,12 @@ class EDDC_Admin_Notices {
 
 		switch( strtolower( $_GET['edd-message'] ) ) {
 
+			case 'add' :
+
+				$message = __( 'Commission added successfully', 'eddc' );
+
+				break;
+
 			case 'delete' :
 
 				$message = __( 'Commission deleted successfully', 'eddc' );
