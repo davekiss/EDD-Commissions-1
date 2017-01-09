@@ -166,6 +166,11 @@ function eddc_render_commission_view( $view, $callbacks ) {
  * @return void
  */
 function eddc_commissions_view( $commission ) {
+	if ( ! $commission ) {
+		echo '<div class="info-wrapper item-section">' . __( 'Invalid commission specified.', 'eddc' ) . '</div>';
+		return;
+	}
+
 	$base            = admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission->ID );
 	$base            = wp_nonce_url( $base, 'eddc_commission_nonce' );
 	$commission_id   = $commission->ID;
@@ -307,6 +312,11 @@ function eddc_commissions_view( $commission ) {
  * @return void
  */
 function eddc_commissions_delete_view( $commission ) {
+	if ( ! $commission ) {
+		echo '<div class="info-wrapper item-section">' . __( 'Invalid commission specified.', 'eddc' ) . '</div>';
+		return;
+	}
+	
 	$commission_id = $commission->ID;
 	?>
 
