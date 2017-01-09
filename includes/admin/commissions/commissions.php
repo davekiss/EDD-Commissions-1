@@ -166,15 +166,33 @@ function eddc_render_commission_view( $view, $callbacks ) {
  * @return void
  */
 function eddc_commissions_view( $commission ) {
-	$base           = admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission->ID );
-	$base           = wp_nonce_url( $base, 'eddc_commission_nonce' );
-	$commission_id  = $commission->ID;
-	$child_args     = array(
+	$base            = admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission->ID );
+	$base            = wp_nonce_url( $base, 'eddc_commission_nonce' );
+	$commission_id   = $commission->ID;
+	$commission_info = get_post_meta( $commission_id, '_edd_commission_info', true );
+	$user_data       = get_userdata( $commission_info['user_id'] );
+	$payment         = get_post_meta( $commission_id, '_edd_commission_payment_id', true );
+	$download        = get_post_meta( $commission_id, '_download_id', true );
+	$type            = eddc_get_commission_type( $download );
+
+	$child_args      = array(
 		'post_type'      => 'edd_commission',
 		'post_status'    => array( 'publish', 'future' ),
 		'posts_per_page' => -1,
 		'post_parent'    => $commission_id
 	);
+
+	$has_variable_prices = edd_has_variable_prices( $download );
+	$variation           = false;
+	if ( $has_variable_prices ) {
+		$variation = get_post_meta( $commission_id, '_edd_commission_download_variation', true );
+	}
+
+	if ( 'percentage' == $type ) {
+		$rate = $commission_info['rate'] . '%';
+	} else {
+		$rate = edd_currency_filter( edd_sanitize_amount( $commission_info['rate'] ) );
+	}
 
 	do_action( 'eddc_commission_card_top', $commission_id );
 	?>
@@ -183,7 +201,76 @@ function eddc_commissions_view( $commission ) {
 			<div class="item-info">
 				<table class="widefat striped">
 					<tbody>
-						<?php eddc_render_commission_info_rows( $commission_id ); ?>
+						<tr>
+							<td class="row-title">
+								<label for="tablecell"><?php echo __( 'Commission ID', 'eddc' ); ?></label>
+							</td>
+							<td style="word-wrap: break-word">
+								<?php echo $commission_id; ?>
+							</td>
+						</tr>
+						<tr>
+							<td class="row-title">
+								<label for="tablecell"><?php echo __( 'Payment', 'eddc' ); ?></label>
+							</td>
+							<td style="word-wrap: break-word">
+								<?php echo $payment ? '<a href="' . esc_url( admin_url( 'edit.php?post_type=download&page=edd-payment-history&view=view-order-details&id=' . $payment ) ) . '" title="' . __( 'View payment details', 'eddc' ) . '">#' . $payment . '</a> - ' . edd_get_payment_status( get_post( $payment ), true  ) : ''; ?>
+							</td>
+						</tr>
+						<tr>
+							<td class="row-title">
+								<label for="tablecell"><?php echo __( 'Status', 'eddc' ); ?></label>
+							</td>
+							<td style="word-wrap: break-word">
+								<?php echo eddc_get_commission_status( $commission_id ); ?>
+							</td>
+						</tr>
+						<tr>
+							<td class="row-title">
+								<label for="tablecell"><?php echo __( 'Purchase Date', 'eddc' ); ?></label>
+							</td>
+							<td style="word-wrap: break-word">
+								<?php echo date_i18n( get_option( 'date_format' ), strtotime( get_post_field( 'post_date', $commission_id ) ) ); ?>
+							</td>
+						</tr>
+						<tr>
+							<td class="row-title">
+								<label for="tablecell"><?php echo __( 'User', 'eddc' ); ?></label>
+							</td>
+							<td style="word-wrap: break-word">
+								<?php
+								if ( false !== $user_data ) {
+									echo '<a href="' . esc_url( add_query_arg( 'user', $user_data->ID ) ) . '" title="' . __( 'View all commissions for this user', 'eddc' ) . '"">' . $user_data->display_name . '</a>';
+								} else {
+									echo '<em>' . __( 'Invalid User', 'eddc' ) . '</em>';
+								}
+								?>
+							</td>
+						</tr>
+						<tr>
+							<td class="row-title">
+								<label for="tablecell"><?php echo __( 'Download', 'eddc' ); ?></label>
+							</td>
+							<td style="word-wrap: break-word">
+								<?php echo ! empty( $download ) ? '<a href="' . esc_url( add_query_arg( 'download', $download ) ) . '" title="' . __( 'View all commissions for this item', 'eddc' ) . '">' . get_the_title( $download ) . '</a>' . ( ! empty( $variation ) ? ' - ' . $variation : '') : '' ?>
+							</td>
+						</tr>
+						<tr>
+							<td class="row-title">
+								<label for="tablecell"><?php echo __( 'Rate', 'eddc' ); ?></label>
+							</td>
+							<td style="word-wrap: break-word">
+								<?php echo $rate; ?>
+							</td>
+						</tr>
+						<tr>
+							<td class="row-title">
+								<label for="tablecell"><?php echo __( 'Amount', 'eddc' ); ?></label>
+							</td>
+							<td style="word-wrap: break-word">
+								<?php echo edd_currency_filter( edd_format_amount( $commission_info['amount'] ) ); ?>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 			</div>
