@@ -30,7 +30,7 @@ jQuery(document).ready(function($) {
 
 		eddc_edit_commission_item(link, user_input);
 
-		$('.eddc-commission-user').toggle();
+		$('#eddc_user_chosen').toggle();
 	});
 
 	$('.eddc-commission-user').on('change', function() {
@@ -45,7 +45,7 @@ jQuery(document).ready(function($) {
 
 		eddc_edit_commission_item(link, user_input);
 
-		$('.eddc-commission-download').toggle();
+		$('#eddc_download_chosen').toggle();
 	});
 
 	$('.eddc-commission-download').on('change', function() {

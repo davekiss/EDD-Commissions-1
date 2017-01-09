@@ -132,7 +132,7 @@ function eddc_render_add_commission_view() {
 										<label for="user_id"><?php _e('User ID', 'eddc'); ?></label>
 									</td>
 									<td style="word-wrap: break-word">
-										<input type="text" id="user_id" name="user_id" value=""/>
+										<?php echo EDD()->html->user_dropdown( array( 'id' => 'user_id', 'name' => 'user_id' ) ); ?>
 										<p class="description"><?php _e('The ID of the user that received this commission', 'eddc'); ?></p>
 									</td>
 								</tr>
@@ -141,7 +141,7 @@ function eddc_render_add_commission_view() {
 										<label for="download_id"><?php _e('Download ID', 'eddc'); ?></label>
 									</td>
 									<td style="word-wrap: break-word">
-										<input type="text" id="download_id" name="download_id" value=""/>
+										<?php echo EDD()->html->product_dropdown( array( 'id' => 'download_id', 'name' => 'download_id', 'chosen' => true, 'variations' => true ) ); ?>
 										<p class="description"><?php _e('The ID of the product this commission was for', 'eddc'); ?></p>
 									</td>
 								</tr>
@@ -345,7 +345,7 @@ function eddc_commissions_view( $commission ) {
 									echo '<em>' . __( 'Invalid User', 'eddc' ) . '</em>';
 								}
 								?>
-								<input type="text" name="eddc_user" class="hidden eddc-commission-user" value="<?php echo esc_attr( $commission_info['user_id'] ); ?>" />
+								<?php echo EDD()->html->user_dropdown( array( 'class' => 'eddc-commission-user', 'id' => 'eddc_user', 'name' => 'eddc_user', 'selected' => esc_attr( $commission_info['user_id'] ) ) ); ?>
 								<span>&nbsp;&ndash;&nbsp;</span>
 								<a href="#" class="eddc-edit-commission-user"><?php _e( 'Edit', 'eddc' ); ?></a>
 							</td>
@@ -355,8 +355,11 @@ function eddc_commissions_view( $commission ) {
 								<label for="tablecell"><?php _e( 'Download', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
-								<?php echo ! empty( $download ) ? '<a href="' . esc_url( add_query_arg( 'download', $download ) ) . '" title="' . __( 'View all commissions for this item', 'eddc' ) . '">' . get_the_title( $download ) . '</a>' . ( ! empty( $variation ) ? ' - ' . $variation : '') : '' ?>
-								<input type="text" name="eddc_download" class="hidden eddc-commission-download" value="<?php echo esc_attr( $download ); ?>" />
+								<?php
+								$selected = ! empty( $download ) ? $download . ( ! empty( $variation ) ? '_' . $variation : '' ) : '';
+								echo ! empty( $download ) ? '<a href="' . esc_url( add_query_arg( 'download', $download ) ) . '" title="' . __( 'View all commissions for this item', 'eddc' ) . '">' . get_the_title( $download ) . '</a>' . ( ! empty( $variation ) ? ' - ' . $variation : '') : '';
+								echo EDD()->html->product_dropdown( array( 'class' => 'eddc-commission-download', 'id' => 'eddc_download', 'name' => 'eddc_download', 'chosen' => true, 'variations' => true, 'selected' => $selected ) );
+								?>
 								<span>&nbsp;&ndash;&nbsp;</span>
 								<a href="#" class="eddc-edit-commission-download"><?php _e( 'Edit', 'eddc' ); ?></a>
 							</td>

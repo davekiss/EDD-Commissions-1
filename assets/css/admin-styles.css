@@ -46,6 +46,10 @@
 	display: none;
 }
 
+#eddc_user_chosen, #eddc_download_chosen {
+	display: none;
+}
+
 .edd-item-info.delete-commission {
 	text-align: center;
 	margin-top: 5px;
