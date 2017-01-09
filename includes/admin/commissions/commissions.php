@@ -15,7 +15,9 @@ function eddc_commissions_page() {
 	$default_views  = eddc_commission_views();
 	$requested_view = isset( $_GET['view'] ) ? sanitize_text_field( $_GET['view'] ) : 'commissions';
 
-	if ( array_key_exists( $requested_view, $default_views ) && function_exists( $default_views[$requested_view] ) ) {
+	if ( $requested_view == 'add' ) {
+		eddc_render_add_commission_view();
+	} elseif ( array_key_exists( $requested_view, $default_views ) && function_exists( $default_views[$requested_view] ) ) {
 		eddc_render_commission_view( $requested_view, $default_views );
 	} else {
 		eddc_commissions_list();
@@ -58,7 +60,10 @@ function eddc_commissions_list() {
 	<div class="wrap">
 
 		<div id="icon-edit" class="icon32"><br/></div>
-		<h2><?php _e( 'Easy Digital Download Commissions', 'eddc' ); ?></h2>
+		<h2>
+			<?php _e( 'Easy Digital Download Commissions', 'eddc' ); ?>
+			<a href="<?php echo esc_url( add_query_arg( array( 'view' => 'add' ) ) ); ?>" class="add-new-h2"><?php _e( 'Add New', 'eddc' ); ?></a>
+		</h2>
 
 		<style>
 			.column-status, .column-count { width: 100px; }
@@ -95,9 +100,98 @@ function eddc_commissions_list() {
 
 
 /**
+ * Renders the add commission view
+ *
+ * @since 3.3
+ * @return void
+ */
+function eddc_render_add_commission_view() {
+	$render = true;
+
+	if( ! current_user_can( 'edit_shop_payments' ) ) {
+		edd_set_error( 'edd-no-access', __( 'You are not permitted to add commissions.', 'eddc' ) );
+		$render = false;
+	}
+	?>
+	<div class="wrap">
+		<h2><?php _e( 'Commission Details', 'eddc' ); ?></h2>
+		<?php if( edd_get_errors() ) : ?>
+			<div class="error settings-error">
+				<?php edd_print_errors(); ?>
+			</div>
+		<?php endif; ?>
+
+		<?php if( $render ) : ?>
+			<div id="edd-item-card-wrapper" class="eddc-commission-card" style="float: left">
+				<div class="info-wrapper item-section">
+					<form id="add-item-info" method="post" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions' ); ?>">
+						<div class="item-info">
+							<table class="widefat striped">
+								<tr>
+									<td class="row-title">
+										<label for="user_id"><?php _e('User ID', 'eddc'); ?></label>
+									</td>
+									<td style="word-wrap: break-word">
+										<input type="text" id="user_id" name="user_id" value=""/>
+										<p class="description"><?php _e('The ID of the user that received this commission', 'eddc'); ?></p>
+									</td>
+								</tr>
+								<tr>
+									<td class="row-title">
+										<label for="download_id"><?php _e('Download ID', 'eddc'); ?></label>
+									</td>
+									<td style="word-wrap: break-word">
+										<input type="text" id="download_id" name="download_id" value=""/>
+										<p class="description"><?php _e('The ID of the product this commission was for', 'eddc'); ?></p>
+									</td>
+								</tr>
+								<tr>
+									<td class="row-title">
+										<label for="payment_id_id"><?php _e('Payment ID', 'eddc'); ?></label>
+									</td>
+									<td style="word-wrap: break-word">
+										<input type="text" id="payment_id_id" name="payment_id_id" value=""/>
+										<p class="description"><?php _e('The payment ID this commission is related to (optional).', 'eddc'); ?></p>
+									</td>
+								</tr>
+								<tr>
+									<td class="row-title">
+										<label for="rate"><?php _e('Rate', 'eddc'); ?></label>
+									</td>
+									<td style="word-wrap: break-word">
+										<input type="text" id="rate" name="rate" value=""/>
+										<p class="description"><?php _e('The percentage rate of this commission', 'eddc'); ?></p>
+									</td>
+								</tr>
+								<tr>
+									<td class="row-title">
+										<label for="amount"><?php _e('Amount', 'eddc'); ?></label>
+									</td>
+									<td style="word-wrap: break-word">
+										<input type="text" id="amount" name="amount" value=""/>
+										<p class="description"><?php _e('The total amount of this commission', 'eddc'); ?></p>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div id="item-edit-actions" class="edit-item" style="float: right; margin: 10px 0 0; display: block;">
+							<?php wp_nonce_field( 'eddc_add_commission', 'eddc_add_commission_nonce' ); ?>
+							<input type="submit" name="eddc_add_commission" id="eddc_add_commission" class="button button-primary" value="<?php _e( 'Add Commission', 'eddc' ); ?>" />
+						</div>
+						<div class="clear"></div>
+					</form>
+				</div>
+			</div>
+		<?php endif; ?>
+	</div>
+	<?php
+}
+
+
+/**
  * Renders the commission view wrapper
  *
- * @since  3.5
+ * @since  3.3
  * @param  string $view      The View being requested
  * @param  array $callbacks  The Registered views and their callback functions
  * @return void

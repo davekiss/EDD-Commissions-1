@@ -20,6 +20,57 @@ add_action( 'admin_menu', 'eddc_add_commissions_link', 10 );
 
 
 /**
+ * Add a Commission
+ *
+ * @since       2.9
+ * @return      void
+ */
+function eddc_add_manual_commission() {
+	if ( ! isset( $_POST['eddc_add_commission_nonce'] ) || ! wp_verify_nonce( $_POST['eddc_add_commission_nonce'], 'eddc_add_commission' ) ) {
+		return;
+	}
+
+	if( ! current_user_can( 'edit_shop_payments' ) ) {
+		wp_die( __( 'You do not have permission to record commissions', 'eddc' ) );
+	}
+
+	$user_info   = get_userdata( $_POST['user_id'] );
+	$download_id = absint( $_POST['download_id'] );
+	$payment_id  = isset( $_POST['payment_id'] ) ? absint( $_POST['payment_id'] ) : 0;
+	$amount      = edd_sanitize_amount( $_POST['amount'] );
+	$rate        = sanitize_text_field( $_POST['rate'] );
+
+	$commission = array(
+		'post_type'     => 'edd_commission',
+		'post_title'    => $user_info->user_email . ' - ' . get_the_title( $download_id ),
+		'post_status'   => 'publish'
+	);
+
+	$commission_id = wp_insert_post( apply_filters( 'edd_commission_post_data', $commission ) );
+
+	$commission_info = apply_filters( 'edd_commission_info', array(
+		'user_id'   => absint( $_POST['user_id'] ),
+		'rate'      => $rate,
+		'amount'    => $amount,
+		'currency'  => edd_get_currency()
+	), $commission_id, $payment_id, $download_id );
+
+	eddc_set_commission_status( $commission_id, 'unpaid' );
+
+	update_post_meta( $commission_id, '_edd_commission_info', $commission_info );
+	update_post_meta( $commission_id, '_download_id', $download_id );
+	update_post_meta( $commission_id, '_user_id', absint( $_POST['user_id'] ) );
+	update_post_meta( $commission_id, '_edd_commission_payment_id', $payment_id );
+
+	do_action( 'eddc_insert_commission', absint( $_POST['user_id'] ), $amount, $rate, $download_id, $commission_id, $payment_id );
+
+	wp_redirect( add_query_arg( array( 'view' => false, 'edd-message' => 'add' ) ) );
+	exit;
+}
+add_action( 'admin_init', 'eddc_add_manual_commission' );
+
+
+/**
  * Process commission actions for single view
  *
  * @since 3.3
