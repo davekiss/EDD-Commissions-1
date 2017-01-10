@@ -16,11 +16,11 @@ WP_TESTS_DIR=${WP_TESTS_DIR-/tmp/wordpress-tests-lib}
 WP_CORE_DIR=${WP_CORE_DIR-/tmp/wordpress/}
 
 download() {
-	if [ `which curl` ]; then
-		curl -s "$1" > "$2";
-	elif [ `which wget` ]; then
-		wget -nv -O "$2" "$1"
-	fi
+    if [ `which curl` ]; then
+        curl -s "$1" > "$2";
+    elif [ `which wget` ]; then
+        wget -nv -O "$2" "$1"
+    fi
 }
 
 if [[ $WP_VERSION =~ [0-9]+\.[0-9]+(\.[0-9]+)? ]]; then
@@ -122,11 +122,11 @@ install_db() {
 
 install_edd() {
 	echo "Installing EDD"
-
-	wget -O /tmp/edd.zip https://github.com/easydigitaldownloads/Easy-Digital-Downloads/archive/master.zip
+	wget -O /tmp/edd.zip https://github.com/easydigitaldownloads/easy-digital-downloads/archive/master.zip
 	unzip -qq /tmp/edd.zip -d $WP_CORE_DIR/wp-content/plugins/
 	mv $WP_CORE_DIR/wp-content/plugins/easy-digital-downloads-master $WP_CORE_DIR/wp-content/plugins/easy-digital-downloads
 }
+
 install_wp
 install_test_suite
 install_db
