@@ -19,7 +19,7 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 require $_tests_dir . '/includes/bootstrap.php';
 
 echo "Installing Easy Digital Downloads...\n";
-activate_plugin( 'easy-digita-downloads-master/easy-digital-downloads.php' );
+activate_plugin( 'easy-digital-downloads/easy-digital-downloads.php' );
 
 echo "Installing Commissions...\n";
 activate_plugin( 'EDD-Commissions/edd-commissions.php' );
