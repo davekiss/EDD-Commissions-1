@@ -122,10 +122,12 @@ install_db() {
 }
 
 install_edd() {
-	wget -O /tmp/edd.zip https://github.com/easydigitaldownloads/Easy-Digital-Downloads/archive/master.zip
-	unzip -q /tmp/edd.zip -d $WP_CORE_DIR/wp-content/plugins/
-	mv $WP_CORE_DIR/wp-content/plugins/Easy-Digital-Downloads-master $WP_CORE_DIR/wp-content/plugins/Easy-Digital-Downloads
+	echo "Installing EDD"
+	wget -O /tmp/edd.zip https://github.com/easydigitaldownloads/easy-digital-downloads/archive/master.zip
+	unzip -qq /tmp/edd.zip -d $WP_CORE_DIR/wp-content/plugins/
+	mv $WP_CORE_DIR/wp-content/plugins/easy-digital-downloads-master $WP_CORE_DIR/wp-content/plugins/easy-digital-downloads
 }
+
 install_wp
 install_test_suite
 install_db
