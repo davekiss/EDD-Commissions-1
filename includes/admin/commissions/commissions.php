@@ -346,8 +346,6 @@ function eddc_commissions_view( $commission ) {
 								}
 								?>
 								<?php echo EDD()->html->user_dropdown( array( 'class' => 'eddc-commission-user', 'id' => 'eddc_user', 'name' => 'eddc_user', 'selected' => esc_attr( $commission_info['user_id'] ) ) ); ?>
-								<span>&nbsp;&ndash;&nbsp;</span>
-								<a href="#" class="eddc-edit-commission-user"><?php _e( 'Edit', 'eddc' ); ?></a>
 							</td>
 						</tr>
 						<tr>
@@ -360,8 +358,6 @@ function eddc_commissions_view( $commission ) {
 								echo ! empty( $download ) ? '<a href="' . esc_url( add_query_arg( 'download', $download ) ) . '" title="' . __( 'View all commissions for this item', 'eddc' ) . '">' . get_the_title( $download ) . '</a>' . ( ! empty( $variation ) ? ' - ' . $variation : '') : '';
 								echo EDD()->html->product_dropdown( array( 'class' => 'eddc-commission-download', 'id' => 'eddc_download', 'name' => 'eddc_download', 'chosen' => true, 'variations' => true, 'selected' => $selected ) );
 								?>
-								<span>&nbsp;&ndash;&nbsp;</span>
-								<a href="#" class="eddc-edit-commission-download"><?php _e( 'Edit', 'eddc' ); ?></a>
 							</td>
 						</tr>
 						<tr>
@@ -371,8 +367,6 @@ function eddc_commissions_view( $commission ) {
 							<td style="word-wrap: break-word">
 								<?php echo $rate; ?>
 								<input type="text" name="eddc_rate" class="hidden eddc-commission-rate" value="<?php echo esc_attr( $commission_info['rate'] ); ?>" />
-								<span>&nbsp;&ndash;&nbsp;</span>
-								<a href="#" class="eddc-edit-commission-rate"><?php _e( 'Edit', 'eddc' ); ?></a>
 							</td>
 						</tr>
 						<tr>
@@ -382,8 +376,6 @@ function eddc_commissions_view( $commission ) {
 							<td style="word-wrap: break-word">
 								<?php echo edd_currency_filter( edd_format_amount( $commission_info['amount'] ) ); ?>
 								<input type="text" name="eddc_amount" class="hidden eddc-commission-amount" value="<?php echo edd_format_amount( $commission_info['amount'] ); ?>" />
-								<span>&nbsp;&ndash;&nbsp;</span>
-								<a href="#" class="eddc-edit-commission-amount"><?php _e( 'Edit', 'eddc' ); ?></a>
 							</td>
 						</tr>
 						<tr>
@@ -399,7 +391,9 @@ function eddc_commissions_view( $commission ) {
 							</td>
 							<td class="eddc-commission-card-actions">
 								<?php
-								$actions = array();
+								$actions = array(
+									'edit' => '<a href="#" class="eddc-edit-commission">' . __( 'Edit Commission', 'eddc' ) . '</a>'
+								);
 								$base    = admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission_id );
 								$base    = wp_nonce_url( $base, 'eddc_commission_nonce' );
 
