@@ -388,6 +388,13 @@ function eddc_commissions_view( $commission ) {
 						</tr>
 						<tr>
 							<td class="row-title">
+								<label for="tablecell"><?php _e( 'Currency', 'eddc' ); ?></label>
+							</td>
+							<td style="word-wrap: break-word">
+								<?php echo $commission_info['currency']; ?>
+							</td>
+						<tr>
+							<td class="row-title">
 								<label for="tablecell"><?php _e( 'Actions:', 'eddc' ); ?></label>
 							</td>
 							<td class="eddc-commission-card-actions">
