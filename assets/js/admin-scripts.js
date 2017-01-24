@@ -12,4 +12,7 @@ jQuery(document).ready(function($) {
 		window.scrollTo(0, 0);
 	});
 
+	$("#edd_commisions_enabled").change( function() {
+		$(".eddc_toggled_row").toggle();
+	});
 });
