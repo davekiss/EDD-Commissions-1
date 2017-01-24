@@ -20,23 +20,20 @@ function eddc_render_commissions_meta_box() {
 	$enabled = get_post_meta( $post->ID, '_edd_commisions_enabled', true ) ? true : false;
 	$meta    = get_post_meta( $post->ID, '_edd_commission_settings', true );
 	$type    = isset( $meta['type']    ) ? $meta['type']    : 'percentage';
-	$rates   = get_post_meta( $post->ID, '_edd_commission_rates', true );
 	$display = $enabled ? '' : ' style="display:none";';
 
-	// Backwards compatibility - should be handled by an upgrade routine
-	if ( ! $rates ) {
-		$user_id = isset( $meta['user_id'] ) ? $meta['user_id'] : '';
-		$amounts = isset( $meta['amount']  ) ? $meta['amount']  : '';
-		$users   = array_map( 'trim', explode( ',', $user_id ) );
-		$amounts = array_map( 'trim', explode( ',', $amounts ) );
-		$rates   = array();
+	// Convert to array
+	$user_id = isset( $meta['user_id'] ) ? $meta['user_id'] : '';
+	$amounts = isset( $meta['amount']  ) ? $meta['amount']  : '';
+	$users   = array_map( 'trim', explode( ',', $user_id ) );
+	$amounts = array_map( 'trim', explode( ',', $amounts ) );
+	$rates   = array();
 
-		foreach ( $users as $i => $user_id ) {
-			$rates[ $i ] = array(
-				'user_id' => $user_id,
-				'amount'  => $amounts[ $i ]
-			);
-		}
+	foreach ( $users as $i => $user_id ) {
+		$rates[ $i ] = array(
+			'user_id' => $user_id,
+			'amount'  => $amounts[ $i ]
+		);
 	}
 
 	/**
@@ -92,13 +89,13 @@ function eddc_render_commissions_meta_box() {
 						echo '<tr class="edd_repeatable_upload_wrapper edd_repeatable_row" data-key="' . esc_attr( $key ) . '">';
 							echo '<td>';
 								echo EDD()->html->user_dropdown( array(
-									'name'        => 'edd_commission_settings[' . $key . '][user_id]',
+									'name'        => 'edd_commission_settings[rates][' . $key . '][user_id]',
 									'id'          => 'edd_commission_user_' . $key,
 									'selected'    => $value['user_id']
 								) );
 							echo '</td>';
 							echo '<td>';
-								echo '<input type="text" name="edd_commission_settings[' . $key . '][amount]" id="edd_commission_amount_' . $key . '" value="' . $value['amount'] . '" . placeholder="' . __( 'Rate for this user', 'eddc' ) . '"/>';
+								echo '<input type="text" name="edd_commission_settings[rates][' . $key . '][amount]" id="edd_commission_amount_' . $key . '" value="' . $value['amount'] . '" . placeholder="' . __( 'Rate for this user', 'eddc' ) . '"/>';
 							echo '</td>';
 							echo '<td>';
 								echo '<a href="#" class="edd_remove_repeatable" style="background: url(' . admin_url('/images/xit.gif') . ') no-repeat;">&times;</a>';
@@ -109,12 +106,12 @@ function eddc_render_commissions_meta_box() {
 					echo '<tr class="edd_repeatable_upload_wrapper edd_repeatable_row" data-key="1">';
 						echo '<td>';
 							echo EDD()->html->user_dropdown( array(
-								'name'        => 'edd_commission_settings[1][user_id]',
+								'name'        => 'edd_commission_settings[rates][1][user_id]',
 								'id'          => 'edd_commission_user_1'
 							) );
 						echo '</td>';
 						echo '<td>';
-							echo '<input type="text" name="edd_commission_settings[1][amount]" id="edd_commission_amount_1" placeholder="' . __( 'Rate for this user', 'eddc' ) . '"/>';
+							echo '<input type="text" name="edd_commission_settings[rates][1][amount]" id="edd_commission_amount_1" placeholder="' . __( 'Rate for this user', 'eddc' ) . '"/>';
 						echo '</td>';
 						echo '<td>';
 							echo '<a href="#" class="edd_remove_repeatable" style="background: url(' . admin_url('/images/xit.gif') . ') no-repeat;">&times;</a>';
@@ -164,6 +161,22 @@ function eddc_download_meta_box_save( $post_id ) {
 
 		$new  = isset( $_POST['edd_commission_settings'] ) ? $_POST['edd_commission_settings'] : false;
 		$type = ! empty( $_POST['edd_commission_settings']['type'] ) ? $_POST['edd_commission_settings']['type'] : 'percentage';
+
+		if ( ! empty( $_POST['edd_commission_settings']['rates'] ) && is_array( $_POST['edd_commission_settings']['rates'] ) ) {
+			$users   = array();
+			$amounts = array();
+
+			foreach( $_POST['edd_commission_settings']['rates'] as $rate ) {
+				$amounts[] = $rate['amount'];
+				$users[]   = $rate['user_id'];
+			}
+
+			$new['user_id'] = implode( ',', $users );
+			$new['amount']  = implode( ',', $amounts );
+
+			// No need to store this value since we're saving as a string
+			unset( $_POST['edd_commission_settings']['rates'] );
+		}
 
 		if ( $new ) {
 			if( ! empty( $new['amount'] ) ) {
