@@ -322,7 +322,7 @@ function eddc_commissions_view( $commission ) {
 								<label for="tablecell"><?php _e( 'Status', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
-								<?php echo $status; ?>
+								<?php echo ucfirst( $status ); ?>
 							</td>
 						</tr>
 						<tr>
