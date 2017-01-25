@@ -344,7 +344,7 @@ function eddc_commissions_view( $commission ) {
 						</tr>
 						<tr>
 							<td class="row-title">
-								<label for="tablecell"><?php _e( 'Purchase Date', 'eddc' ); ?></label>
+								<label for="tablecell"><?php _e( 'Create Date', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
 								<?php echo date_i18n( get_option( 'date_format' ), strtotime( get_post_field( 'post_date', $commission_id ) ) ); ?>
