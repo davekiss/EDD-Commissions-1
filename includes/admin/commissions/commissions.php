@@ -223,28 +223,45 @@ function eddc_render_commission_view( $view, $callbacks ) {
 		<?php endif; ?>
 
 		<?php if( $render ) : ?>
-			<div id="edd-item-tab-wrapper" class="commission-tab-wrapper">
-				<ul id="edd-item-tab-wrapper-list" class="commission-tab-wrapper-list">
-					<?php foreach ( $commission_tabs as $key => $tab ) : ?>
-						<?php $active = $key === $view ? true : false; ?>
-						<?php $class  = $active ? 'active' : 'inactive'; ?>
+			<div id="edd-item-wrapper" class="edd-item-has-tabs edd-clearfix">
+				<div id="edd-item-tab-wrapper" class="commission-tab-wrapper">
+					<ul id="edd-item-tab-wrapper-list" class="commission-tab-wrapper-list">
+						<?php foreach ( $commission_tabs as $key => $tab ) : ?>
+							<?php $active = $key === $view ? true : false; ?>
+							<?php $class  = $active ? 'active' : 'inactive'; ?>
 
-						<li class="<?php echo sanitize_html_class( $class ); ?>">
-							<?php if ( ! $active ) : ?>
-								<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=download&page=edd-commissions&view=' . $key . '&commission=' . $commission_id . '#wpbody-content' ) ); ?>">
-							<?php endif; ?>
-								<span class="dashicons <?php echo sanitize_html_class( $tab['dashicon'] ); ?>" aria-hidden="true"></span>
-								<span class="screen-reader-text"><?php echo esc_attr( $tab['title'] ); ?></span>
-							<?php if ( ! $active ) : ?>
-								</a>
-							<?php endif; ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			</div>
+							<li class="<?php echo sanitize_html_class( $class ); ?>">
+								<?php
+								$tab_title  = sprintf( _x( 'Commission %s', 'Commission Details page tab title', 'eddc' ), esc_attr( $tab['title'] ) );
+								$aria_label = ' aria-label="' . $tab_title . '"';
+								?>
 
-			<div id="edd-item-card-wrapper" class="eddc-commission-card" style="float: left">
-				<?php $callbacks[$view]( $commission ) ?>
+								<?php if ( ! $active ) : ?>
+									<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=download&page=edd-commissions&view=' . $key . '&commission=' . $commission_id . '#wpbody-content' ) ); ?>"<?php echo $aria_label; ?>>
+								<?php endif; ?>
+								<span class="edd-item-tab-label-wrap"<?php echo $active ? $aria_label : ''; ?>>
+									<span class="dashicons <?php echo sanitize_html_class( $tab['dashicon'] ); ?>" aria-hidden="true"></span>
+									<?php
+									if ( version_compare( EDD_VERSION, 2.7, '>=' ) ) {
+										echo '<span class="edd-item-tab-label">' . esc_attr( $tab['title'] ) . '</span>';
+									}
+									?>
+								</span>
+								<?php if ( ! $active ) : ?>
+									</a>
+								<?php endif; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
+
+				<div id="edd-item-card-wrapper" class="eddc-commission-card" style="float: left">
+					<?php
+					if ( function_exists( $callbacks[ $view ] ) ) {
+						$callbacks[ $view ]( $commission );
+					}
+					?>
+				</div>
 			</div>
 		<?php endif; ?>
 	</div>
