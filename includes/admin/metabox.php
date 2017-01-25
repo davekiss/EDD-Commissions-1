@@ -60,7 +60,8 @@ function eddc_render_commissions_meta_box() {
 	echo '<tr' . $display . ' class="eddc_toggled_row">';
 		echo '<td class="edd_field_type_select">';
 			do_action( 'eddc_metabox_before_type', $post->ID );
-			echo '<label for="edd_commission_settings[type]"><strong>' . __( 'Type', 'eddc' ) . '</strong></label><br/>';
+			echo '<label for="edd_commission_settings[type]"><strong>' . __( 'Type:', 'eddc' ) . '</strong></label>';
+			echo '<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong>' . __( 'Type', 'eddc' ) . '</strong>: ' . __( 'With commissions enabled, you will need to specify who to assign commissions to. Commissions can be given based on a percentage of the purchase cost, or at a flat rate.', 'eddc' ) . '"></span><br/>';
 			echo '<p>';
 				echo '<input type="radio" name="edd_commission_settings[type]" value="percentage"' . checked( $type, 'percentage', false ) . '/>&nbsp;' . __( 'Percentage', 'eddc' );
 				echo '<br/ >';
@@ -74,12 +75,14 @@ function eddc_render_commissions_meta_box() {
 	echo '</table>';
 
 	echo '<div' . $display . ' id="eddc_commission_rates_wrapper" class="edd_meta_table_wrap eddc_toggled_row">';
-		echo '<p><strong>' . __( 'Commission Rates', 'eddc' ) . '</strong></p>';
+		echo '<p><strong>' . __( 'Commission Rates:', 'eddc' ) . '</strong></p>';
 		echo '<table class="widefat edd_repeatable_table" width="100%" cellpadding="0" cellspacing="0">';
 			echo '<thead>';
 				echo '<tr>';
 					echo '<th class="eddc-commission-rate-user">' . __( 'User', 'eddc' ) . '</th>';
-					echo '<th class="eddc-commission-rate-rate">' . __( 'Rate', 'eddc' ) . '</th>';
+					echo '<th class="eddc-commission-rate-rate">';
+					echo __( 'Rate', 'eddc' ) . '<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong>' . __( 'Rate', 'eddc' ) . '</strong>: ' . __( 'Enter the flat or percentage rate for commissions for each user. If no rate is entered, the global default rate will be used. Currency and percent symbols are not required.', 'eddc' ) . '"></span>';
+					echo '</th>';
 					echo '<th class="eddc-commission-rate-remove"></th>';
 				echo '</tr>';
 			echo '</thead>';
