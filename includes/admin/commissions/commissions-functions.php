@@ -33,7 +33,7 @@ add_filter( 'eddc_commission_views', 'eddc_register_default_commission_views', 1
 function eddc_register_default_commission_tabs( $tabs ) {
 
 	$default_tabs = array(
-		'overview' => array( 'dashicon' => 'dashicons-lock', 'title' => __( 'Commission', 'eddc' ) ),
+		'overview' => array( 'dashicon' => 'dashicons-products', 'title' => __( 'Details', 'eddc' ) ),
 	);
 
 	return array_merge( $tabs, $default_tabs );
@@ -49,7 +49,7 @@ add_filter( 'eddc_commission_tabs', 'eddc_register_default_commission_tabs', 1, 
  * @return array       The altered list of tabs, with 'delete' at the bottom
  */
 function eddc_register_delete_commission_tab( $tabs ) {
-	$tabs['delete'] = array( 'dashicon' => 'dashicons-trash', 'title' => __( 'Delete Commission', 'eddc' ) );
+	$tabs['delete'] = array( 'dashicon' => 'dashicons-trash', 'title' => __( 'Delete', 'eddc' ) );
 
 	return $tabs;
 }
