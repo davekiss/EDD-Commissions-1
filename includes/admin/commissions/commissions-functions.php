@@ -33,7 +33,7 @@ add_filter( 'eddc_commission_views', 'eddc_register_default_commission_views', 1
 function eddc_register_default_commission_tabs( $tabs ) {
 
 	$default_tabs = array(
-		'overview' => array( 'dashicon' => 'dashicons-products', 'title' => __( 'Details', 'eddc' ) ),
+		'overview' => array( 'dashicon' => 'dashicons-products', 'title' => __( 'Overview', 'eddc' ) ),
 	);
 
 	return array_merge( $tabs, $default_tabs );
