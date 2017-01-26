@@ -59,21 +59,9 @@ function eddc_settings_extensions( $settings ) {
 			'type' => 'checkbox',
 		),
 	);
-
-	if ( class_exists( 'EDD_Simple_Shipping' ) ) {
-		$commission_settings[] = array(
-			'id'      => 'edd_commissions_shipping',
-			'name'    => __( 'Shipping Fees', 'eddc' ),
-			'desc'    => __( 'How should shipping fees affect commission calculations?', 'eddc' ),
-			'type'    => 'select',
-			'options' => array(
-				'ignored'          => __( 'Split shipping fees equally.', 'eddc' ),
-				'include_shipping' => __( 'Shipping fee paid to first user ID in product\'s Commission settings.', 'eddc' ),
-				'exclude_shipping' => __( 'Shipping fee paid to Store.', 'eddc' ),
-			),
-		);
-	}
-
+	
+	$commission_settings = apply_filters( 'eddc_settings', $commission_settings );
+	
 	if ( version_compare( EDD_VERSION, 2.5, '>=' ) ) {
 		$commission_settings = array( 'commissions' => $commission_settings );
 	}
