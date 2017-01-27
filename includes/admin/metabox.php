@@ -81,7 +81,7 @@ function eddc_render_commissions_meta_box() {
 				echo '<tr>';
 					echo '<th class="eddc-commission-rate-user">' . __( 'User', 'eddc' ) . '</th>';
 					echo '<th class="eddc-commission-rate-rate">';
-					echo __( 'Rate', 'eddc' ) . '<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong>' . __( 'Rate', 'eddc' ) . '</strong>: ' . __( 'Enter the flat or percentage rate for commissions for each user. If no rate is entered, the global default rate will be used. Currency and percent symbols are not required.', 'eddc' ) . '"></span>';
+					echo __( 'Rate', 'eddc' ) . '<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong>' . __( 'Rate', 'eddc' ) . '</strong>: ' . __( 'Enter the flat or percentage rate for commissions for each user. If no rate is entered, the default rate for the user will be used. If no user rate is set, the global default rate will be used. Currency and percent symbols are not required.', 'eddc' ) . '"></span>';
 					echo '</th>';
 					echo '<th class="eddc-commission-rate-remove"></th>';
 				echo '</tr>';
