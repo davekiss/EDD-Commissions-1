@@ -166,7 +166,7 @@ function eddc_dashboard_commissions_widget() {
 					</div>
 				</div><!--end #edd_user_commissions_paid-->
 
-				<div id"edd_commissions_export">
+				<div id="edd_commissions_export">
 					<p><strong><?php _e( 'Export Paid Commissions', 'eddc' ); ?></strong></p>
 					<form method="post" action="<?php echo admin_url( 'index.php' ); ?>">
 						<?php echo EDD()->html->month_dropdown(); ?>
