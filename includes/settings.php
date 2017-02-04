@@ -55,10 +55,19 @@ function eddc_settings_extensions( $settings ) {
 		array(
 			'id' => 'edd_commissions_autopay_pa',
 			'name' => __('Instant Pay Commmissions', 'eddc'),
-			'desc' => sprintf( __('If checked and <a href="%s">PayPal Adaptive Payments</a> gateway is installed, EDD will automatically pay commissions at the time of purchase', 'eddc'), 'https://easydigitaldownloads.com/extensions/paypal-adaptive-payments/' ),
+			'desc' => sprintf( __('If checked and <a href="%s">PayPal Adaptive Payments</a> gateway is installed, EDD will automatically pay commissions at the time of purchase', 'eddc'), 'https://easydigitaldownloads.com/downloads/paypal-adaptive-payments/' ),
 			'type' => 'checkbox',
 		),
 	);
+
+	if ( class_exists( 'EDD_Recurring' ) ) {
+		$commission_settings[] = array(
+			'id' => 'edd_commissions_recurring_renewals',
+			'name' => __( 'Recurring Payments Commissions', 'eddc' ),
+			'desc' => sprintf( __('If checked and <a href="%s">Recurring Payments</a> is installed, EDD will automatically pay commissions when subscription renewals are recorded.', 'eddc'), 'https://easydigitaldownloads.com/downloads/recurring-payments/' ),
+			'type' => 'checkbox',
+		);
+	}
 	
 	$commission_settings = apply_filters( 'eddc_settings', $commission_settings );
 	
