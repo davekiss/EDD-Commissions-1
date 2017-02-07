@@ -34,7 +34,11 @@ add_action( 'edd_recurring_record_payment', 'eddc_record_subscription_commission
  * @return array
  */
 function eddc_add_recurring_payment_status( $statuses ) {
-	$statuses = array_merge( array( 'edd_subscription', $statuses ) );
+
+	$allow_recurring_commissions = edd_get_option( 'edd_commissions_recurring_renewals', false );
+	if ( $allow_recurring_commissions ) {
+		$statuses = array_merge( array( 'edd_subscription' ), $statuses );
+	}
 
 	return $statuses;
 }
@@ -49,10 +53,10 @@ add_filter( 'eddc_allowed_complete_statuses', 'eddc_add_recurring_payment_status
  * @return bool
  */
 function eddc_download_has_recurring_commissions( $download_id = 0 ) {
-	$meta    = get_post_meta( $download_id, '_edd_commission_settings', true );
-	$disable = isset( $meta['disable_recurring'] ) ? true : false;
+	$meta  = get_post_meta( $download_id, '_edd_commission_settings', true );
+	$allow = isset( $meta['disable_recurring'] ) ? false : true;
 
-	return $disable;
+	return $allow;
 }
 
 /**
@@ -71,14 +75,14 @@ function eddc_metabox_disable_recurring_checkbox() {
 	wp_register_script( 'eddc-recurring-admin-scripts', EDDC_PLUGIN_URL . 'assets/js/admin-eddc-recurring-integration' . $suffix . '.js', array( 'jquery' ), EDD_COMMISSIONS_VERSION, true );
 	wp_enqueue_script( 'eddc-recurring-admin-scripts' );
 
-	$disable_recurring_commissions = eddc_download_has_recurring_commissions( $post->ID );
+	$has_recurring_commissions     = eddc_download_has_recurring_commissions( $post->ID );
 	$recurring_commissions_enabled = edd_get_option( 'edd_commissions_recurring_renewals', false );
 	if ( false === $recurring_commissions_enabled ) { return; }
 
 	echo '<tr style="display:none;" class="eddc_commission_row" id="edd_commissions_recurring">';
 		echo '<th style="width:20%"><label for="edd_commission_shipping_fee">' . __ ( 'Recurring', 'eddc' ) . '</label></th>';
 		echo '<td class="edd_field_type_text">';
-			echo '<input type="checkbox" ' . checked( true, $disable_recurring_commissions, false ) . ' name="edd_commission_settings[disable_recurring]" id="edd_commission_amount" value="1"/>&nbsp;';
+			echo '<input type="checkbox" ' . checked( false, $has_recurring_commissions, false ) . ' name="edd_commission_settings[disable_recurring]" id="edd_commission_amount" value="1"/>&nbsp;';
 			echo __( 'Disable Recurring Commissions.', 'eddc' );
 		echo '<td>';
 	echo '</tr>';
@@ -100,10 +104,10 @@ function eddc_recurring_record_download_commissions( $record_commissions, $downl
 	$payment = new EDD_Payment( $payment_id );
 	$has_recurring_commissions = eddc_download_has_recurring_commissions( $download_id );
 
-	if ( 'edd_subscription' === $payment->status && $has_recurring_commissions ) {
-		$record_commissions = true;
+	if ( 'edd_subscription' === $payment->status && ! $has_recurring_commissions ) {
+		$record_commissions = false;
 	}
 
 	return $record_commissions;
 }
-add_filter( 'eddc_should_record_download_commissions', 'eddc_recurring_record_download_commissions', 10, 1 );
+add_filter( 'eddc_should_record_download_commissions', 'eddc_recurring_record_download_commissions', 10, 3 );
