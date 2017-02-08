@@ -43,6 +43,12 @@ function eddc_calculate_payment_commissions( $payment_id ) {
 			continue;
 		}
 
+		$should_record_commissions = apply_filters( 'eddc_should_record_download_commissions', true, $download_id, $payment_id );
+		if ( false === $should_record_commissions ) {
+			continue;
+		}
+
+
 		$recipients = eddc_get_recipients( $download_id );
 
 		if( empty( $recipients ) ) {
@@ -141,7 +147,8 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 	}
 
 	// Make sure the commission is only recorded when new status is complete
-	if( $new_status != 'publish' && $new_status != 'complete' ) {
+	$allowed_new_statuses = apply_filters( 'eddc_allowed_complete_statuses', array( 'publish', 'complete' ) );
+	if( ! in_array( $new_status, $allowed_new_statuses ) ) {
 		return;
 	}
 
@@ -311,7 +318,7 @@ function eddc_commission_is_renewal( $commission_id = 0 ) {
 function eddc_get_recipients( $download_id = 0 ) {
 	$settings = get_post_meta( $download_id, '_edd_commission_settings', true );
 
-	// If the information for commissions was not saved or this happens to be for a post with commissions curently disabled
+	// If the information for commissions was not saved or this happens to be for a post with commissions currently disabled
 	if ( !isset( $settings['user_id'] ) ){
 		return array();
 	}

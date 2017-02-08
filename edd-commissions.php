@@ -70,6 +70,10 @@ function edd_commissions_load() {
 		include_once EDDC_PLUGIN_DIR . 'includes/integrations/paypal-adaptive-payments.php';
 	}
 
+	if ( class_exists( 'EDD_Recurring' ) ) {
+		include_once EDDC_PLUGIN_DIR . 'includes/integrations/recurring-payments.php';
+	}
+
 	if ( is_admin() ) {
 
 		if ( class_exists( 'EDD_License' ) ) {
