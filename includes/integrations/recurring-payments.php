@@ -10,6 +10,25 @@
  */
 
 /**
+ * Add new site-wide settings under "Downloads" > "Extensions" > "Commissions" for determining if recurring commissions should be enabled.
+ *
+ * @since    3.3
+ * @param  	 array $commission_settings The array of settings for the Commissions settings page.
+ * @return   array $commission_settings The array of settings for the Commissions settings page.
+ */
+function eddc_settings_add_recurring_options( $commission_settings ){
+	$commission_settings[] = array(
+		'id'   => 'edd_commissions_recurring_renewals',
+		'name' => __( 'Recurring Payments Commissions', 'eddc' ),
+		'desc' => sprintf( __('If checked and <a href="%s">Recurring Payments</a> is installed, EDD will automatically pay commissions when subscription renewals are recorded.', 'eddc'), 'https://easydigitaldownloads.com/downloads/recurring-payments/' ),
+		'type' => 'checkbox',
+	);
+
+	return $commission_settings;
+}
+add_filter( 'eddc_settings', 'eddc_settings_add_recurring_options', 10, 1 );
+
+/**
  * When Recurring Payments records a subscription renewal, run the record commission function.
  *
  * @since 3.3

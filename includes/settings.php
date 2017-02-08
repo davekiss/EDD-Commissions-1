@@ -60,15 +60,6 @@ function eddc_settings_extensions( $settings ) {
 		),
 	);
 
-	if ( class_exists( 'EDD_Recurring' ) ) {
-		$commission_settings[] = array(
-			'id' => 'edd_commissions_recurring_renewals',
-			'name' => __( 'Recurring Payments Commissions', 'eddc' ),
-			'desc' => sprintf( __('If checked and <a href="%s">Recurring Payments</a> is installed, EDD will automatically pay commissions when subscription renewals are recorded.', 'eddc'), 'https://easydigitaldownloads.com/downloads/recurring-payments/' ),
-			'type' => 'checkbox',
-		);
-	}
-	
 	$commission_settings = apply_filters( 'eddc_settings', $commission_settings );
 	
 	if ( version_compare( EDD_VERSION, 2.5, '>=' ) ) {
