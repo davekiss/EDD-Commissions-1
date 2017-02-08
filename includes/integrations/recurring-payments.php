@@ -20,10 +20,10 @@
  *
  * @return void
  */
-function eddc_record_subscription_commissions( $payment_id, $parent_payment_id, $payment_total, $transaction_id ) {
-	eddc_record_commission( $payment_id, 'edd_subscription', 'pending' );
+function eddc_record_subscription_commissions( $payment, $subscription ) {
+	eddc_record_commission( $payment->ID, 'edd_subscription', 'pending' );
 }
-add_action( 'edd_recurring_record_payment', 'eddc_record_subscription_commissions', 10, 4 );
+add_action( 'edd_recurring_add_subscription_payment', 'eddc_record_subscription_commissions', 10, 2 );
 
 /**
  * Add 'edd_subscription' to the list of payment statuses that are allowed to record commissions.
