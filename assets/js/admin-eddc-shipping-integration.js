@@ -4,10 +4,10 @@ jQuery(document).ready(function($) {
 	// If both commissions and shipping are enabled, show Shipping Split options in the commissions metabox
 	$.fn.edd_commissions_shipping_show_hide = function() {
 
-		if( $("#edd_commisions_enabled").is(':checked') && $("#edd_enable_shipping").is(':checked') && $("input[name='edd_commission_settings[type]']:checked").val() == 'percentage' ){
-			$("#edd_commissions_shipping_fee_split").show();
+		if( $( "#edd_commisions_enabled" ).is( ':checked' ) && $( "#edd_enable_shipping" ).is( ':checked' ) && $( "input[name='edd_commission_settings[type]']:checked" ).val() == 'percentage' ){
+			$( "#edd_commissions_shipping_fee_split" ).show();
 		}else{
-			$("#edd_commissions_shipping_fee_split").hide();
+			$( "#edd_commissions_shipping_fee_split" ).hide();
 		}
 
 		return this;

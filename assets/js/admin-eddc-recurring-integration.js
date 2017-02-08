@@ -4,10 +4,10 @@ jQuery(document).ready(function($) {
 	// If both commissions and shipping are enabled, show Recurring options in the commissions metabox
 	$.fn.edd_commissions_recurring_show_hide = function() {
 
-		if( $("#edd_commisions_enabled").is(':checked') ){
-			$("#edd_commissions_recurring").show();
+		if( $( "#edd_commisions_enabled" ).is( ':checked' ) ){
+			$( "#edd_commissions_recurring" ).show();
 		}else{
-			$("#edd_commissions_recurring").hide();
+			$( "#edd_commissions_recurring" ).hide();
 		}
 
 		return this;
