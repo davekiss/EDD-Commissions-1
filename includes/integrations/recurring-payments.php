@@ -64,7 +64,7 @@ function eddc_download_has_recurring_commissions( $download_id = 0 ) {
  *
  * @since 3.3
  *
- * @return void1
+ * @return void
  */
 function eddc_metabox_disable_recurring_checkbox() {
 	global $post;
