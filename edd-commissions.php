@@ -92,8 +92,6 @@ function edd_commissions_load() {
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/customers.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/EDD_C_List_Table.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/class.admin-notices.php';
-	} else {
-		include_once EDDC_PLUGIN_DIR . 'includes/adaptive-payments.php';
 	}
 
 	add_action( 'fes_load_fields_require', 'eddc_add_fes_functionality' );
