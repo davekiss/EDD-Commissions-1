@@ -61,8 +61,8 @@ function edd_commissions_load() {
 	if( function_exists( 'epap_load_class' ) ) {
 		include_once EDDC_PLUGIN_DIR . 'includes/integrations/paypal-adaptive-payments.php';
 	}
-  
-  if ( class_exists( 'EDD_Recurring' ) ) {
+
+	if ( class_exists( 'EDD_Recurring' ) ) {
 		include_once EDDC_PLUGIN_DIR . 'includes/integrations/recurring-payments.php';
 	}
 
@@ -83,7 +83,7 @@ function edd_commissions_load() {
 		include_once EDDC_PLUGIN_DIR . 'includes/reports.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/settings.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/list.php';
-    include_once EDDC_PLUGIN_DIR . 'includes/admin/commissions/commissions.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/commissions/commissions.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/commissions/commissions-actions.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/commissions/commissions-functions.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/metabox.php';
@@ -91,9 +91,10 @@ function edd_commissions_load() {
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/upgrades.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/customers.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/EDD_C_List_Table.php';
-    include_once EDDC_PLUGIN_DIR . 'includes/admin/class.admin-notices.php';
-} else {
-	include_once EDDC_PLUGIN_DIR . 'includes/adaptive-payments.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/class.admin-notices.php';
+	} else {
+		include_once EDDC_PLUGIN_DIR . 'includes/adaptive-payments.php';
+	}
 
 	add_action( 'fes_load_fields_require', 'eddc_add_fes_functionality' );
 }
