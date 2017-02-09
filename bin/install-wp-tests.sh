@@ -128,6 +128,6 @@ install_edd() {
 }
 
 install_wp
+install_edd
 install_test_suite
 install_db
-install_edd
