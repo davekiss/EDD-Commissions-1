@@ -503,6 +503,7 @@ function eddc_get_commissions( $args = array() ) {
 		'paged'      => 1,
 		'query_args' => array(),
 		'status'     => false,
+		'payment_id' => false,
 	);
 
 	$args = wp_parse_args( $args, $defaults );
@@ -583,6 +584,13 @@ function eddc_get_commissions( $args = array() ) {
 
 		}
 
+	}
+
+	if ( ! empty( $args['payment_id'] ) ) {
+		$meta_query[] = array(
+			'key'   => '_edd_commission_payment_id',
+			'value' => absint( $args['payment_id'] ),
+		);
 	}
 
 	if ( ! empty( $meta_query ) ) {
@@ -954,3 +962,41 @@ function eddc_filter_post_meta_for_status( $check, $object_id, $meta_key, $singl
 
 }
 add_filter( 'get_post_metadata', 'eddc_filter_post_meta_for_status', 10, 4 );
+
+/**
+ * Revoke an unpaid commission when the payment it's associated with is refunded.
+ *
+ * @since 3.3
+ * @param $payment EDD_Payment object.
+ *
+ * @return void
+ */
+function eddc_revoke_on_refund( $payment ) {
+
+	$revoke_on_refund = edd_get_option( 'edd_commissions_revoke_on_refund', false );
+	if ( false === $revoke_on_refund ) {
+		return;
+	}
+
+	$commissions = eddc_get_commissions( array(
+		'payment_id' => $payment->ID,
+		'status'     => 'unpaid',
+	) );
+
+	if ( ! empty( $commissions ) ) {
+		foreach ( $commissions as $commission ) {
+			eddc_set_commission_status( $commission->ID, 'revoked' );
+
+			$recipient = get_post_meta( $commission->ID, '_user_id', true );
+			$note      = sprintf(
+				__( 'Commission revoked for %s due to refunded payment &ndash; <a href="%s">View</a>', 'eddc' ),
+				get_userdata( $recipient )->display_name,
+				admin_url( 'edit.php?post_type=download&page=edd-commissions&payment=' . $payment->ID )
+			);
+
+			$payment->add_note( $note );
+		}
+	}
+
+}
+add_action( 'edd_post_refund_payment', 'eddc_revoke_on_refund', 10, 1 );

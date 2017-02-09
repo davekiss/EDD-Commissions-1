@@ -58,6 +58,12 @@ function eddc_settings_extensions( $settings ) {
 			'desc' => sprintf( __('If checked and <a href="%s">PayPal Adaptive Payments</a> gateway is installed, EDD will automatically pay commissions at the time of purchase', 'eddc'), 'https://easydigitaldownloads.com/downloads/paypal-adaptive-payments/' ),
 			'type' => 'checkbox',
 		),
+		array(
+			'id' => 'edd_commissions_revoke_on_refund',
+			'name' => __('Revoke on Refund', 'eddc'),
+			'desc' => __('If checked EDD will automatically revoke any <em>unpaid</em> commissions when a payment is refunded.', 'eddc'),
+			'type' => 'checkbox',
+		),
 	);
 
 	$commission_settings = apply_filters( 'eddc_settings', $commission_settings );
