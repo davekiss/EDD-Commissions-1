@@ -178,7 +178,7 @@ function eddc_download_meta_box_save( $post_id ) {
 			$new['amount']  = implode( ',', $amounts );
 
 			// No need to store this value since we're saving as a string
-			unset( $_POST['edd_commission_settings']['rates'] );
+			unset( $new['edd_commission_settings']['rates'] );
 		}
 
 		if ( $new ) {
