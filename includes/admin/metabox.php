@@ -25,17 +25,15 @@ function eddc_render_commissions_meta_box() {
 	// Convert to array
 	$user_id = isset( $meta['user_id'] ) ? $meta['user_id'] : '';
 	$amounts = isset( $meta['amount']  ) ? $meta['amount']  : '';
-	$users   = array_map( 'trim', explode( ',', $user_id ) );
-	$amounts = array_map( 'trim', explode( ',', $amounts ) );
+	$users   = ! empty( $user_id ) ? array_map( 'trim', explode( ',', $user_id ) ) : array();
+	$amounts = ! empty( $amounts ) ? array_map( 'trim', explode( ',', $amounts ) ) : array();
 	$rates   = array();
 
 	foreach ( $users as $i => $user_id ) {
-		if ( ! empty( $i ) ) {
-			$rates[ $i ] = array(
-				'user_id' => $user_id,
-				'amount'  => $amounts[ $i ]
-			);
-		}
+		$rates[ $i ] = array(
+			'user_id' => $user_id,
+			'amount'  => $amounts[ $i ]
+		);
 	}
 
 	/**
