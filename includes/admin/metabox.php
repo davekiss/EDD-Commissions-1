@@ -125,7 +125,7 @@ function eddc_render_commissions_meta_box() {
 				endif;
 				echo '<tr>';
 					echo '<td class="submit" colspan="4" style="float: none; clear:both; background: #fff;">';
-						echo '<a class="button-secondary edd_add_repeatable" style="margin: 6px 0 10px;">' .  __( 'Add New Commission Rate', 'eddc' ) . '</a>';
+						echo '<a class="button-secondary edd_commission_rates_add_repeatable" style="margin: 6px 0 10px;">' .  __( 'Add New Commission Rate', 'eddc' ) . '</a>';
 					echo '</td>';
 				echo '</tr>';
 			echo '</tbody>';
