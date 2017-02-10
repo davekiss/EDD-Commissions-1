@@ -1,10 +1,28 @@
 <?php
+/**
+ * Commission Admin Notice Generation Class
+ *
+ * This class handles display of admin notices for EDD Commissions
+ *
+ * @package     EDDC
+ * @subpackage  Admin/Notices
+ * @copyright   Copyright (c) 2015, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       3.3
+ */
+
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+
+/**
+ * EDDC_Admin_Notices Class
+ *
+ * @since 3.3
+ */
 class EDDC_Admin_Notices {
 
 	public function __construct() {
