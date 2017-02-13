@@ -24,6 +24,20 @@ jQuery(document).ready(function($) {
 		}
 	});
 
+	$("#edd_download_commissions .button-link").on( 'click', function() {
+		if (! $('#edd_download_commissions').hasClass('closed')) {
+			var checked = $('#edd_commisions_enabled').is(':checked');
+			var target  = $('.eddc_toggled_row');
+
+			if ( checked ) {
+				$('.edd_repeatable_row').find( '.edd-select-chosen' ).css( 'width', '300px' );
+				target.show();
+			} else {
+				target.hide();
+			}
+		}
+	});
+
 	/**
 	 * Commission Configuration Metabox
 	 */
