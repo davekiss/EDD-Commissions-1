@@ -41,3 +41,18 @@
 .eddc-user-search-wrapper .edd_user_search_results ul {
 	width: 200px;
 }
+
+.eddc-commission-card #eddc_update_commission {
+	display: none;
+}
+
+#eddc_user_chosen, #eddc_download_chosen {
+	display: none;
+}
+
+.edd-item-info.delete-commission {
+	text-align: center;
+	margin-top: 5px;
+	margin-bottom: 10px;
+	min-height: 185px;
+}

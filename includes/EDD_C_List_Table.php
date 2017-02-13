@@ -56,6 +56,11 @@ class EDD_C_List_Table extends WP_List_Table {
 			case 'payment':
 				$payment = get_post_meta( $item['ID'], '_edd_commission_payment_id', true );
 				return $payment ? '<a href="' . esc_url( admin_url( 'edit.php?post_type=download&page=edd-payment-history&view=view-order-details&id=' . $payment ) ) . '" title="' . __( 'View payment details', 'eddc' ) . '">#' . $payment . '</a> - ' . edd_get_payment_status( get_post( $payment ), true  ) : '';
+			case 'actions':
+				echo '<a href="' . add_query_arg( array( 'view' => 'overview', 'commission' => $item['ID'] ) ) . '">' . __( 'View', 'eddc' ) . '</a>';
+				break;
+			default:
+				return print_r( $item, true ); //Show the whole array for troubleshooting purposes
 		}
 
 		do_action( 'manage_edd_commissions_custom_column', $column_name, $item['ID'] );
@@ -74,8 +79,7 @@ class EDD_C_List_Table extends WP_List_Table {
 			$actions['mark_as_paid'] = sprintf( '<a href="%s&action=%s&commission=%s">' . __( 'Mark as Paid', 'eddc' ) . '</a>', $base, 'mark_as_paid', $item['ID'] );
 			$actions['mark_as_revoked'] = sprintf( '<a href="%s&action=%s&commission=%s">' . __( 'Revoke', 'eddc' ) . '</a>', $base, 'mark_as_revoked', $item['ID'] );
 		}
-		$actions['edit'] = sprintf( '<a href="%s&action=%s&commission=%s">' . __( 'Edit' ) . '</a>', $base, 'edit', $item['ID'] );
-		$actions['delete'] = sprintf( '<a href="%s&action=%s&commission=%s">' . __( 'Delete' ) . '</a>', $base, 'delete', $item['ID'] );
+		$actions['delete'] = sprintf( '<a href="%s&view=%s&commission=%s">' . __( 'Delete' ) . '</a>', $base, 'delete', $item['ID'] );
 
 		$actions = apply_filters( 'edd_commission_row_actions', $actions, $item );
 
@@ -111,7 +115,8 @@ class EDD_C_List_Table extends WP_List_Table {
 			'rate'      => __( 'Rate', 'eddc' ),
 			'amount'    => __( 'Amount', 'eddc' ),
 			'status'    => __( 'Status', 'eddc' ),
-			'date'      => __( 'Date', 'eddc' )
+			'date'      => __( 'Date', 'eddc' ),
+			'actions'   => __( 'Actions', 'eddc' )
 		);
 
 		$columns = apply_filters( 'manage_edd_commissions_columns', $columns );
