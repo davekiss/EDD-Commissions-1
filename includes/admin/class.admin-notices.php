@@ -25,14 +25,38 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class EDDC_Admin_Notices {
 
+
+	/**
+	 * Get things started
+	 *
+	 * @access      public
+	 * @since       3.3
+	 * @return      void
+	 */
 	public function __construct() {
 		$this->init();
 	}
 
+
+	/**
+	 * Process hooks on init
+	 *
+	 * @access      public
+	 * @since       3.3
+	 * @return      void
+	 */
 	public function init() {
 		add_action( 'admin_notices', array( $this, 'notices' ) );
 	}
 
+
+	/**
+	 * Determine which, if any, messages to show
+	 *
+	 * @access      public
+	 * @since       3.3
+	 * @return      void
+	 */
 	public function notices() {
 		if( ! isset( $_GET['page'] ) || $_GET['page'] != 'edd-commissions' ) {
 			return;
