@@ -79,7 +79,7 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 		// if we need to award a commission, and the price is greater than zero
 		if ( $commissions_enabled && floatval( $price ) > '0' ) {
 
-			$recipients = eddc_get_recipients( $download_id );
+			$recipients = eddc_get_recipients( $download_id );var_dump( $recipients );exit;
 
 			if ( ! empty( $recipients ) ) {
 

@@ -30,10 +30,12 @@ function eddc_render_commissions_meta_box() {
 	$rates   = array();
 
 	foreach ( $users as $i => $user_id ) {
-		$rates[ $i ] = array(
-			'user_id' => $user_id,
-			'amount'  => $amounts[ $i ]
-		);
+		if ( array_key_exists( $i, $amounts ) ) {
+			$rates[ $i ] = array(
+				'user_id' => $user_id,
+				'amount'  => $amounts[ $i ]
+			);
+		}
 	}
 
 	/**
