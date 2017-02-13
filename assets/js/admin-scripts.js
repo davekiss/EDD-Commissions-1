@@ -24,7 +24,7 @@ jQuery(document).ready(function($) {
 		}
 	});
 
-	$("#edd_download_commissions .button-link").on( 'click', function() {
+	$("#edd_download_commissions").on( 'click', function() {
 		if (! $('#edd_download_commissions').hasClass('closed')) {
 			var checked = $('#edd_commisions_enabled').is(':checked');
 			var target  = $('.eddc_toggled_row');
