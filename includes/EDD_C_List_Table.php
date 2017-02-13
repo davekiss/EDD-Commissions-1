@@ -62,6 +62,8 @@ class EDD_C_List_Table extends WP_List_Table {
 			default:
 				return print_r( $item, true ); //Show the whole array for troubleshooting purposes
 		}
+
+		do_action( 'manage_edd_commissions_custom_column', $column_name, $item['ID'] );
 	}
 
 	function column_title( $item ) {
@@ -79,6 +81,7 @@ class EDD_C_List_Table extends WP_List_Table {
 		}
 		$actions['delete'] = sprintf( '<a href="%s&view=%s&commission=%s">' . __( 'Delete' ) . '</a>', $base, 'delete', $item['ID'] );
 
+		$actions = apply_filters( 'edd_commission_row_actions', $actions, $item );
 
 		$user = get_userdata( $item['user'] );
 
@@ -115,6 +118,9 @@ class EDD_C_List_Table extends WP_List_Table {
 			'date'      => __( 'Date', 'eddc' ),
 			'actions'   => __( 'Actions', 'eddc' )
 		);
+
+		$columns = apply_filters( 'manage_edd_commissions_columns', $columns );
+
 		return $columns;
 	}
 
