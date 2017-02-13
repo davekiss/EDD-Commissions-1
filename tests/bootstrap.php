@@ -12,6 +12,7 @@ if ( !$_tests_dir ) $_tests_dir = '/tmp/wordpress-tests-lib';
 require_once $_tests_dir . '/includes/functions.php';
 
 function _manually_load_plugin() {
+	require '/tmp/wordpress/wp-content/plugins/easy-digital-downloads/easy-digital-downloads.php';
 	require dirname( __FILE__ ) . '/../edd-commissions.php';
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
@@ -19,7 +20,7 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 require $_tests_dir . '/includes/bootstrap.php';
 
 echo "Installing Easy Digital Downloads...\n";
-activate_plugin( 'easy-digita-downloads-master/easy-digital-downloads.php' );
+activate_plugin( 'easy-digital-downloads/easy-digital-downloads.php' );
 
 echo "Installing Commissions...\n";
 activate_plugin( 'EDD-Commissions/edd-commissions.php' );
