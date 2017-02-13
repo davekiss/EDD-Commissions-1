@@ -31,7 +31,8 @@ function eddc_admin_scripts() {
 	wp_enqueue_script( 'eddc-admin-scripts' );
 	wp_localize_script( 'eddc-admin-scripts', 'eddc_vars', array(
 		'action_edit'   => __( 'Edit Commission', 'eddc' ),
-		'action_cancel' => __( 'Cancel Edit', 'eddc' )
+		'action_cancel' => __( 'Cancel Edit', 'eddc' ),
+		'confirm_payout' => __( 'Generating a payout file will mark all unpaid commissions as paid. Do you want to continue?', 'eddc' )
 	));
 
 	$ui_style = ( 'classic' == get_user_option( 'admin_color' ) ) ? 'classic' : 'fresh';

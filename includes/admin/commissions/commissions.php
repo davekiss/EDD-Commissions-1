@@ -65,6 +65,51 @@ function eddc_commissions_list() {
 			<a href="<?php echo esc_url( add_query_arg( array( 'view' => 'add' ) ) ); ?>" class="add-new-h2"><?php _e( 'Add New', 'eddc' ); ?></a>
 		</h2>
 
+		<?php if ( defined( 'EDD_VERSION' ) && version_compare( '2.4.2', EDD_VERSION, '<=' ) ) : ?>
+			<div id="edd-commissions-export-wrap">
+				<button class="button-primary eddc-commissions-export-toggle"><?php _e( 'Generate Payout File', 'eddc' ); ?></button>
+				<button class="button-primary eddc-commissions-export-toggle" style="display:none"><?php _e( 'Close', 'eddc' ); ?></button>
+
+				<?php do_action( 'eddc_commissions_page_buttons' ); ?>
+
+				<form id="eddc-export-commissions" class="eddc-export-form edd-export-form" method="post" style="display:none;">
+					<?php echo EDD()->html->date_field( array( 'id' => 'edd-payment-export-start', 'name' => 'start', 'placeholder' => __( 'Choose start date', 'eddc' ) ) ); ?>
+					<?php echo EDD()->html->date_field( array( 'id' => 'edd-payment-export-end','name' => 'end', 'placeholder' => __( 'Choose end date', 'eddc' ) ) ); ?>
+					<input type="number" increment="0.01" class="eddc-medium-text" id="minimum" name="minimum" placeholder=" <?php _e( 'Minimum', 'eddc' ); ?>" />
+					<?php wp_nonce_field( 'edd_ajax_export', 'edd_ajax_export' ); ?>
+					<input type="hidden" name="edd-export-class" value="EDD_Batch_Commissions_Payout"/>
+					<span>
+						<input type="submit" value="<?php _e( 'Generate File', 'eddc' ); ?>" class="button-secondary"/>
+						<span class="spinner"></span>
+					</span>
+					<p><?php _e( 'This will generate a payout file for review.', 'eddc' ); ?></p>
+				</form>
+
+				<form id="eddc-export-commissions-mark-as-paid" class="eddc-export-form edd-export-form" method="post" style="display: none;">
+					<?php wp_nonce_field( 'edd_ajax_export', 'edd_ajax_export' ); ?>
+					<input type="hidden" name="edd-export-class" value="EDD_Batch_Commissions_Mark_Paid"/>
+					<span>
+						<input type="submit" value="<?php _e( 'Mark as Paid', 'eddc' ); ?>" class="button-primary"/>&nbsp;
+						<a href="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions' ); ?>" class="button-secondary"><?php _e( 'Cancel', 'eddc' ); ?></a>
+						<span class="spinner"></span>
+					</span>
+					<p><?php _e( 'This will mark all unpaid commissions in the generated file as paid', 'eddc' ); ?></p>
+				</form>
+			</div>
+		<?php else: ?>
+			<p>
+				<form id="commission-payouts" method="get" style="float:right;margin:0;">
+					<input type="text" name="from" class="edd_datepicker" placeholder="<?php _e( 'From - mm/dd/yyyy', 'eddc' ); ?>"/>
+					<input type="text" name="to" class="edd_datepicker" placeholder="<?php _e( 'To - mm/dd/yyyy', 'eddc' ); ?>"/>
+					<input type="hidden" name="post_type" value="download" />
+					<input type="hidden" name="page" value="edd-commissions" />
+					<input type="hidden" name="edd_action" value="generate_payouts" />
+					<?php echo wp_nonce_field( 'eddc-payout-nonce', 'eddc-payout-nonce' ); ?>
+					<?php echo submit_button( __('Generate Mass Payment File', 'eddc'), 'secondary', '', false ); ?>
+				</form>
+			</p>
+		<?php endif; ?>
+
 		<style>
 			.column-status, .column-count { width: 100px; }
 			.column-limit { width: 150px; }
