@@ -53,40 +53,50 @@ function edd_commissions__install() {
 register_activation_hook( __FILE__, 'edd_commissions__install' );
 
 
-/*
-|--------------------------------------------------------------------------
-| INCLUDES
-|--------------------------------------------------------------------------
-*/
+function edd_commissions_load() {
 
+	include_once EDDC_PLUGIN_DIR . 'includes/commission-functions.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/email-functions.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/post-type.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/user-meta.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/rest-api.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/short-codes.php';
 
-include_once EDDC_PLUGIN_DIR . 'includes/commission-functions.php';
-include_once EDDC_PLUGIN_DIR . 'includes/email-functions.php';
-include_once EDDC_PLUGIN_DIR . 'includes/post-type.php';
-include_once EDDC_PLUGIN_DIR . 'includes/user-meta.php';
-include_once EDDC_PLUGIN_DIR . 'includes/rest-api.php';
-include_once EDDC_PLUGIN_DIR . 'includes/short-codes.php';
-
-if ( is_admin() ) {
-
-	if ( class_exists( 'EDD_License' ) ) {
-		$eddc_license = new EDD_License( __FILE__, 'Commissions', EDD_COMMISSIONS_VERSION, 'Pippin Williamson' );
+	if ( class_exists( 'EDD_Simple_Shipping' ) ){
+		include_once EDDC_PLUGIN_DIR . 'includes/integrations/simple-shipping.php';
 	}
-	//include_once(EDDC_PLUGIN_DIR . 'includes/scheduled-payouts.php');
-	//include_once(EDDC_PLUGIN_DIR . 'includes/masspay/class-paypal-masspay.php');
-	include_once EDDC_PLUGIN_DIR . 'includes/reports.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/settings.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/admin/list.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/admin/metabox.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/admin/widgets.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/admin/upgrades.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/admin/customers.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/EDD_C_List_Table.php';
-} else {
-	include_once EDDC_PLUGIN_DIR . 'includes/adaptive-payments.php';
-}
 
-add_action( 'fes_load_fields_require', 'eddc_add_fes_functionality' );
+	if( function_exists( 'epap_load_class' ) ) {
+		include_once EDDC_PLUGIN_DIR . 'includes/integrations/paypal-adaptive-payments.php';
+	}
+
+	if ( class_exists( 'EDD_Recurring' ) ) {
+		include_once EDDC_PLUGIN_DIR . 'includes/integrations/recurring-payments.php';
+	}
+
+	if ( is_admin() ) {
+
+		if ( class_exists( 'EDD_License' ) ) {
+			$eddc_license = new EDD_License( __FILE__, 'Commissions', EDD_COMMISSIONS_VERSION, 'Pippin Williamson' );
+		}
+		//include_once(EDDC_PLUGIN_DIR . 'includes/scheduled-payouts.php');
+		//include_once(EDDC_PLUGIN_DIR . 'includes/masspay/class-paypal-masspay.php');
+		include_once EDDC_PLUGIN_DIR . 'includes/reports.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/settings.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/list.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/metabox.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/widgets.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/upgrades.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/customers.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/EDD_C_List_Table.php';
+	}
+
+	add_action( 'fes_load_fields_require', 'eddc_add_fes_functionality' );
+
+}
+add_action( 'plugins_loaded', 'edd_commissions_load', 11 );
+
+
 function eddc_add_fes_functionality(){
 	if ( class_exists( 'EDD_Front_End_Submissions' ) ){
 		if ( version_compare( fes_plugin_version, '2.3', '>=' ) ) {
