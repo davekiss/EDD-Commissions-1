@@ -1,5 +1,19 @@
 jQuery(document).ready(function($) {
 
+	$('#commission-payouts').submit(function() {
+		if( confirm( eddc_vars.confirm_payout ) ) {
+			return true;
+		}
+		return false;
+	});
+
+	if ($('.edd_datepicker').length > 0) {
+		var dateFormat = 'mm/dd/yy';
+		$('.edd_datepicker').datepicker({
+			dateFormat: dateFormat
+		});
+	}
+
 	$('.eddc-commissions-export-toggle').click( function() {
 		$('.eddc-commissions-export-toggle').toggle();
 		$('#eddc-export-commissions').toggle();
