@@ -43,7 +43,7 @@ class EDD_Commission {
 	 * @access protected
 	 * @var mixed float|int
 	 */
-	protected $rate;
+	protected $rate = 0.00;
 
 	/**
 	 * Commission Amount.
@@ -52,7 +52,7 @@ class EDD_Commission {
 	 * @access protected
 	 * @var mixed float|int
 	 */
-	protected $amount;
+	protected $amount = 0.00;
 
 	/**
 	 * Currency.
@@ -61,7 +61,7 @@ class EDD_Commission {
 	 * @access protected
 	 * @var string
 	 */
-	protected $currency;
+	protected $currency = null;
 
 	/**
 	 * Download ID.
@@ -80,6 +80,15 @@ class EDD_Commission {
 	 * @var int
 	 */
 	protected $payment_ID = 0;
+
+	/**
+	 * Status.
+	 *
+	 * @since 3.3
+	 * @access protected
+	 * @var string
+	 */
+	protected $status = null;
 
 	/**
 	 * Array of items that have changed since the last save() was run.
@@ -279,6 +288,7 @@ class EDD_Commission {
 		$this->download_ID = $this->setup_download_ID();
 		$this->user_ID     = $this->setup_user_ID();
 		$this->payment_ID  = $this->setup_payment_ID();
+		$this->status      = $this->setup_status();
 
 		/**
 		 * Setup discount object vars with WP_Post vars
@@ -383,6 +393,28 @@ class EDD_Commission {
 	}
 
 	/**
+	 * Setup the paid status of a commission.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @return string Status.
+	 */
+	private function setup_status() {
+		$status = 'unpaid';
+		$terms  = get_the_terms( $this->ID, 'edd_commission_status' );
+
+		if ( is_array( $terms ) ) {
+			foreach ( $terms as $term ) {
+				$status = $term->slug;
+				break;
+			}
+		}
+
+		return $status;
+	}
+
+	/**
 	 * Helper method to retrieve meta data associated with the commission.
 	 *
 	 * @since 3.3
@@ -408,5 +440,41 @@ class EDD_Commission {
 
 		$meta = get_post_meta( $this->ID, '_edd_commission_' . $key, $single );
 		return $meta;
+	}
+
+	/**
+	 * Retrieve the paid status of a commission.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @return string Status.
+	 */
+	public function get_status() {
+		/**
+		 * Allow the paid status of a commission to be filtered.
+		 *
+		 * @since 3.3
+		 *
+		 * @param string $status Paid status of a commission.
+		 * @param int    $ID     Commission ID.
+		 */
+		return apply_filters( 'eddc_get_commission_status', $this->status, $this->ID );
+	}
+
+	/**
+	 * Update the status of a commission.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @param string $new_status New status.
+	 * @return void
+	 */
+	public function set_status( $new_status = 'unpaid' ) {
+		do_action( 'eddc_pre_set_commission_status', $this->ID, $new_status, $this->status );
+		wp_set_object_terms( $this->ID, $new_status, 'edd_commission_status', false );
+		$this->status = $new_status;
+		do_action( 'eddc_set_commission_status', $this->ID, $new_status, $this->status );
 	}
 }
