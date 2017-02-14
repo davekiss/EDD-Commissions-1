@@ -73,15 +73,6 @@ class EDD_Commission {
 	protected $download_ID = 0;
 
 	/**
-	 * User ID.
-	 *
-	 * @since 3.3
-	 * @access protected
-	 * @var int
-	 */
-	protected $user_ID = 0;
-
-	/**
 	 * Payment ID.
 	 *
 	 * @since 3.3
@@ -233,5 +224,161 @@ class EDD_Commission {
 	 */
 	public function array_convert() {
 		return get_object_vars( $this );
+	}
+
+	/**
+	 * Setup object vars with commission WP_Post object.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @param object $commission WP_Post instance of the commission.
+	 * @return bool Object var initialisation successful or not.
+	 */
+	private function setup_commission( $commission = null ) {
+		$this->pending = array();
+
+		if ( null == $commission ) {
+			return false;
+		}
+
+		if ( ! is_object( $commission ) ) {
+			return false;
+		}
+
+		if ( is_wp_error( $commission ) ) {
+			return false;
+		}
+
+		if ( ! is_a( $commission, 'WP_Post' ) ) {
+			return false;
+		}
+
+		if ( 'edd_commission' !== $commission->post_type ) {
+			return false;
+		}
+
+		/**
+		 * Fires before the instance of the EDD_Commission object is set up.
+		 *
+		 * @since 3.3
+		 *
+		 * @param object EDD_Commission      EDD_Commission instance of the commission object.
+		 * @param object WP_Post $commission WP_Post instance of the commission object.
+		 */
+		do_action( 'eddc_pre_setup_commission', $this, $commission );
+
+		/**
+		 * Setup all object variables
+		 */
+		$this->ID          = absint( $commission->ID );
+		$this->user_ID     = $this->setup_user_ID();
+		$this->rate        = $this->setup_rate();
+		$this->amount      = $this->setup_amount();
+		$this->currency    = $this->setup_currency();
+		$this->download_ID = $this->setup_download_ID();
+		$this->user_ID     = $this->setup_user_ID();
+		$this->payment_ID  = $this->setup_payment_ID();
+
+		/**
+		 * Setup discount object vars with WP_Post vars
+		 */
+		foreach ( get_object_vars( $commission ) as $key => $value ) {
+			$this->{$key} = $value;
+		}
+
+		/**
+		 * Fires after the instance of the EDD_Commission object is set up. Allows extensions to add items to this object via hook.
+		 *
+		 * @since 3.3
+		 *
+		 * @param object EDD_Commission      EDD_Commission instance of the commission object.
+		 * @param object WP_Post $commission WP_Post instance of the commission object.
+		 */
+		do_action( 'eddc_after_setup_commission', $this, $commission );
+
+		return true;
+	}
+
+	/**
+	 * Setup Functions
+	 */
+
+	/**
+	 * Setup commission user ID.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @return int User ID.
+	 */
+	private function setup_user_ID() {
+		$user_ID = $this->get_meta( 'user_id', true );
+		return $user_ID;
+	}
+
+	/**
+	 * Setup commission rate.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @return int User ID.
+	 */
+	private function setup_rate() {
+		$rate = $this->get_meta( 'rate', true );
+		return $rate;
+	}
+
+	/**
+	 * Setup commission amount.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @return int User ID.
+	 */
+	private function setup_amount() {
+		$amount = $this->get_meta( 'amount', true );
+		return $amount;
+	}
+
+	/**
+	 * Setup commission currency.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @return int User ID.
+	 */
+	private function setup_currency() {
+		$currency = $this->get_meta( 'currency', true );
+		return $currency;
+	}
+
+	/**
+	 * Setup commission download ID.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @return int User ID.
+	 */
+	private function setup_download_ID() {
+		$download_ID = $this->get_meta( 'download_ID', true );
+		return $download_ID;
+	}
+
+	/**
+	 * Setup commission payment ID.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @return int User ID.
+	 */
+	private function setup_payment_ID() {
+		$payment_ID = $this->get_meta( 'payment_ID', true );
+		return $payment_ID;
 	}
 }
