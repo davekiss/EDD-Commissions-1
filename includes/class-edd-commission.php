@@ -378,7 +378,35 @@ class EDD_Commission {
 	 * @return int User ID.
 	 */
 	private function setup_payment_ID() {
-		$payment_ID = $this->get_meta( 'payment_ID', true );
+		$payment_ID = $this->get_meta( 'payment_id', true );
 		return $payment_ID;
+	}
+
+	/**
+	 * Helper method to retrieve meta data associated with the commission.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @param string $key    Meta key.
+	 * @param bool   $single Return single item or array.
+	 */
+	public function get_meta( $key = '', $single = true ) {
+		$commission_info = array( 'user_id', 'rate', 'amount', 'currency' );
+
+		if ( in_array( $key, $commission_info ) ) {
+			$meta = get_post_meta( $this->ID, '_edd_commission_info', false );
+			if ( array_key_exists( $key, $meta ) ) {
+				return $meta[ $key ];
+			}
+		}
+
+		if ( 'download_ID' == $key ) {
+			$download_ID = get_post_meta( $this->ID, '_download_id', true );
+			return $download_ID;
+		}
+
+		$meta = get_post_meta( $this->ID, '_edd_commission_' . $key, $single );
+		return $meta;
 	}
 }
