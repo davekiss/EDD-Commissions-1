@@ -91,6 +91,15 @@ class EDD_Commission {
 	protected $status = null;
 
 	/**
+	 * Is Renewal?
+	 *
+	 * @since 3.3
+	 * @access protected
+	 * @var bool
+	 */
+	protected $is_renewal = false;
+
+	/**
 	 * Array of items that have changed since the last save() was run.
 	 * This is for internal use, to allow fewer update_post_meta calls to be run.
 	 *
@@ -289,6 +298,7 @@ class EDD_Commission {
 		$this->user_ID     = $this->setup_user_ID();
 		$this->payment_ID  = $this->setup_payment_ID();
 		$this->status      = $this->setup_status();
+		$this->is_renewal  = $this->setup_is_renewal();
 
 		/**
 		 * Setup discount object vars with WP_Post vars
@@ -415,6 +425,19 @@ class EDD_Commission {
 	}
 
 	/**
+	 * Setup the property that determines whether the commission is a renewal or not.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @return bool Is renewal?
+	 */
+	private function setup_is_renewal() {
+		$is_renewal = $this->get_meta( 'is_renewal', true );
+		return (bool) $is_renewal;
+	}
+
+	/**
 	 * Helper method to retrieve meta data associated with the commission.
 	 *
 	 * @since 3.3
@@ -476,5 +499,25 @@ class EDD_Commission {
 		wp_set_object_terms( $this->ID, $new_status, 'edd_commission_status', false );
 		$this->status = $new_status;
 		do_action( 'eddc_set_commission_status', $this->ID, $new_status, $this->status );
+	}
+
+	/**
+	 * Retrieve whether or not this commission is a renewal.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @return bool Is renewal?
+	 */
+	public function get_is_renewal() {
+		/**
+		 * Allow the renewal flag of a commission to be filtered.
+		 *
+		 * @since 3.3
+		 *
+		 * @param string $is_renewal Is the commission a renewal?
+		 * @param int    $ID         Commission ID.
+		 */
+		return apply_filters( 'eddc_commission_is_renewal', $this->is_renewal, $this->ID );
 	}
 }
