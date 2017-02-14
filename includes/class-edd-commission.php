@@ -153,4 +153,85 @@ class EDD_Commission {
 			return false;
 		}
 	}
+
+	/**
+	 * Magic __get method to dispatch a call to retrieve a protected property.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @param mixed $key
+	 * @return mixed
+	 */
+	public function __get( $key ) {
+		$key = sanitize_key( $key );
+
+		if ( method_exists( $this, 'get_' . $key ) ) {
+			return call_user_func( array( $this, 'get_' . $key ) );
+		} else if ( property_exists( $this, $key ) ) {
+			return $this->{$key};
+		} else {
+			return new WP_Error( 'edd-commissions-invalid-property', sprintf( __( 'Can\'t get property %s', 'eddc' ), $key ) );
+		}
+	}
+
+	/**
+	 * Magic __set method to dispatch a call to update a protected property.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @see set()
+	 *
+	 * @param string $key   Property name.
+	 * @param mixed  $value Property value.
+	 */
+	public function __set( $key, $value ) {
+		$key = sanitize_key( $key );
+
+		// Only real properties can be saved.
+		$keys = array_keys( get_class_vars( get_called_class() ) );
+
+		if ( ! in_array( $key, $keys ) ) {
+			return false;
+		}
+
+		$this->pending[ $key ] = $value;
+
+		// Dispatch to setter method if value needs to be sanitized
+		if ( method_exists( $this, 'set_' . $key ) ) {
+			return call_user_func( array( $this, 'set_' . $key ), $key, $value );
+		} else {
+			$this->{$key} = $value;
+		}
+	}
+
+	/**
+	 * Magic __isset method to allow empty checks on protected elements
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @param string $key The attribute to get
+	 * @return boolean If the item is set or not
+	 */
+	public function __isset( $key ) {
+		if ( property_exists( $this, $key ) ) {
+			return false === empty( $this->{$key} );
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Converts the instance of the EDD_Discount object into an array for special cases.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @return array EDD_Discount object as an array.
+	 */
+	public function array_convert() {
+		return get_object_vars( $this );
+	}
 }
