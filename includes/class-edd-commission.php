@@ -173,8 +173,6 @@ class EDD_Commission {
 	 * @return mixed
 	 */
 	public function __get( $key ) {
-		$key = sanitize_key( $key );
-
 		if ( method_exists( $this, 'get_' . $key ) ) {
 			return call_user_func( array( $this, 'get_' . $key ) );
 		} else if ( property_exists( $this, $key ) ) {
