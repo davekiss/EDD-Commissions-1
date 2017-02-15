@@ -483,6 +483,11 @@ class EDD_Commission {
 
 		$commission_info = array( 'user_id', 'rate', 'amount', 'currency' );
 
+		// User ID is stored in two meta keys
+		if ( 'user_id' == $key ) {
+			update_post_meta( $this->ID, '_user_id', absint( $value ) );
+		}
+
 		if ( in_array( $key, $commission_info ) ) {
 			$commission_data = $this->get_meta( 'info' );
 			switch ( $key ) {
