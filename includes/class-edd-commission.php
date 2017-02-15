@@ -385,7 +385,7 @@ class EDD_Commission {
 	 * @return int User ID.
 	 */
 	private function setup_download_ID() {
-		$download_ID = $this->get_meta( 'download_ID', true );
+		$download_ID = $this->get_meta( 'download_id', true );
 		return $download_ID;
 	}
 
@@ -456,7 +456,7 @@ class EDD_Commission {
 			}
 		}
 
-		if ( 'download_ID' == $key ) {
+		if ( 'download_id' == $key ) {
 			$download_ID = get_post_meta( $this->ID, '_download_id', true );
 			return $download_ID;
 		}
@@ -555,8 +555,8 @@ class EDD_Commission {
 
 		$commission_data = array(
 			'commission_info' => $commission_info,
-			'download_ID' => $this->download_ID,
-			'payment_id' => $this->payment_ID
+			'download_id'     => $this->download_ID,
+			'payment_id'      => $this->payment_ID
 		);
 
 		$args = apply_filters( 'eddc_insert_commission_args', array(
