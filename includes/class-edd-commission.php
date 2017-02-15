@@ -450,8 +450,8 @@ class EDD_Commission {
 		$commission_info = array( 'user_id', 'rate', 'amount', 'currency' );
 
 		if ( in_array( $key, $commission_info ) ) {
-			$meta = get_post_meta( $this->ID, '_edd_commission_info', false );
-			if ( array_key_exists( $key, $meta ) ) {
+			$meta = get_post_meta( $this->ID, '_edd_commission_info', true );
+			if ( isset( $meta[ $key ] ) ) {
 				return $meta[ $key ];
 			}
 		}
