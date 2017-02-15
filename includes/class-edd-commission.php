@@ -520,4 +520,124 @@ class EDD_Commission {
 		 */
 		return apply_filters( 'eddc_commission_is_renewal', $this->is_renewal, $this->ID );
 	}
+
+	/**
+	 * Check if a commission exists.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @return bool Commission exists.
+	 */
+	public function exists() {
+		if ( ! $this->ID > 0 ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Create a new commission. If the commission already exists in the database, update it.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @return mixed bool|int false if data isn't passed and class not instantiated for creation, or post ID for the new commission.
+	 */
+	private function add() {
+		$commission_info = apply_filters( 'edd_commission_info', array(
+			'user_id'  => $this->user_ID,
+			'rate'     => $this->rate,
+			'amount'   => $this->amount,
+			'currency' => $this->currency,
+		), $this->ID, $this->payment_ID, $this->download_ID );
+
+		$commission_data = array(
+			'commission_info' => $commission_info,
+			'download_ID' => $this->download_ID,
+			'payment_id' => $this->payment_ID
+		);
+
+		$args = apply_filters( 'eddc_insert_commission_args', array(
+			'post_title'    => $this->name,
+			'post_status'   => 'unpaid',
+			'post_type'     => 'edd_commission',
+			'post_date'     => ! empty( $this->date ) ? $this->date : null,
+			'post_date_gmt' => ! empty( $this->date ) ? get_gmt_from_date( $this->date ) : null
+		), $commission_data );
+
+		// Create a blank edd_commission post
+		$commission_id = wp_insert_post( $args );
+
+		if ( ! empty( $commission_id ) ) {
+			$this->ID  = $commission_id;
+
+			foreach ( $commission_data as $key => $value ) {
+				$this->update_meta( $key, $value );
+			}
+		}
+
+		return $this->ID;
+	}
+
+	/**
+	 * Once object variables has been set, an update is needed to persist them to the database.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @return bool True if the save was successful, false if it failed or wasn't needed.
+	 */
+	public function save() {
+		$saved = false;
+
+		if ( empty( $this->ID ) ) {
+			$commission_id = $this->add();
+
+			if ( false === $commission_id ) {
+				$saved = false;
+			} else {
+				$this->ID = $commission_id;
+			}
+		}
+
+		/**
+		 * Save all the object variables that have been updated to the databse.
+		 */
+		if ( ! empty( $this->pending ) ) {
+			foreach ( $this->pending as $key => $value ) {
+				$this->update_meta( $key, $value );
+
+				if ( 'status' == $key ) {
+					$this->update_status( $value );
+				}
+
+				if ( 'name' == $key ) {
+					wp_update_post( array(
+						'ID'         => $this->ID,
+						'post_title' => $value
+					) );
+				}
+			}
+
+			$saved = true;
+		}
+
+		if ( true == $saved ) {
+			$this->setup_commission( WP_Post::get_instance( $this->ID ) );
+
+			/**
+			 * Fires after each meta update allowing developers to hook their own items saved in $pending.
+			 *
+			 * @since 3.3
+			 *
+			 * @param object       Instance of EDD_Commission object.
+			 * @param string $key  Meta key.
+			 */
+			do_action( 'eddc_commission_save', $this->ID, $this );
+		}
+
+		return $saved;
+	}
 }
