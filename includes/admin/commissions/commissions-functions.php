@@ -2,8 +2,8 @@
 /**
  * Commissions Functions.
  *
- * @package EDD_Commissions
- * @subpackage Functions
+ * @package 	EDD_Commissions
+ * @subpackage 	Admin
  * @copyright   Copyright (c) 2017, Pippin Williamson
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
@@ -11,40 +11,6 @@
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
-
-/**
- * Retrieves an instance of EDD_Commission for a specified ID.
- *
- * @since 2.7
- *
- * @param mixed int|EDD_Commission|WP_Post $commission Commission ID, EDD_Commission object or WP_Post object.
- * @return mixed false|object EDD_Commission if a valid commission ID, false otherwise.
- */
-function eddc_get_commission( $commission = null ) {
-	if ( is_a( $commission, 'WP_Post' ) || is_a( $commission, 'EDD_Commission' ) ) {
-		$commission_id = $commission->ID;
-	} else {
-		$commission_id = $commission;
-	}
-
-	if ( empty( $commission_id ) ) {
-		return false;
-	}
-
-	$cache_key  = md5( 'eddc_commission' . $commission_id );
-	$commission = wp_cache_get( $cache_key, 'commissions' );
-
-	if ( false === $commission ) {
-		$commission = new EDD_Commission( $commission_id );
-		if ( empty( $commission->ID ) || ( (int) $commission->ID !== (int) $commission_id ) ) {
-			return false;
-		} else {
-			wp_cache_set( $cache_key, $commission, 'commissions' );
-		}
-	}
-
-	return $commission;
-}
 
 /**
  * Register a view for the single commission view
