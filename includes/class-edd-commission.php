@@ -466,6 +466,49 @@ class EDD_Commission {
 	}
 
 	/**
+	 * Helper method to update meta data associated with the commission.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @param string $key        Meta key.
+	 * @param string $value      Meta value.
+	 * @param string $prev_value Previous meta value.
+	 * @return int|bool Meta ID if the key didn't exist, true on successful update, false on failure.
+	 */
+	public function update_meta( $key = '', $value = '', $prev_value = '' ) {
+		if ( empty( $key ) || '' == $key ) {
+			return false;
+		}
+
+		$value = apply_filters( 'eddc_update_commission_meta_' . $key, $value, $this->ID );
+
+		$commission_info = array( 'user_id', 'rate', 'amount', 'currency' );
+
+		if ( in_array( $key, $commission_info ) ) {
+			$commission_data = $this->get_meta( 'info' );
+			switch ( $key ) {
+				case 'rate' :
+				case 'amount':
+					$commission_data[ $key ] = (float) $value;
+					break;
+				case 'user_id' :
+					$commission_data[ $key ] = absint( $value );
+					break;
+				default:
+					break;
+			}
+			return update_post_meta( $this->ID, '_edd_commission_info', $commission_data, $prev_value );
+		}
+
+		if ( 'download_id' == $key ) {
+			return update_post_meta( $this->ID, '_download_id', $value, $prev_value );
+		}
+
+		return update_post_meta( $this->ID, $key, $value, $prev_value );
+	}
+
+	/**
 	 * Retrieve the paid status of a commission.
 	 *
 	 * @since 3.3
