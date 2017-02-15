@@ -52,7 +52,8 @@ function eddc_add_manual_commission() {
 		'user_id'   => absint( $_POST['user_id'] ),
 		'rate'      => $rate,
 		'amount'    => $amount,
-		'currency'  => edd_get_currency()
+		'currency'  => edd_get_currency(),
+		'type'      => eddc_get_commission_type( $download_id )
 	), $commission_id, $payment_id, $download_id );
 
 	eddc_set_commission_status( $commission_id, 'unpaid' );
