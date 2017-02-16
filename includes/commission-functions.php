@@ -253,20 +253,17 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 
 		$commission = new EDD_Commission;
 		$commission->post_title  = $user_info['email'] . ' - ' . get_the_title( $commission_calculated['download_id'] );
-		$commission->post_type   = 'edd_commission';
-		$commission->post_status = 'publish';
 		$commission->status      = 'unpaid';
-		$commission->user_id     = $commission_info['user_id'];
+		$commission->user_ID     = $commission_info['user_id'];
 		$commission->rate        = $commission_info['rate'];
 		$commission->amount      = $commission_info['amount'];
 		$commission->currency    = $commission_info['currency'];
-		$commission->download_id = $commission_calculated['download_id'];
-		$commission->user_id     = $commission_calculated['recipient'];
-		$commission->payment_id  = $payment_id;
+		$commission->download_ID = (int) $commission_calculated['download_id'];
+		$commission->payment_ID  = $payment_id;
 
 		// If we are dealing with a variation, then save variation info
 		if ( $commission_calculated['has_variable_prices'] && ! empty( $commission_calculated['variation'] ) ) {
-			update_post_meta( $commission_id, '_edd_commission_download_variation', $commission_calculated['variation'] );
+			$commission->download_variation = $commission_calculated['variation'];
 		}
 
 		// If it's a renewal, save that detail

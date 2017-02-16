@@ -100,6 +100,15 @@ class EDD_Commission {
 	protected $is_renewal = false;
 
 	/**
+	 * Download variation (if any).
+	 *
+	 * @since 3.3
+	 * @access protected
+	 * @var string
+	 */
+	protected $download_variation = null;
+
+	/**
 	 * Array of items that have changed since the last save() was run.
 	 * This is for internal use, to allow fewer update_post_meta calls to be run.
 	 *
@@ -194,8 +203,6 @@ class EDD_Commission {
 	 * @param mixed  $value Property value.
 	 */
 	public function __set( $key, $value ) {
-		$key = sanitize_key( $key );
-
 		// Only real properties can be saved.
 		$keys = array_keys( get_class_vars( get_called_class() ) );
 
@@ -297,6 +304,7 @@ class EDD_Commission {
 		$this->payment_ID  = $this->setup_payment_ID();
 		$this->status      = $this->setup_status();
 		$this->is_renewal  = $this->setup_is_renewal();
+		$this->download_variation = $this->setup_download_variation();
 
 		/**
 		 * Setup discount object vars with WP_Post vars
@@ -433,6 +441,19 @@ class EDD_Commission {
 	private function setup_is_renewal() {
 		$is_renewal = $this->get_meta( 'is_renewal', true );
 		return (bool) $is_renewal;
+	}
+
+	/**
+	 * Setup the download variation (if any).
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @return string Download variation.
+	 */
+	private function setup_download_variation() {
+		$download_variation = $this->get_meta( 'download_variation', true );
+		return $download_variation;
 	}
 
 	/**
@@ -599,14 +620,8 @@ class EDD_Commission {
 			'currency' => $this->currency,
 		), $this->ID, $this->payment_ID, $this->download_ID );
 
-		$commission_data = array(
-			'commission_info' => $commission_info,
-			'download_id'     => $this->download_ID,
-			'payment_id'      => $this->payment_ID
-		);
-
 		$args = apply_filters( 'eddc_insert_commission_args', array(
-			'post_title'    => $this->name,
+			'post_title'    => $this->post_title,
 			'post_status'   => 'unpaid',
 			'post_type'     => 'edd_commission',
 			'post_date'     => ! empty( $this->date ) ? $this->date : null,
@@ -618,10 +633,6 @@ class EDD_Commission {
 
 		if ( ! empty( $commission_id ) ) {
 			$this->ID  = $commission_id;
-
-			foreach ( $commission_data as $key => $value ) {
-				$this->update_meta( $key, $value );
-			}
 		}
 
 		return $this->ID;
@@ -685,5 +696,45 @@ class EDD_Commission {
 		}
 
 		return $saved;
+	}
+
+	/**
+	 * Update the status of the commission.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @param string $new_status New status
+	 * @return void
+	 */
+	public function update_status( $new_status = '' ) {
+		if ( empty( $status ) ) {
+			return;
+		}
+
+		/**
+		 * Fires before the status of the commission is updated.
+		 *
+		 * @since 2.7
+		 *
+		 * @param int    $ID          Commission ID.
+		 * @param string $new_status  New status.
+		 * @param string $status      Commission status.
+		 */
+		do_action( 'eddc_pre_set_commission_status', $this->ID, $new_status, $this->status );
+
+		wp_set_object_terms( $this->ID, $new_status, 'edd_commission_status', false );
+		$this->status = $new_status;
+
+		/**
+		 * Fires after the status of the commission is updated.
+		 *
+		 * @since 2.7
+		 *
+		 * @param int    $ID          Commission ID.
+		 * @param string $new_status  New status.
+		 * @param string $status      Commission status.
+		 */
+		do_action( 'eddc_set_commission_status', $this->ID, $new_status, $this->status );
 	}
 }
