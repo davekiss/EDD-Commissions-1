@@ -30,12 +30,10 @@ function eddc_render_commissions_meta_box() {
 	$rates   = array();
 
 	foreach ( $users as $i => $user_id ) {
-		if ( array_key_exists( $i, $amounts ) ) {
-			$rates[ $i ] = array(
-				'user_id' => $user_id,
-				'amount'  => $amounts[ $i ]
-			);
-		}
+		$rates[ $i ] = array(
+			'user_id' => $user_id,
+			'amount'  => array_key_exists( $i, $amounts ) ? $amounts[ $i ] : ''
+		);
 	}
 
 	/**
@@ -180,11 +178,11 @@ function eddc_download_meta_box_save( $post_id ) {
 			$new['amount']  = implode( ',', $amounts );
 
 			// No need to store this value since we're saving as a string
-			unset( $new['edd_commission_settings']['rates'] );
+			unset( $new['rates'] );
 		}
 
 		if ( $new ) {
-			if( ! empty( $new['amount'] ) ) {
+			if( ! empty( $new['user_id'] ) ) {
 				$new['amount'] = str_replace( '%', '', $new['amount'] );
 				$new['amount'] = str_replace( '$', '', $new['amount'] );
 
