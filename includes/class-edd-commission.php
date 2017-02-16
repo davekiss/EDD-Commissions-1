@@ -500,6 +500,12 @@ class EDD_Commission {
 			return false;
 		}
 
+		$key = sanitize_key( $key );
+
+		if ( ! in_array( $key, array( 'user_id', 'rate', 'amount', 'currency', 'is_renewal', 'download_id', 'download_variation', 'payment_id' ) ) ) {
+			return;
+		}
+
 		$value = apply_filters( 'eddc_update_commission_meta_' . $key, $value, $this->ID );
 
 		$commission_info = array( 'user_id', 'rate', 'amount', 'currency' );
@@ -511,6 +517,9 @@ class EDD_Commission {
 
 		if ( in_array( $key, $commission_info ) ) {
 			$commission_data = $this->get_meta( 'info' );
+			if ( empty( $commission_data ) ) {
+				$commission_data = array();
+			}
 			switch ( $key ) {
 				case 'rate' :
 				case 'amount':
@@ -520,16 +529,17 @@ class EDD_Commission {
 					$commission_data[ $key ] = absint( $value );
 					break;
 				default:
+					$commission_data[ $key ] = $value;
 					break;
 			}
 			return update_post_meta( $this->ID, '_edd_commission_info', $commission_data, $prev_value );
 		}
 
 		if ( 'download_id' == $key ) {
-			return update_post_meta( $this->ID, '_download_id', $value, $prev_value );
+			return update_post_meta( $this->ID, '_' . $key, $value, $prev_value );
 		}
 
-		return update_post_meta( $this->ID, $key, $value, $prev_value );
+		return update_post_meta( $this->ID, '_edd_commission_' . $key, $value, $prev_value );
 	}
 
 	/**
@@ -622,11 +632,11 @@ class EDD_Commission {
 
 		$args = apply_filters( 'eddc_insert_commission_args', array(
 			'post_title'    => $this->post_title,
-			'post_status'   => 'unpaid',
+			'post_status'   => 'publish',
 			'post_type'     => 'edd_commission',
 			'post_date'     => ! empty( $this->date ) ? $this->date : null,
 			'post_date_gmt' => ! empty( $this->date ) ? get_gmt_from_date( $this->date ) : null
-		), $commission_data );
+		), $commission_info );
 
 		// Create a blank edd_commission post
 		$commission_id = wp_insert_post( $args );
@@ -664,11 +674,11 @@ class EDD_Commission {
 		 */
 		if ( ! empty( $this->pending ) ) {
 			foreach ( $this->pending as $key => $value ) {
-				$this->update_meta( $key, $value );
-
 				if ( 'status' == $key ) {
 					$this->update_status( $value );
 				}
+
+				$this->update_meta( $key, $value );
 
 				if ( 'name' == $key ) {
 					wp_update_post( array(
