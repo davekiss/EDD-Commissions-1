@@ -3,7 +3,7 @@
 function eddc_add_commission_meta_box() {
 
 	if( current_user_can( 'manage_shop_settings' ) ) {
-		add_meta_box( 'edd_download_commissions', __( 'Commission', 'edd' ), 'eddc_render_commissions_meta_box', 'download', 'side', 'core' );
+		add_meta_box( 'edd_download_commissions', __( 'Commission', 'edd' ), 'eddc_render_commissions_meta_box', 'download', 'normal', 'high' );
 	}
 }
 add_action( 'add_meta_boxes', 'eddc_add_commission_meta_box', 100 );
@@ -17,61 +17,123 @@ function eddc_render_commissions_meta_box() {
 
 	echo '<table class="form-table">';
 
-	$enabled       = get_post_meta( $post->ID, '_edd_commisions_enabled', true ) ? true : false;
-	$meta          = get_post_meta( $post->ID, '_edd_commission_settings', true );
-	$user_id       = isset( $meta['user_id']       ) ? $meta['user_id']       : '';
-	$amount        = isset( $meta['amount']        ) ? $meta['amount']        : '';
-	$type          = isset( $meta['type']          ) ? $meta['type']          : 'percentage';
-
+	$enabled = get_post_meta( $post->ID, '_edd_commisions_enabled', true ) ? true : false;
+	$meta    = get_post_meta( $post->ID, '_edd_commission_settings', true );
+	$type    = isset( $meta['type']    ) ? $meta['type']    : 'percentage';
 	$display = $enabled ? '' : ' style="display:none";';
 
-	$script = '<script type="text/javascript">';
-	$script .= 'jQuery(document).ready(function($){';
-		$script .= '$("#edd_commisions_enabled").change(function(){';
-			$script .= 'if( $("#edd_commisions_enabled").is(\':checked\') ){';
-				$script .= '$(".eddc_commission_row").show();';
-			$script .= '}else{';
-				$script .= '$(".eddc_commission_row").hide();';
-			$script .= '}';
-		$script .= '});';
-	$script .= '});';
-	$script .= '</script>';
+	// Convert to array
+	$user_id = isset( $meta['user_id'] ) ? $meta['user_id'] : '';
+	$amounts = isset( $meta['amount']  ) ? $meta['amount']  : '';
+	$users   = ! empty( $user_id ) ? array_map( 'trim', explode( ',', $user_id ) ) : array();
+	$amounts = ! empty( $amounts ) ? array_map( 'trim', explode( ',', $amounts ) ) : array();
+	$rates   = array();
 
-	echo $script;
+	foreach ( $users as $i => $user_id ) {
+		if ( array_key_exists( $i, $amounts ) ) {
+			$rates[ $i ] = array(
+				'user_id' => $user_id,
+				'amount'  => $amounts[ $i ]
+			);
+		}
+	}
+
+	/**
+	 * TODO: Remove once issue/148 is merged.
+	 * Issue 148 reworks the logic behind when/where to load admin scripts,
+	 * allowing them to load on individual download pages. To prevent a merge
+	 * conflict, it is not being re-added here. As such, this injected script
+	 * is left for testing purposes.
+	 */
+	wp_register_script( 'eddc-admin-scripts', EDDC_PLUGIN_URL . 'assets/js/admin-scripts.js', array( 'jquery' ), EDD_COMMISSIONS_VERSION, true );
+ 	wp_enqueue_script( 'eddc-admin-scripts' );
+
+	do_action( 'eddc_metabox_before', $post->ID );
 
 	echo '<tr>';
 		echo '<td class="edd_field_type_text" colspan="2">';
+			do_action( 'eddc_metabox_before_commissions_enabled', $post->ID );
 			echo '<input type="checkbox" name="edd_commisions_enabled" id="edd_commisions_enabled" value="1" ' . checked( true, $enabled, false ) . '/>&nbsp;';
-			echo __( 'Check to enable commissions', 'eddc' );
-		echo '<td>';
+			echo '<label for="edd_commisions_enabled">' . __( 'Check to enable commissions', 'eddc' ) . '</label>';
+			do_action( 'eddc_metabox_after_commissions_enabled', $post->ID );
+		echo '</td>';
 	echo '</tr>';
 
-	echo '<tr' . $display . ' class="eddc_commission_row">';
-		echo '<th style="width:20%"><label>' . __ ( 'Type', 'eddc' ) . '</label></th>';
-		echo '<td class="edd_field_type_text">';
-			echo '<input type="radio" name="edd_commission_settings[type]" value="percentage"' . checked( $type, 'percentage', false ) . '/>&nbsp;' . __( 'Percentage', 'eddc' ) . '<br/>';
-			echo '<input type="radio" name="edd_commission_settings[type]" value="flat"' . checked( $type, 'flat', false ) . '/>&nbsp;' . __( 'Flat', 'eddc' ) . '<br/>';
-			echo apply_filters( 'eddc_commission_type_desc', __( 'Select the type of commission(s) to record.', 'eddc' ) );
-		echo '<td>';
+	echo '<tr' . $display . ' class="eddc_toggled_row">';
+		echo '<td class="edd_field_type_select">';
+			do_action( 'eddc_metabox_before_type', $post->ID );
+			echo '<label for="edd_commission_settings[type]"><strong>' . __( 'Type:', 'eddc' ) . '</strong></label>';
+			echo '<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong>' . __( 'Type', 'eddc' ) . '</strong>: ' . __( 'With commissions enabled, you will need to specify who to assign commissions to. Commissions can be given based on a percentage of the purchase cost, or at a flat rate.', 'eddc' ) . '"></span><br/>';
+			echo '<p>';
+				echo '<input type="radio" name="edd_commission_settings[type]" value="percentage"' . checked( $type, 'percentage', false ) . '/>&nbsp;' . __( 'Percentage', 'eddc' );
+				echo '<br/ >';
+				echo '<input type="radio" name="edd_commission_settings[type]" value="flat"' . checked( $type, 'flat', false ) . '/>&nbsp;' . __( 'Flat', 'eddc' ) . '<br/>';
+			echo '</p>';
+			echo '<p>' . __( 'Select the type of commission(s) to record.', 'eddc' ) . '</p>';
+			do_action( 'eddc_metabox_after_type', $post->ID );
+		echo '</td>';
 	echo '</tr>';
 
-	echo '<tr' . $display . ' class="eddc_commission_row">';
-		echo '<th style="width:20%"><label for="edd_commission_user">' . __ ( 'User(s)', 'eddc' ) . '</label></th>';
-		echo '<td class="edd_field_type_text">';
-			echo '<input type="text" name="edd_commission_settings[user_id]" id="edd_commission_user" value="' . $user_id . '"/><br/>';
-			echo __( 'Enter the user ID that should receive a commission of each sale. Separate user IDs by a comma.', 'eddc' );
-		echo '<td>';
-	echo '</tr>';
+	echo '</table>';
 
-	echo '<tr' . $display . ' class="eddc_commission_row">';
-		echo '<th style="width:20%"><label for="edd_commission_amount">' . __ ( 'Rate(s)', 'eddc' ) . '</label></th>';
-		echo '<td class="edd_field_type_text">';
-			echo '<input type="text" name="edd_commission_settings[amount]" id="edd_commission_amount" value="' . $amount . '"/><br/>';
-			echo __( 'Enter the amount the user(s) should receive of each sale. Separate rates by a comma.', 'eddc' );
-		echo '<td>';
-	echo '</tr>';
-	
-	do_action( 'eddc_meta_table_after' );
+	echo '<div' . $display . ' id="eddc_commission_rates_wrapper" class="edd_meta_table_wrap eddc_toggled_row">';
+		echo '<p><strong>' . __( 'Commission Rates:', 'eddc' ) . '</strong></p>';
+		echo '<table class="widefat edd_repeatable_table" width="100%" cellpadding="0" cellspacing="0">';
+			echo '<thead>';
+				echo '<tr>';
+					echo '<th class="eddc-commission-rate-user">' . __( 'User', 'eddc' ) . '</th>';
+					echo '<th class="eddc-commission-rate-rate">';
+					echo __( 'Rate', 'eddc' ) . '<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong>' . __( 'Rate', 'eddc' ) . '</strong>: ' . __( 'Enter the flat or percentage rate for commissions for each user. If no rate is entered, the default rate for the user will be used. If no user rate is set, the global default rate will be used. Currency and percent symbols are not required.', 'eddc' ) . '"></span>';
+					echo '</th>';
+					echo '<th class="eddc-commission-rate-remove"></th>';
+				echo '</tr>';
+			echo '</thead>';
+			echo '<tbody>';
+				if ( ! empty( $rates ) ) :
+					foreach ( $rates as $key => $value ) :
+						echo '<tr class="edd_repeatable_upload_wrapper edd_repeatable_row" data-key="' . esc_attr( $key ) . '">';
+							echo '<td>';
+								echo EDD()->html->user_dropdown( array(
+									'name'        => 'edd_commission_settings[rates][' . $key . '][user_id]',
+									'id'          => 'edd_commission_user_' . $key,
+									'selected'    => $value['user_id']
+								) );
+							echo '</td>';
+							echo '<td>';
+								echo '<input type="text" name="edd_commission_settings[rates][' . $key . '][amount]" id="edd_commission_amount_' . $key . '" value="' . $value['amount'] . '" . placeholder="' . __( 'Rate for this user', 'eddc' ) . '"/>';
+							echo '</td>';
+							echo '<td>';
+								echo '<a href="#" class="edd_remove_repeatable" style="background: url(' . admin_url('/images/xit.gif') . ') no-repeat;">&times;</a>';
+							echo '</td>';
+						echo '</tr>';
+					endforeach;
+				else :
+					echo '<tr class="edd_repeatable_upload_wrapper edd_repeatable_row" data-key="1">';
+						echo '<td>';
+							echo EDD()->html->user_dropdown( array(
+								'name'        => 'edd_commission_settings[rates][1][user_id]',
+								'id'          => 'edd_commission_user_1'
+							) );
+						echo '</td>';
+						echo '<td>';
+							echo '<input type="text" name="edd_commission_settings[rates][1][amount]" id="edd_commission_amount_1" placeholder="' . __( 'Rate for this user', 'eddc' ) . '"/>';
+						echo '</td>';
+						echo '<td>';
+							echo '<a href="#" class="edd_remove_repeatable" style="background: url(' . admin_url('/images/xit.gif') . ') no-repeat;">&times;</a>';
+						echo '</td>';
+					echo '</tr>';
+				endif;
+				echo '<tr>';
+					echo '<td class="submit" colspan="4" style="float: none; clear:both; background: #fff;">';
+						echo '<a class="button-secondary edd_commission_rates_add_repeatable" style="margin: 6px 0 10px;">' .  __( 'Add New Commission Rate', 'eddc' ) . '</a>';
+					echo '</td>';
+				echo '</tr>';
+			echo '</tbody>';
+		echo '</table>';
+		echo '<p class="description">' . __( 'Configure the commission rates for your users. ', 'eddc' ) . '</p>';
+	echo '</div>';
+
+	do_action( 'eddc_metabox_after', $post->ID );
 
 	echo '</table>';
 }
@@ -104,6 +166,22 @@ function eddc_download_meta_box_save( $post_id ) {
 
 		$new  = isset( $_POST['edd_commission_settings'] ) ? $_POST['edd_commission_settings'] : false;
 		$type = ! empty( $_POST['edd_commission_settings']['type'] ) ? $_POST['edd_commission_settings']['type'] : 'percentage';
+
+		if ( ! empty( $_POST['edd_commission_settings']['rates'] ) && is_array( $_POST['edd_commission_settings']['rates'] ) ) {
+			$users   = array();
+			$amounts = array();
+
+			foreach( $_POST['edd_commission_settings']['rates'] as $rate ) {
+				$amounts[] = $rate['amount'];
+				$users[]   = $rate['user_id'];
+			}
+
+			$new['user_id'] = implode( ',', $users );
+			$new['amount']  = implode( ',', $amounts );
+
+			// No need to store this value since we're saving as a string
+			unset( $new['edd_commission_settings']['rates'] );
+		}
 
 		if ( $new ) {
 			if( ! empty( $new['amount'] ) ) {

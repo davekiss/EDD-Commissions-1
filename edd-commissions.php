@@ -54,14 +54,6 @@ register_activation_hook( __FILE__, 'edd_commissions__install' );
 
 
 function edd_commissions_load() {
-
-	include_once EDDC_PLUGIN_DIR . 'includes/commission-functions.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/email-functions.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/post-type.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/user-meta.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/rest-api.php';
-	include_once EDDC_PLUGIN_DIR . 'includes/short-codes.php';
-
 	if ( class_exists( 'EDD_Simple_Shipping' ) ){
 		include_once EDDC_PLUGIN_DIR . 'includes/integrations/simple-shipping.php';
 	}
@@ -70,8 +62,19 @@ function edd_commissions_load() {
 		include_once EDDC_PLUGIN_DIR . 'includes/integrations/paypal-adaptive-payments.php';
 	}
 
-	if ( is_admin() ) {
+	if ( class_exists( 'EDD_Recurring' ) ) {
+		include_once EDDC_PLUGIN_DIR . 'includes/integrations/recurring-payments.php';
+	}
 
+	include_once EDDC_PLUGIN_DIR . 'includes/commission-functions.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/email-functions.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/post-type.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/user-meta.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/rest-api.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/short-codes.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/scripts.php';
+
+	if ( is_admin() ) {
 		if ( class_exists( 'EDD_License' ) ) {
 			$eddc_license = new EDD_License( __FILE__, 'Commissions', EDD_COMMISSIONS_VERSION, 'Pippin Williamson' );
 		}
@@ -80,15 +83,18 @@ function edd_commissions_load() {
 		include_once EDDC_PLUGIN_DIR . 'includes/reports.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/settings.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/list.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/commissions/commissions.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/commissions/commissions-actions.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/commissions/commissions-functions.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/metabox.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/widgets.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/upgrades.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/customers.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/EDD_C_List_Table.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/class.admin-notices.php';
 	}
 
 	add_action( 'fes_load_fields_require', 'eddc_add_fes_functionality' );
-
 }
 add_action( 'plugins_loaded', 'edd_commissions_load', 11 );
 

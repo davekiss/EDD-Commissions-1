@@ -43,6 +43,12 @@ function eddc_calculate_payment_commissions( $payment_id ) {
 			continue;
 		}
 
+		$should_record_commissions = apply_filters( 'eddc_should_record_download_commissions', true, $download_id, $payment_id );
+		if ( false === $should_record_commissions ) {
+			continue;
+		}
+
+
 		$recipients = eddc_get_recipients( $download_id );
 
 		if( empty( $recipients ) ) {
@@ -141,7 +147,8 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 	}
 
 	// Make sure the commission is only recorded when new status is complete
-	if( $new_status != 'publish' && $new_status != 'complete' ) {
+	$allowed_new_statuses = apply_filters( 'eddc_allowed_complete_statuses', array( 'publish', 'complete' ) );
+	if( ! in_array( $new_status, $allowed_new_statuses ) ) {
 		return;
 	}
 
@@ -189,7 +196,8 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 			'has_variable_prices'   => NULL,
 			'price_id'              => NULL,
 			'variation'             => NULL,
-			'cart_item'             => NULL
+			'cart_item'             => NULL,
+			'type'                  => NULL
 		);
 
 		$commission_calculated = wp_parse_args(	$commission_calculated, $default_commission_calculated );
@@ -211,7 +219,8 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 			'user_id'  => $commission_calculated['recipient'],
 			'rate'     => $commission_calculated['rate'],
 			'amount'   => $commission_calculated['commission_amount'],
-			'currency' => $commission_calculated['currency']
+			'currency' => $commission_calculated['currency'],
+			'type'     => eddc_get_commission_type( $commission_calculated['download_id'] )
 		), $commission_id, $payment_id, $commission_calculated['download_id'] );
 
 		eddc_set_commission_status( $commission_id, 'unpaid' );
@@ -311,7 +320,7 @@ function eddc_commission_is_renewal( $commission_id = 0 ) {
 function eddc_get_recipients( $download_id = 0 ) {
 	$settings = get_post_meta( $download_id, '_edd_commission_settings', true );
 
-	// If the information for commissions was not saved or this happens to be for a post with commissions curently disabled
+	// If the information for commissions was not saved or this happens to be for a post with commissions currently disabled
 	if ( !isset( $settings['user_id'] ) ){
 		return array();
 	}
@@ -496,6 +505,7 @@ function eddc_get_commissions( $args = array() ) {
 		'paged'      => 1,
 		'query_args' => array(),
 		'status'     => false,
+		'payment_id' => false,
 	);
 
 	$args = wp_parse_args( $args, $defaults );
@@ -576,6 +586,13 @@ function eddc_get_commissions( $args = array() ) {
 
 		}
 
+	}
+
+	if ( ! empty( $args['payment_id'] ) ) {
+		$meta_query[] = array(
+			'key'   => '_edd_commission_payment_id',
+			'value' => absint( $args['payment_id'] ),
+		);
 	}
 
 	if ( ! empty( $meta_query ) ) {
@@ -947,3 +964,41 @@ function eddc_filter_post_meta_for_status( $check, $object_id, $meta_key, $singl
 
 }
 add_filter( 'get_post_metadata', 'eddc_filter_post_meta_for_status', 10, 4 );
+
+/**
+ * Revoke an unpaid commission when the payment it's associated with is refunded.
+ *
+ * @since 3.3
+ * @param $payment EDD_Payment object.
+ *
+ * @return void
+ */
+function eddc_revoke_on_refund( $payment ) {
+
+	$revoke_on_refund = edd_get_option( 'edd_commissions_revoke_on_refund', false );
+	if ( false === $revoke_on_refund ) {
+		return;
+	}
+
+	$commissions = eddc_get_commissions( array(
+		'payment_id' => $payment->ID,
+		'status'     => 'unpaid',
+	) );
+
+	if ( ! empty( $commissions ) ) {
+		foreach ( $commissions as $commission ) {
+			eddc_set_commission_status( $commission->ID, 'revoked' );
+
+			$recipient = get_post_meta( $commission->ID, '_user_id', true );
+			$note      = sprintf(
+				__( 'Commission revoked for %s due to refunded payment &ndash; <a href="%s">View</a>', 'eddc' ),
+				get_userdata( $recipient )->display_name,
+				admin_url( 'edit.php?post_type=download&page=edd-commissions&payment=' . $payment->ID )
+			);
+
+			$payment->add_note( $note );
+		}
+	}
+
+}
+add_action( 'edd_post_refund_payment', 'eddc_revoke_on_refund', 10, 1 );
