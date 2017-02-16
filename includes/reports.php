@@ -169,9 +169,9 @@ function edd_show_commissions_graph() {
 						$consolidated_date = $month === end( $month_keys ) ? cal_days_in_month( CAL_GREGORIAN, $month, $year ) : 1;
 					}
 
-					$commissions     = array_sum( $days );
-					$date            = mktime( 0, 0, 0, $month, $consolidated_date, $year ) * 1000;
-					$earnings_data[] = array( $date, $commissions );
+					$commissions = array_sum( $days );
+					$date        = mktime( 0, 0, 0, $month, $consolidated_date, $year ) * 1000;
+					$data[]      = array( $date, $commissions );
 				}
 			}
 		}
