@@ -89,7 +89,7 @@ function eddc_render_commissions_meta_box() {
 			echo '<tbody>';
 				if ( ! empty( $rates ) ) :
 					foreach ( $rates as $key => $value ) :
-						echo '<tr class="edd_repeatable_upload_wrapper edd_repeatable_row" data-key="' . esc_attr( $key ) . '">';
+						echo '<tr class="edd_repeatable_commissions_wrapper edd_repeatable_row edd_repeatable_commissions" data-key="' . esc_attr( $key ) . '">';
 							echo '<td>';
 								echo EDD()->html->user_dropdown( array(
 									'name'        => 'edd_commission_settings[rates][' . $key . '][user_id]',
@@ -101,12 +101,12 @@ function eddc_render_commissions_meta_box() {
 								echo '<input type="text" name="edd_commission_settings[rates][' . $key . '][amount]" id="edd_commission_amount_' . $key . '" value="' . $value['amount'] . '" . placeholder="' . __( 'Rate for this user', 'eddc' ) . '"/>';
 							echo '</td>';
 							echo '<td>';
-								echo '<a href="#" class="edd_remove_repeatable" style="background: url(' . admin_url('/images/xit.gif') . ') no-repeat;">&times;</a>';
+								echo '<a href="#" class="edd_commissions_remove_repeatable" data-type="commission"><span class="dashicons dashicons-trash"></span></a>';
 							echo '</td>';
 						echo '</tr>';
 					endforeach;
 				else :
-					echo '<tr class="edd_repeatable_upload_wrapper edd_repeatable_row" data-key="1">';
+					echo '<tr class="edd_repeatable_commissions_wrapper edd_repeatable_row edd_repeatable_commissions" data-key="1">';
 						echo '<td>';
 							echo EDD()->html->user_dropdown( array(
 								'name'        => 'edd_commission_settings[rates][1][user_id]',
@@ -117,7 +117,7 @@ function eddc_render_commissions_meta_box() {
 							echo '<input type="text" name="edd_commission_settings[rates][1][amount]" id="edd_commission_amount_1" placeholder="' . __( 'Rate for this user', 'eddc' ) . '"/>';
 						echo '</td>';
 						echo '<td>';
-							echo '<a href="#" class="edd_remove_repeatable" style="background: url(' . admin_url('/images/xit.gif') . ') no-repeat;">&times;</a>';
+							echo '<a href="#" class="edd_commissions_remove_repeatable" data-type="commission"><span class="dashicons dashicons-trash"></span></a>';
 						echo '</td>';
 					echo '</tr>';
 				endif;
