@@ -74,7 +74,7 @@ class Tests_EDD_Commissions_Class extends WP_UnitTestCase {
 	}
 
 	public function test_description() {
-		$this->assertEquals( 'admin@example.org - ' . self::$_download->get_name(), self::$_commission->description );
+		$this->assertEquals( 'admin@example.org - ' . self::$_download->post_title, self::$_commission->description );
 	}
 
 	public function test_rate() {
