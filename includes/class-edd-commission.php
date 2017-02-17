@@ -809,7 +809,7 @@ class EDD_Commission {
 	 */
 	public function update_status( $new_status = '' ) {
 		if ( empty( $status ) ) {
-			return;
+			return false;
 		}
 
 		/**
@@ -836,5 +836,7 @@ class EDD_Commission {
 		 * @param string $status      Commission status.
 		 */
 		do_action( 'eddc_set_commission_status', $this->ID, $new_status, $this->status );
+
+		return true;
 	}
 }
