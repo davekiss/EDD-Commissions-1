@@ -495,64 +495,6 @@ class EDD_Commission {
 	}
 
 	/**
-	 * Helper method to update meta data associated with the commission.
-	 *
-	 * @since 3.3
-	 * @access public
-	 *
-	 * @param string $key        Meta key.
-	 * @param string $value      Meta value.
-	 * @param string $prev_value Previous meta value.
-	 * @return int|bool Meta ID if the key didn't exist, true on successful update, false on failure.
-	 */
-	public function update_meta( $key = '', $value = '', $prev_value = '' ) {
-		if ( empty( $key ) || '' == $key ) {
-			return false;
-		}
-
-		$key = sanitize_key( $key );
-
-		if ( ! in_array( $key, array( 'user_id', 'rate', 'amount', 'currency', 'is_renewal', 'download_id', 'download_variation', 'payment_id' ) ) ) {
-			return;
-		}
-
-		$value = apply_filters( 'eddc_update_commission_meta_' . $key, $value, $this->ID );
-
-		$commission_info = array( 'user_id', 'rate', 'amount', 'currency' );
-
-		// User ID is stored in two meta keys
-		if ( 'user_id' == $key ) {
-			update_post_meta( $this->ID, '_user_id', absint( $value ) );
-		}
-
-		if ( in_array( $key, $commission_info ) ) {
-			$commission_data = $this->get_meta( 'info' );
-			if ( empty( $commission_data ) ) {
-				$commission_data = array();
-			}
-			switch ( $key ) {
-				case 'rate' :
-				case 'amount':
-					$commission_data[ $key ] = (float) $value;
-					break;
-				case 'user_id' :
-					$commission_data[ $key ] = absint( $value );
-					break;
-				default:
-					$commission_data[ $key ] = $value;
-					break;
-			}
-			return update_post_meta( $this->ID, '_edd_commission_info', $commission_data, $prev_value );
-		}
-
-		if ( 'download_id' == $key ) {
-			return update_post_meta( $this->ID, '_' . $key, $value, $prev_value );
-		}
-
-		return update_post_meta( $this->ID, '_edd_commission_' . $key, $value, $prev_value );
-	}
-
-	/**
 	 * Retrieve the paid status of a commission.
 	 *
 	 * @since 3.3
@@ -795,7 +737,81 @@ class EDD_Commission {
 			do_action( 'eddc_commission_save', $this->ID, $this );
 		}
 
+		/**
+		 * Update the commission in the object cache.
+		 */
+		$cache_key = md5( 'eddc_commission' . $this->ID );
+		wp_cache_set( $cache_key, $this, 'commissions' );
+
 		return $saved;
+	}
+
+	/**
+	 * Helper method to update meta data associated with the commission.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @param string $key        Meta key.
+	 * @param string $value      Meta value.
+	 * @param string $prev_value Previous meta value.
+	 * @return int|bool Meta ID if the key didn't exist, true on successful update, false on failure.
+	 */
+	public function update_meta( $key = '', $value = '', $prev_value = '' ) {
+		if ( empty( $key ) || '' == $key ) {
+			return false;
+		}
+
+		$key = sanitize_key( $key );
+
+		if ( ! in_array( $key, array( 'user_id', 'rate', 'amount', 'currency', 'is_renewal', 'download_id', 'download_variation', 'payment_id' ) ) ) {
+			return;
+		}
+
+		$value = apply_filters( 'eddc_update_commission_meta_' . $key, $value, $this->ID );
+
+		$commission_info = array( 'user_id', 'rate', 'amount', 'currency' );
+
+		// User ID is stored in two meta keys
+		if ( 'user_id' == $key ) {
+			update_post_meta( $this->ID, '_user_id', absint( $value ) );
+		}
+
+		if ( in_array( $key, $commission_info ) ) {
+			$commission_data = $this->get_meta( 'info' );
+			if ( empty( $commission_data ) ) {
+				$commission_data = array();
+			}
+			switch ( $key ) {
+				case 'rate' :
+				case 'amount':
+					$commission_data[ $key ] = (float) $value;
+					break;
+				case 'user_id' :
+					$commission_data[ $key ] = absint( $value );
+					break;
+				default:
+					$commission_data[ $key ] = $value;
+					break;
+			}
+			return update_post_meta( $this->ID, '_edd_commission_info', $commission_data, $prev_value );
+		}
+
+		if ( 'download_id' == $key ) {
+			return update_post_meta( $this->ID, '_' . $key, $value, $prev_value );
+		}
+
+		$updated = update_post_meta( $this->ID, '_edd_commission_' . $key, $value, $prev_value );
+
+		if ( true == $updated ) {
+			/**
+			 * Update the commission in the object cache.
+			 */
+			$cache_key = md5( 'eddc_commission' . $this->ID );
+			wp_cache_set( $cache_key, $this, 'commissions' );
+		}
+
+		return $updated;
 	}
 
 	/**
