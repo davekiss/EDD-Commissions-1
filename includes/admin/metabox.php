@@ -101,7 +101,7 @@ function eddc_render_commissions_meta_box() {
 								echo '<input type="text" name="edd_commission_settings[rates][' . $key . '][amount]" id="edd_commission_amount_' . $key . '" value="' . $value['amount'] . '" . placeholder="' . __( 'Rate for this user', 'eddc' ) . '"/>';
 							echo '</td>';
 							echo '<td>';
-								echo '<a href="#" class="edd_commissions_remove_repeatable" data-type="commission"><span class="dashicons dashicons-trash"></span></a>';
+								echo '<a href="#" class="edd_commissions_remove_repeatable" data-type="commission"><span class="dashicons dashicons-dismiss"></span></a>';
 							echo '</td>';
 						echo '</tr>';
 					endforeach;
@@ -117,7 +117,7 @@ function eddc_render_commissions_meta_box() {
 							echo '<input type="text" name="edd_commission_settings[rates][1][amount]" id="edd_commission_amount_1" placeholder="' . __( 'Rate for this user', 'eddc' ) . '"/>';
 						echo '</td>';
 						echo '<td>';
-							echo '<a href="#" class="edd_commissions_remove_repeatable" data-type="commission"><span class="dashicons dashicons-trash"></span></a>';
+							echo '<a href="#" class="edd_commissions_remove_repeatable" data-type="commission"><span class="dashicons dashicons-dismiss"></span></a>';
 						echo '</td>';
 					echo '</tr>';
 				endif;
