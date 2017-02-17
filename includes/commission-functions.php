@@ -252,7 +252,7 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 		), $commission_id, $payment_id, $commission_calculated['download_id'] );
 
 		$commission = new EDD_Commission;
-		$commission->post_title  = $user_info['email'] . ' - ' . get_the_title( $commission_calculated['download_id'] );
+		$commission->description = $user_info['email'] . ' - ' . get_the_title( $commission_calculated['download_id'] );
 		$commission->status      = 'unpaid';
 		$commission->user_ID     = $commission_info['user_id'];
 		$commission->rate        = $commission_info['rate'];

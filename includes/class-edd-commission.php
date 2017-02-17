@@ -37,6 +37,15 @@ class EDD_Commission {
 	protected $user_ID = 0;
 
 	/**
+	 * Description (same as post_title).
+	 *
+	 * @since 3.3
+	 * @access protected
+	 * @var string
+	 */
+	protected $description = null;
+
+	/**
 	 * Commission Rate.
 	 *
 	 * @since 3.3
@@ -296,6 +305,7 @@ class EDD_Commission {
 		 */
 		$this->ID          = absint( $commission->ID );
 		$this->user_ID     = $this->setup_user_ID();
+		$this->description = $commission->post_title;
 		$this->rate        = $this->setup_rate();
 		$this->amount      = $this->setup_amount();
 		$this->currency    = $this->setup_currency();
@@ -599,6 +609,56 @@ class EDD_Commission {
 	}
 
 	/**
+	 * Retrieve the description (post_title) for the commission.
+	 *
+	 * @since 3.3
+	 * @access public
+	 *
+	 * @return string Commission description.
+	 */
+	public function get_description() {
+		/**
+		 * Allow the description of a commission to be filtered.
+		 *
+		 * @since 3.3
+		 *
+		 * @param string $description Commission description.
+		 * @param int    $ID          Commission ID.
+		 */
+		return apply_filters( 'eddc_commission_is_renewal', $this->description, $this->ID );
+	}
+
+	/**
+	 * Set the 'post_title' to be the same as the description for a commission.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @param string $key   Class property.
+	 * @param string $value Value for the class property.
+	 * @return void
+	 */
+	private function set_description( $key, $value ) {
+		$this->post_title  = $value;
+		$this->description = $value;
+	}
+
+	/**
+	 * Set the 'description' to be the same as the post_title for a commission.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @param string $key   Class property.
+	 * @param string $value Value for the class property.
+	 * @return void
+	 */
+	private function set_post_title( $key, $value ) {
+		$this->post_title  = $value;
+		$this->description = $value;
+	}
+
+	/**
 	 * Check if a commission exists.
 	 *
 	 * @since 3.3
@@ -680,7 +740,7 @@ class EDD_Commission {
 
 				$this->update_meta( $key, $value );
 
-				if ( 'name' == $key ) {
+				if ( 'description' == $key ) {
 					wp_update_post( array(
 						'ID'         => $this->ID,
 						'post_title' => $value
