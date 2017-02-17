@@ -30,11 +30,11 @@ class Tests_EDD_Commissions_Functions extends WP_UnitTestCase {
 
 		wp_insert_user( $subscriber ) ;
 
-		self::$_payment_id = EDD_Helper_Payment::create_simple_payment();
-		self::$_payment = new EDD_Payment( self::$_payment_id );
-		self::$_download_id = self::$_payment->downloads[0]['id'];
-		self::$_user     = get_user_by( 'login', 'subscriber' );
-		self::$_author   = get_user_by( 'login', 'author' );
+		self::$_payment_id  = EDD_Helper_Payment::create_simple_payment();
+		self::$_payment     = new EDD_Payment( self::$_payment_id );
+		self::$_download_id = self::$_payment->downloads[ 0 ][ 'id' ];
+		self::$_user        = get_user_by( 'login', 'subscriber' );
+		self::$_author      = get_user_by( 'login', 'author' );
 
 		// Set the product's rates
 		$commissions_config = array(
