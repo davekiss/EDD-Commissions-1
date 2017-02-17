@@ -567,7 +567,7 @@ class EDD_Commission {
 		 * @param string $description Commission description.
 		 * @param int    $ID          Commission ID.
 		 */
-		return apply_filters( 'eddc_commission_is_renewal', $this->description, $this->ID );
+		return apply_filters( 'eddc_commission_description', $this->description, $this->ID );
 	}
 
 	/**
