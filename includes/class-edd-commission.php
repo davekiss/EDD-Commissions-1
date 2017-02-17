@@ -683,6 +683,23 @@ class EDD_Commission {
 	 * @return mixed bool|int false if data isn't passed and class not instantiated for creation, or post ID for the new commission.
 	 */
 	private function add() {
+		/**
+		 * Allow the commission information to be filtered.
+		 *
+		 * @since 3.3
+		 *
+		 * @param array $args {
+		 *     Filterable metadata.
+		 *
+		 *     @type int             $user_ID  User ID.
+		 *     @type mixed int|float $rate     Commission rate.
+		 *     @type mixed int|float $amount   Commission amount.
+		 *     @type string          $currency Currency (e.g. USD).
+		 * }
+		 * @param int $ID          Commission ID.
+		 * @param int $payment_ID  Payment ID linked to the commission.
+		 * @param int $download_ID Download ID linked to the commission.
+		 */
 		$commission_info = apply_filters( 'edd_commission_info', array(
 			'user_id'  => $this->user_ID,
 			'rate'     => $this->rate,
@@ -690,13 +707,26 @@ class EDD_Commission {
 			'currency' => $this->currency,
 		), $this->ID, $this->payment_ID, $this->download_ID );
 
+		/**
+		 * Allow the arguments passed to `wp_insert_post` to be filtered.
+		 *
+		 * @since 3.3
+		 *
+		 * @param array $args {
+		 *     @type string $post_title    Post title.
+		 *     @type string $post_status   Post status.
+		 *     @type string $post_type     Post type
+		 *     @type string $post_date     Post date.
+		 *     @type string $post_date_gmt Post date in the GMT timezone.
+		 * }
+		 */
 		$args = apply_filters( 'eddc_insert_commission_args', array(
 			'post_title'    => $this->post_title,
 			'post_status'   => 'publish',
 			'post_type'     => 'edd_commission',
 			'post_date'     => ! empty( $this->date ) ? $this->date : null,
 			'post_date_gmt' => ! empty( $this->date ) ? get_gmt_from_date( $this->date ) : null
-		), $commission_info );
+		) );
 
 		// Create a blank edd_commission post
 		$commission_id = wp_insert_post( $args );
@@ -730,7 +760,7 @@ class EDD_Commission {
 		}
 
 		/**
-		 * Save all the object variables that have been updated to the databse.
+		 * Save all the object variables that have been updated to the database.
 		 */
 		if ( ! empty( $this->pending ) ) {
 			foreach ( $this->pending as $key => $value ) {
@@ -759,8 +789,8 @@ class EDD_Commission {
 			 *
 			 * @since 3.3
 			 *
-			 * @param object       Instance of EDD_Commission object.
-			 * @param string $key  Meta key.
+			 * @param object EDD_Commission Instance of EDD_Commission object.
+			 * @param string $key Meta key.
 			 */
 			do_action( 'eddc_commission_save', $this->ID, $this );
 		}
