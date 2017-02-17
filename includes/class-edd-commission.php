@@ -182,12 +182,7 @@ class EDD_Commission {
 
 		$id = absint( $id );
 		$commission = WP_Post::get_instance( $id );
-
-		if ( $commission ) {
-			$this->setup_commission( $commission );
-		} else {
-			return false;
-		}
+		$this->setup_commission( $commission );
 	}
 
 	/**
