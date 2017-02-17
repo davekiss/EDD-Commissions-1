@@ -91,7 +91,7 @@ class EDD_Batch_Commissions_Payout extends EDD_Batch_Export {
 				$user          = get_userdata( $user_id );
 				$custom_paypal = get_user_meta( $user_id, 'eddc_user_paypal', true );
 				$email         = is_email( $custom_paypal ) ? $custom_paypal : $user->user_email;
-				$key           = md5( $email );
+				$key           = md5( $email . $commission_meta['currency'] );
 
 				if ( array_key_exists( $key, $payouts ) ) {
 					$payouts[ $key ]['amount'] += $commission_meta['amount'];
