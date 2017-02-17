@@ -667,11 +667,11 @@ class EDD_Commission {
 	 * @return bool Commission exists.
 	 */
 	public function exists() {
-		if ( ! $this->ID > 0 ) {
-			return false;
+		if ( $this->ID > 0 ) {
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	/**
