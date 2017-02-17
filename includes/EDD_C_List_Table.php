@@ -38,8 +38,9 @@ class EDD_C_List_Table extends WP_List_Table {
 	function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 			case 'rate':
-				$download = get_post_meta( $item['ID'], '_download_id', true );
-				$type     = eddc_get_commission_type( $download );
+				$download        = get_post_meta( $item['ID'], '_download_id', true );
+				$commission_info = get_post_meta( $item['ID'], '_edd_commission_info', true );
+				$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download ) );
 				if( 'percentage' == $type )
 					return $item[ $column_name ] . '%';
 				else

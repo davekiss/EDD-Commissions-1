@@ -334,7 +334,7 @@ function eddc_commissions_view( $commission ) {
 	$user_data       = get_userdata( $commission_info['user_id'] );
 	$payment         = get_post_meta( $commission_id, '_edd_commission_payment_id', true );
 	$download        = get_post_meta( $commission_id, '_download_id', true );
-	$type            = eddc_get_commission_type( $download );
+	$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download ) );
 	$status          = eddc_get_commission_status( $commission_id );
 
 	$child_args      = array(

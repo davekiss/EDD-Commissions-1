@@ -234,7 +234,8 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 			'has_variable_prices'   => NULL,
 			'price_id'              => NULL,
 			'variation'             => NULL,
-			'cart_item'             => NULL
+			'cart_item'             => NULL,
+			'type'                  => NULL
 		);
 
 		$commission_calculated = wp_parse_args(	$commission_calculated, $default_commission_calculated );
@@ -248,7 +249,8 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 			'user_id'  => $commission_calculated['recipient'],
 			'rate'     => $commission_calculated['rate'],
 			'amount'   => $commission_calculated['commission_amount'],
-			'currency' => $commission_calculated['currency']
+			'currency' => $commission_calculated['currency'],
+			'type'     => eddc_get_commission_type( $commission_calculated['download_id'] )
 		), $commission_id, $payment_id, $commission_calculated['download_id'] );
 
 		$commission = new EDD_Commission;
