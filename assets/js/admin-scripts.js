@@ -149,13 +149,12 @@ jQuery(document).ready(function($) {
 		},
 
 		remove : function() {
-			$( document.body ).on( 'click', '.edd_remove_repeatable', function(e) {
+			$( document.body ).on( 'click', '.edd_commissions_remove_repeatable', function(e) {
 				e.preventDefault();
 
 				var row   = $(this).parent().parent( 'tr' ),
 					count = row.parent().find( 'tr' ).length - 1,
-					type  = $(this).data('type'),
-					repeatable = 'tr.edd_repeatable_' + type + 's',
+					repeatable = 'tr.edd_repeatable_commissions',
 					focusElement,
 					focusable,
 					firstFocusable;
@@ -170,36 +169,23 @@ jQuery(document).ready(function($) {
 					focusable  = focusElement.find( 'select, input, textarea, button' ).filter( ':visible' );
 					firstFocusable = focusable.eq(0);
 
-				if ( type === 'price' ) {
-					var price_row_id = row.data('key');
-					/** remove from price condition */
-					$( '.edd_repeatable_condition_field option[value="' + price_row_id + '"]' ).remove();
-				}
-
 				if( count > 1 ) {
 					$( 'input, select', row ).val( '' );
 					row.fadeOut( 'fast' ).remove();
 					firstFocusable.focus();
 				} else {
-					switch( type ) {
-						case 'price' :
-							alert( edd_vars.one_price_min );
-							break;
-						case 'file' :
-							$( 'input, select', row ).val( '' );
-							break;
-						default:
-							alert( edd_vars.one_field_min );
-							break;
-					}
+					alert( edd_vars.one_field_min );
 				}
 
 				/* re-index after deleting */
 				$(repeatable).each( function( rowIndex ) {
+					$(this).data( 'key', rowIndex );
 					$(this).find( 'input, select' ).each(function() {
 						var name = $( this ).attr( 'name' );
-						name = name.replace( /\[(\d+)\]/, '[' + rowIndex+ ']');
-						$( this ).attr( 'name', name ).attr( 'id', name );
+						if ( typeof name !== 'undefined' ) {
+							name = name.replace( /\[(\d+)\]/, '[' + rowIndex+ ']');
+							$( this ).attr( 'name', name ).attr( 'id', name );
+						}
 					});
 				});
 			});
