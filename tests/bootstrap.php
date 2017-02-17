@@ -22,11 +22,12 @@ require $_tests_dir . '/includes/bootstrap.php';
 echo "Installing Easy Digital Downloads...\n";
 activate_plugin( 'easy-digital-downloads/easy-digital-downloads.php' );
 
+edd_run_install();
+
 echo "Installing Commissions...\n";
 activate_plugin( 'EDD-Commissions/edd-commissions.php' );
 
 // Install Commissions
-
 global $current_user, $edd_options;
 $edd_options = get_option( 'edd_settings' );
 

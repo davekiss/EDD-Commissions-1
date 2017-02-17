@@ -13,6 +13,8 @@ class Tests_EDD_Commissions_Class extends WP_UnitTestCase {
 
 	public static function wpSetUpBeforeClass() {
 
+		edd_run_install();
+
 		// Let's make some default users for later
 		// `Author` can be used to make products that have commissions assigned to him
 		$author = array(
@@ -113,4 +115,13 @@ class Tests_EDD_Commissions_Class extends WP_UnitTestCase {
 	public function test_download_variation() {
 		$this->assertEmpty( self::$_commission->download_variation );
 	}
+
+	public function test_update_status_success() {
+		$this->assertTrue( self::$_commission->update_status( 'paid' ) );
+	}
+
+	public function test_update_status_false_empty() {
+		$this->assertFalse( self::$_commission->update_status( '' ) );
+	}
+
 }

@@ -838,7 +838,7 @@ class EDD_Commission {
 	 * @return void
 	 */
 	public function update_status( $new_status = '' ) {
-		if ( empty( $status ) ) {
+		if ( empty( $new_status ) ) {
 			return false;
 		}
 
@@ -853,7 +853,12 @@ class EDD_Commission {
 		 */
 		do_action( 'eddc_pre_set_commission_status', $this->ID, $new_status, $this->status );
 
-		wp_set_object_terms( $this->ID, $new_status, 'edd_commission_status', false );
+		$updated = wp_set_object_terms( $this->ID, $new_status, 'edd_commission_status', false );
+
+		if ( is_wp_error( $updated ) ) {
+			return false;
+		}
+
 		$this->status = $new_status;
 
 		/**

@@ -11,6 +11,8 @@ class Tests_EDD_Commissions_Functions extends WP_UnitTestCase {
 
 	public static function wpSetUpBeforeClass() {
 
+		edd_run_install();
+
 		// Let's make some default users for later
 		// `Author` can be used to make products that have commissions assigned to him
 		$author = array(
