@@ -55,6 +55,15 @@ class EDD_Commission {
 	protected $rate = 0.00;
 
 	/**
+	 * Commission Type.
+	 *
+	 * @since 3.3
+	 * @access protected
+	 * @var  string
+	 */
+	protected $type = null;
+
+	/**
 	 * Commission Amount.
 	 *
 	 * @since 3.3
@@ -307,10 +316,10 @@ class EDD_Commission {
 		$this->user_ID     = $this->setup_user_ID();
 		$this->description = $commission->post_title;
 		$this->rate        = $this->setup_rate();
+		$this->type        = $this->setup_type();
 		$this->amount      = $this->setup_amount();
 		$this->currency    = $this->setup_currency();
 		$this->download_ID = $this->setup_download_ID();
-		$this->user_ID     = $this->setup_user_ID();
 		$this->payment_ID  = $this->setup_payment_ID();
 		$this->status      = $this->setup_status();
 		$this->is_renewal  = $this->setup_is_renewal();
@@ -364,6 +373,11 @@ class EDD_Commission {
 	private function setup_rate() {
 		$rate = $this->get_meta( 'rate', true );
 		return $rate;
+	}
+
+	private function setup_type() {
+		$type = $this->get_meta( 'type', true );
+		return $type;
 	}
 
 	/**
@@ -488,6 +502,11 @@ class EDD_Commission {
 		if ( 'download_id' == $key ) {
 			$download_ID = get_post_meta( $this->ID, '_download_id', true );
 			return $download_ID;
+		}
+
+		if ( 'type' === $key ) {
+			$download_ID = get_post_meta( $this->ID, '_download_id', true );
+			return eddc_get_commission_type( $download_ID );
 		}
 
 		$meta = get_post_meta( $this->ID, '_edd_commission_' . $key, $single );

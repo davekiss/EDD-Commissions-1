@@ -235,7 +235,6 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 			'price_id'              => NULL,
 			'variation'             => NULL,
 			'cart_item'             => NULL,
-			'type'                  => NULL
 		);
 
 		$commission_calculated = wp_parse_args(	$commission_calculated, $default_commission_calculated );
@@ -245,23 +244,16 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 		// set a flag so downloads with commissions awarded are easy to query
 		update_post_meta( $commission_calculated['download_id'], '_edd_has_commission', true );
 
-		$commission_info = apply_filters( 'edd_commission_info', array(
-			'user_id'  => $commission_calculated['recipient'],
-			'rate'     => $commission_calculated['rate'],
-			'amount'   => $commission_calculated['commission_amount'],
-			'currency' => $commission_calculated['currency'],
-			'type'     => eddc_get_commission_type( $commission_calculated['download_id'] )
-		), $commission_id, $payment_id, $commission_calculated['download_id'] );
-
 		$commission = new EDD_Commission;
 		$commission->description = $user_info['email'] . ' - ' . get_the_title( $commission_calculated['download_id'] );
 		$commission->status      = 'unpaid';
-		$commission->user_ID     = $commission_info['user_id'];
-		$commission->rate        = $commission_info['rate'];
-		$commission->amount      = $commission_info['amount'];
-		$commission->currency    = $commission_info['currency'];
+		$commission->user_ID     = $commission_calculated['recipient'];
+		$commission->rate        = $commission_calculated['rate'];
+		$commission->amount      = $commission_calculated['commission_amount'];
+		$commission->currency    = $commission_calculated['currency'];
 		$commission->download_ID = (int) $commission_calculated['download_id'];
 		$commission->payment_ID  = $payment_id;
+		$commission->type        = eddc_get_commission_type( $commission_calculated['download_id'] );
 
 		// If we are dealing with a variation, then save variation info
 		if ( $commission_calculated['has_variable_prices'] && ! empty( $commission_calculated['variation'] ) ) {
@@ -275,7 +267,30 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 
 		$commission->save();
 
-		do_action( 'eddc_insert_commission', $commission_calculated['recipient'], $commission_calculated['commission_amount'], $commission_calculated['rate'], $commission_calculated['download_id'], $commission_id, $payment_id );
+		$args = array(
+			'user_id'  => $commission->user_id,
+			'rate'     => $commission->rate,
+			'amount'   => $commission->amount,
+			'currency' => $commission->currency,
+			'type'     => $commission->type,
+		);
+
+		$commission_info = apply_filters( 'edd_commission_info', $args, $commission->ID, $commission->payment_ID, $commission->download_ID );
+		$items_changed   = false;
+		foreach ( $commission_info as $key => $value ) {
+			if ( $value === $args[ $key ] ) {
+				continue;
+			}
+
+			$commission->$key = $value;
+			$items_changed    = true;
+		}
+
+		if ( $items_changed ) {
+			$commission->save();
+		}
+
+		do_action( 'eddc_insert_commission', $commission_calculated['recipient'], $commission_calculated['commission_amount'], $commission_calculated['rate'], $commission_calculated['download_id'], $commission->ID, $payment_id );
 	}
 
 }
