@@ -370,6 +370,14 @@ class EDD_Commission {
 		return $rate;
 	}
 
+	/**
+	 * Setup commission type.
+	 *
+	 * @since 3.3
+	 * @access private
+	 *
+	 * @return string Commission type.
+	 */
 	private function setup_type() {
 		$type = $this->get_meta( 'type', true );
 		return $type;
