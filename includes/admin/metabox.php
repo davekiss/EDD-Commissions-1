@@ -44,8 +44,8 @@ function eddc_render_commissions_meta_box() {
 	do_action( 'eddc_metabox_before_options', $post->ID );
 
 	// Use nonce for verification
-	echo '<input type="hidden" name="edd_download_commission_meta_box_nonce" value="', wp_create_nonce( basename( __FILE__ ) ), '" />';
 	?>
+	<input type="hidden" name="edd_download_commission_meta_box_nonce" value="<?php wp_create_nonce( basename( __FILE__ ) ); ?>" />
 	<table class="form-table">
 		<?php do_action( 'eddc_metabox_options_table_begin', $post->ID ); ?>
 		<tr>
