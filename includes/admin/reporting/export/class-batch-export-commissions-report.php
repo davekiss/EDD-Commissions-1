@@ -163,7 +163,7 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 
 			$row_data .= '"' . edd_format_amount( $paid_total + $unpaid_total + $revoked_total ) . '",';
 
-			$row_data .= '"' . edd_format_amount( $paid_total + $unpaid_total ) . '",';
+			$row_data .= '"' . edd_format_amount( $paid_total + $unpaid_total ) . '"';
 
 			$row_data .= "\r\n";
 
