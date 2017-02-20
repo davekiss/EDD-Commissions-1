@@ -92,6 +92,8 @@ function edd_commissions_load() {
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/customers.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/EDD_C_List_Table.php';
 		include_once EDDC_PLUGIN_DIR . 'includes/admin/class.admin-notices.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/reporting/reports.php';
+		include_once EDDC_PLUGIN_DIR . 'includes/admin/reporting/export/export-actions.php';
 	}
 
 	add_action( 'fes_load_fields_require', 'eddc_add_fes_functionality' );
