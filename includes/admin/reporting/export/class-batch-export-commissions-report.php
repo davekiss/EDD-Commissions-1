@@ -70,7 +70,8 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 			__( 'Unpaid', 'eddc' ),
 			__( 'Paid', 'eddc' ),
 			__( 'Revoked', 'eddc' ),
-			__( 'Net Amount', 'eddc' )
+			__( 'Gross Total', 'eddc' ),
+			__( 'Net Total', 'eddc' )
 		);
 
 		$col_data = '';
@@ -86,13 +87,15 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 
 			if ( $i == ( count( $cols ) - 1 ) ) {
 				$col_data .= "\r\n";
+			} elseif( $i == ( count( $cols ) - 2 ) ) {
+				$col_data .= ",";
 			} else {
 				$col_data .= ",,";
 			}
 		}
 
-		// Subtract 2 for `Net Activity` and `Monthly Commissions Activity` column
-		$statuses = count( $cols ) - 2;
+		// Subtract 3 for `Gross Total`, `Net Total` and `Monthly Commissions Activity` column
+		$statuses = count( $cols ) - 3;
 
 		$col_data .= ',';
 		for ( $i = 0; $i < $statuses; $i++ ) {
@@ -157,6 +160,8 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 
 			$row_data .= isset( $data['revoked']['count'] ) ? $data['revoked']['count'] . ',' : 0 . ',';
 			$row_data .= '"' . edd_format_amount( $revoked_total ) . '"' . ',';
+
+			$row_data .= '"' . edd_format_amount( $paid_total + $unpaid_total + $revoked_total ) . '",';
 
 			$row_data .= '"' . edd_format_amount( $paid_total + $unpaid_total ) . '",';
 
