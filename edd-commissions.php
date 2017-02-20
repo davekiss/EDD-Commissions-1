@@ -67,6 +67,7 @@ function edd_commissions_load() {
 	}
 
 	include_once EDDC_PLUGIN_DIR . 'includes/commission-functions.php';
+	include_once EDDC_PLUGIN_DIR . 'includes/class-edd-commission.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/email-functions.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/post-type.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/user-meta.php';

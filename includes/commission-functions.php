@@ -1,4 +1,47 @@
 <?php
+/**
+ * Commissions Functions.
+ *
+ * @package 	EDD_Commissions
+ * @subpackage 	Core
+ * @copyright   Copyright (c) 2017, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       1.0
+ */
+
+/**
+ * Retrieves an instance of EDD_Commission for a specified ID.
+ *
+ * @since 2.7
+ *
+ * @param mixed int|EDD_Commission|WP_Post $commission Commission ID, EDD_Commission object or WP_Post object.
+ * @return mixed false|object EDD_Commission if a valid commission ID, false otherwise.
+ */
+function eddc_get_commission( $commission = null ) {
+	if ( is_a( $commission, 'WP_Post' ) || is_a( $commission, 'EDD_Commission' ) ) {
+		$commission_id = $commission->ID;
+	} else {
+		$commission_id = $commission;
+	}
+
+	if ( empty( $commission_id ) ) {
+		return false;
+	}
+
+	$cache_key  = md5( 'eddc_commission' . $commission_id );
+	$commission = wp_cache_get( $cache_key, 'commissions' );
+
+	if ( false === $commission ) {
+		$commission = new EDD_Commission( $commission_id );
+		if ( empty( $commission->ID ) || ( (int) $commission->ID !== (int) $commission_id ) ) {
+			return false;
+		} else {
+			wp_cache_set( $cache_key, $commission, 'commissions' );
+		}
+	}
+
+	return $commission;
+}
 
 /**
  * Helper function used by anything needing to calculate commissions for a payment ID.
@@ -140,7 +183,6 @@ function eddc_calculate_payment_commissions( $payment_id ) {
  */
 
 function eddc_record_commission( $payment_id, $new_status, $old_status ) {
-
 	// Check if the payment was already set to complete
 	if( $old_status == 'publish' || $old_status == 'complete' ) {
 		return; // Make sure that payments are only completed once
@@ -154,22 +196,18 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 
 	// If we were passed a numeric value as the payment id (which it should be)
 	if ( ! is_object( $payment_id ) && is_numeric( $payment_id ) ) {
-
 		$payment = new EDD_Payment( $payment_id );
-
 	} else {
-
 		// In case we happened to be passed an EDD_Payment object as the $payment_id, reset the $payment_id variable to be the int payment ID.
 		$payment    = $payment_id;
 		$payment_id = $payment->ID;
-
 	}
 
-	if( $payment->gateway == 'manual_purchases' && ! isset( $_POST['commission'] ) ) {
+	if ( $payment->gateway == 'manual_purchases' && ! isset( $_POST['commission'] ) ) {
 		return; // do not record commission on manual payments unless specified
 	}
 
-	if( $payment->completed_date ) {
+	if ( $payment->completed_date ) {
 		return;
 	}
 
@@ -197,7 +235,6 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 			'price_id'              => NULL,
 			'variation'             => NULL,
 			'cart_item'             => NULL,
-			'type'                  => NULL
 		);
 
 		$commission_calculated = wp_parse_args(	$commission_calculated, $default_commission_calculated );
@@ -207,41 +244,53 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 		// set a flag so downloads with commissions awarded are easy to query
 		update_post_meta( $commission_calculated['download_id'], '_edd_has_commission', true );
 
-		$commission_post_data = array(
-			'post_type'   => 'edd_commission',
-			'post_title'  => $user_info['email'] . ' - ' . get_the_title( $commission_calculated['download_id'] ),
-			'post_status' => 'publish'
-		);
-
-		$commission_id = wp_insert_post( apply_filters( 'edd_commission_post_data', $commission_post_data ) );
-
-		$commission_info = apply_filters( 'edd_commission_info', array(
-			'user_id'  => $commission_calculated['recipient'],
-			'rate'     => $commission_calculated['rate'],
-			'amount'   => $commission_calculated['commission_amount'],
-			'currency' => $commission_calculated['currency'],
-			'type'     => eddc_get_commission_type( $commission_calculated['download_id'] )
-		), $commission_id, $payment_id, $commission_calculated['download_id'] );
-
-		eddc_set_commission_status( $commission_id, 'unpaid' );
-
-		update_post_meta( $commission_id, '_edd_commission_info', $commission_info );
-		update_post_meta( $commission_id, '_download_id', $commission_calculated['download_id'] );
-		update_post_meta( $commission_id, '_user_id', $commission_calculated['recipient'] );
-		update_post_meta( $commission_id, '_edd_commission_payment_id', $payment_id );
+		$commission = new EDD_Commission;
+		$commission->description = $user_info['email'] . ' - ' . get_the_title( $commission_calculated['download_id'] );
+		$commission->status      = 'unpaid';
+		$commission->user_ID     = $commission_calculated['recipient'];
+		$commission->rate        = $commission_calculated['rate'];
+		$commission->amount      = $commission_calculated['commission_amount'];
+		$commission->currency    = $commission_calculated['currency'];
+		$commission->download_ID = (int) $commission_calculated['download_id'];
+		$commission->payment_ID  = $payment_id;
+		$commission->type        = eddc_get_commission_type( $commission_calculated['download_id'] );
 
 		// If we are dealing with a variation, then save variation info
 		if ( $commission_calculated['has_variable_prices'] && ! empty( $commission_calculated['variation'] ) ) {
-			update_post_meta( $commission_id, '_edd_commission_download_variation', $commission_calculated['variation'] );
+			$commission->download_variation = $commission_calculated['variation'];
 		}
 
 		// If it's a renewal, save that detail
 		if ( ! empty( $commission_calculated['cart_item']['item_number']['options']['is_renewal'] ) ) {
-			update_post_meta( $commission_id, '_edd_commission_is_renewal', true );
+			$commission->is_renewal = true;
 		}
 
-		do_action( 'eddc_insert_commission', $commission_calculated['recipient'], $commission_calculated['commission_amount'], $commission_calculated['rate'], $commission_calculated['download_id'], $commission_id, $payment_id );
+		$commission->save();
 
+		$args = array(
+			'user_id'  => $commission->user_id,
+			'rate'     => $commission->rate,
+			'amount'   => $commission->amount,
+			'currency' => $commission->currency,
+			'type'     => $commission->type,
+		);
+
+		$commission_info = apply_filters( 'edd_commission_info', $args, $commission->ID, $commission->payment_ID, $commission->download_ID );
+		$items_changed   = false;
+		foreach ( $commission_info as $key => $value ) {
+			if ( $value === $args[ $key ] ) {
+				continue;
+			}
+
+			$commission->$key = $value;
+			$items_changed    = true;
+		}
+
+		if ( $items_changed ) {
+			$commission->save();
+		}
+
+		do_action( 'eddc_insert_commission', $commission_calculated['recipient'], $commission_calculated['commission_amount'], $commission_calculated['rate'], $commission_calculated['download_id'], $commission->ID, $payment_id );
 	}
 
 }
