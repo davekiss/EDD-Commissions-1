@@ -59,22 +59,24 @@ function eddc_metabox_add_shipping_options(){
 	$shipping_fee = isset( $meta['shipping_fee'] ) ? $meta['shipping_fee'] : 'site_default';
 
 	echo '<tr style="display:none;" class="eddc_commission_row" id="edd_commissions_shipping_fee_split">';
-		echo '<th style="width:20%"><label for="edd_commission_shipping_fee">' . __ ( 'Shipping', 'eddc' ) . '</label></th>';
 		echo '<td class="edd_field_type_text">';
-
-			echo '<select name="edd_commission_settings[shipping_fee]" id="edd_commission_shipping_fee">';
-			  echo '<option value="site_default" ' . selected( $shipping_fee, 'site_default', false ) . '>' . __( 'Use site-wide default.', 'eddc' ) . '</option>';
-			  echo '<option value="split_shipping" ' . selected( $shipping_fee, 'split_shipping', false ) . '>' . __( 'Split based on rate.', 'eddc' ) . '</option>';
-			  echo '<option value="pay_to_first_user" ' . selected( $shipping_fee, 'pay_to_first_user', false ) . '>' . __( 'Pay to 1st user.', 'eddc' ) . '</option>';
-			  echo '<option value="pay_to_store" ' . selected( $shipping_fee, 'pay_to_store', false ) . '>' . __( 'Pay to store.', 'eddc' ) . '</option>';
-			echo '</select>';
-
-			echo __( 'How should the shipping fees be split? To learn more about how this works, see', 'eddc' ) . ' <a href="http://docs.easydigitaldownloads.com/article/1448-integration-guide-commissions-and-simple-shipping" target="_blank">' . __( 'this doc.', 'eddc' ) . '</a>';
-
+			echo '<label for="edd_commission_settings[type]"><strong>' . __( 'Shipping:', 'eddc' ) . '</strong></label>';
+			echo '<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong>' . __( 'Shipping', 'eddc' ) . '</strong>: ' . __( 'How should the shipping fees be split?', 'eddc' ) . '"></span><br/>';
+			echo '<p>';
+				echo '<select name="edd_commission_settings[shipping_fee]" id="edd_commission_shipping_fee">';
+				  echo '<option value="site_default" ' . selected( $shipping_fee, 'site_default', false ) . '>' . __( 'Use site-wide default.', 'eddc' ) . '</option>';
+				  echo '<option value="split_shipping" ' . selected( $shipping_fee, 'split_shipping', false ) . '>' . __( 'Split based on rate.', 'eddc' ) . '</option>';
+				  echo '<option value="pay_to_first_user" ' . selected( $shipping_fee, 'pay_to_first_user', false ) . '>' . __( 'Pay to 1st user.', 'eddc' ) . '</option>';
+				  echo '<option value="pay_to_store" ' . selected( $shipping_fee, 'pay_to_store', false ) . '>' . __( 'Pay to store.', 'eddc' ) . '</option>';
+				echo '</select>';
+			echo '</p>';
+			echo '<p>';
+			echo __( ' To learn more about how this works, see', 'eddc' ) . ' <a href="http://docs.easydigitaldownloads.com/article/1448-integration-guide-commissions-and-simple-shipping" target="_blank">' . __( 'this doc.', 'eddc' ) . '</a>';
+			echo '</p>';
 		echo '<td>';
 	echo '</tr>';
 }
-add_action( 'eddc_meta_table_after', 'eddc_metabox_add_shipping_options' );
+add_action( 'eddc_metabox_options_table_after', 'eddc_metabox_add_shipping_options' );
 
 
 /**

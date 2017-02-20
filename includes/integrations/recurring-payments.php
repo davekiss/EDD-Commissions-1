@@ -99,14 +99,16 @@ function eddc_metabox_disable_recurring_checkbox() {
 	if ( false === $recurring_commissions_enabled ) { return; }
 
 	echo '<tr style="display:none;" class="eddc_commission_row" id="edd_commissions_recurring">';
-		echo '<th style="width:20%"><label for="edd_commission_shipping_fee">' . __ ( 'Recurring', 'eddc' ) . '</label></th>';
 		echo '<td class="edd_field_type_text">';
-			echo '<input type="checkbox" ' . checked( false, $has_recurring_commissions, false ) . ' name="edd_commission_settings[disable_recurring]" id="edd_commission_amount" value="1"/>&nbsp;';
-			echo __( 'Disable Recurring Commissions.', 'eddc' );
+			echo '<label for="edd_commission_settings[type]"><strong>' . __( 'Recurring:', 'eddc' ) . '</strong></label>';
+			echo '<p>';
+				echo '<input type="checkbox" ' . checked( false, $has_recurring_commissions, false ) . ' name="edd_commission_settings[disable_recurring]" id="edd_commission_amount" value="1"/>&nbsp;';
+				echo __( 'Disable Recurring Commissions.', 'eddc' );
+			echo '</p>';
 		echo '<td>';
 	echo '</tr>';
 }
-add_action( 'eddc_meta_table_after', 'eddc_metabox_disable_recurring_checkbox' );
+add_action( 'eddc_metabox_options_table_after', 'eddc_metabox_disable_recurring_checkbox' );
 
 /**
  * Allow the record commissions process to avoid downloads that have recurring commissions disabled.
