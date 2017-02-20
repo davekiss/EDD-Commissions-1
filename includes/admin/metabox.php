@@ -108,7 +108,7 @@ function eddc_render_commissions_meta_box() {
 								<input type="text" name="edd_commission_settings[rates][<?php echo $key; ?>][amount]" id="edd_commission_amount_<?php echo $key; ?>" value="<?php echo $value['amount']; ?>" placeholder="<?php _e( 'Rate for this user', 'eddc' ); ?>"/>
 							</td>
 							<td>
-								<a href="#" class="edd_remove_repeatable"><span class="dashicons dashicons-dismiss"></a>
+								<a href="#" class="edd_commissions_remove_repeatable"><span class="dashicons dashicons-dismiss"></a>
 							</td>
 						</tr>
 					<?php endforeach; ?>
