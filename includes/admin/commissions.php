@@ -206,7 +206,7 @@ function eddc_render_add_commission_view() {
 										<label for="payment_id_id"><?php _e('Payment ID', 'eddc'); ?></label>
 									</td>
 									<td style="word-wrap: break-word">
-										<input type="text" id="payment_id_id" name="payment_id_id" value=""/>
+										<input type="text" id="payment_id_id" name="payment_id" value=""/>
 										<p class="description"><?php _e('The payment ID this commission is related to (optional).', 'eddc'); ?></p>
 									</td>
 								</tr>
