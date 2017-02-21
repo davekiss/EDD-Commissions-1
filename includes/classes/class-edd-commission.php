@@ -798,13 +798,9 @@ class EDD_Commission {
 
 		$key = sanitize_key( $key );
 
-		if ( ! in_array( $key, array( 'user_id', 'type', 'rate', 'amount', 'currency', 'is_renewal', 'download_id', 'download_variation', 'payment_id' ) ) ) {
-			return;
-		}
-
 		$value = apply_filters( 'eddc_update_commission_meta_' . $key, $value, $this->ID );
 
-		$commission_info = array( 'user_id', 'type', 'rate', 'amount', 'currency' );
+		$commission_info = apply_filters( 'eddc_update_commission_valid_meta_keys', array( 'user_id', 'type', 'rate', 'amount', 'currency' ) );
 
 		// User ID is stored in two meta keys
 		if ( 'user_id' == $key ) {
@@ -825,7 +821,7 @@ class EDD_Commission {
 					$commission_data[ $key ] = absint( $value );
 					break;
 				default:
-					$commission_data[ $key ] = $value;
+					$commission_data[ $key ] = apply_filters( 'eddc_update_commission_sanitize_meta_' . $key, $value, $key, $this->ID );
 					break;
 			}
 
