@@ -150,15 +150,15 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 				}
 			}
 
-			$paid_total    = isset( $data['paid']['amount'] ) ? $data['paid']['amount'] : 0;
 			$unpaid_total  = isset( $data['unpaid']['amount']  ) ? $data['unpaid']['amount'] : 0;
+			$paid_total    = isset( $data['paid']['amount'] ) ? $data['paid']['amount'] : 0;
 			$revoked_total = isset( $data['revoked']['amount'] ) ? $data['revoked']['amount'] : 0;
-
-			$row_data .= isset( $data['paid']['count'] ) ? $data['paid']['count'] . ',' : 0 . ',';
-			$row_data .= '"' . edd_format_amount( $paid_total ) . '"' . ',';
 
 			$row_data .= isset( $data['unpaid']['count'] ) ? $data['unpaid']['count'] . ',' : 0 . ',';
 			$row_data .= '"' . edd_format_amount( $unpaid_total ) . '"' . ',';
+
+			$row_data .= isset( $data['paid']['count'] ) ? $data['paid']['count'] . ',' : 0 . ',';
+			$row_data .= '"' . edd_format_amount( $paid_total ) . '"' . ',';
 
 			$row_data .= isset( $data['revoked']['count'] ) ? $data['revoked']['count'] . ',' : 0 . ',';
 			$row_data .= '"' . edd_format_amount( $revoked_total ) . '"' . ',';
@@ -219,24 +219,24 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 			)
 		);
 
-		$paid          = eddc_get_paid_commissions( $args );
-		$paid_total    = (float) 0;
 		$unpaid        = eddc_get_unpaid_commissions( $args );
 		$unpaid_total  = (float) 0;
+		$paid          = eddc_get_paid_commissions( $args );
+		$paid_total    = (float) 0;
 		$revoked       = eddc_get_revoked_commissions( $args );
 		$revoked_total = (float) 0;
-
-		if ( $paid ) {
-			foreach ( $paid as $commission ) {
-				$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
-				$paid_total += $commission_info['amount'];
-			}
-		}
 
 		if ( $unpaid ) {
 			foreach ( $unpaid as $commission ) {
 				$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
 				$unpaid_total += $commission_info['amount'];
+			}
+		}
+
+		if ( $paid ) {
+			foreach ( $paid as $commission ) {
+				$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
+				$paid_total += $commission_info['amount'];
 			}
 		}
 
@@ -248,13 +248,13 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 		}
 
 		$data = array(
-			'paid' => array(
-				'count'  => ! empty( $paid ) ? count( $paid ) : 0,
-				'amount' => edd_sanitize_amount( $paid_total )
-			),
 			'unpaid' => array(
 				'count'  => ! empty( $unpaid ) ? count( $unpaid ) : 0,
 				'amount' => edd_sanitize_amount( $unpaid_total )
+			),
+			'paid' => array(
+				'count'  => ! empty( $paid ) ? count( $paid ) : 0,
+				'amount' => edd_sanitize_amount( $paid_total )
 			),
 			'revoked' => array(
 				'count'  => ! empty( $revoked ) ? count( $revoked ) : 0,
