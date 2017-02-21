@@ -47,35 +47,71 @@ function eddc_add_manual_commission() {
 	}
 
 	$user_info   = get_userdata( $_POST['user_id'] );
-	$download_id = absint( $_POST['download_id'] );
-	$payment_id  = isset( $_POST['payment_id'] ) ? absint( $_POST['payment_id'] ) : 0;
-	$amount      = edd_sanitize_amount( $_POST['amount'] );
-	$rate        = sanitize_text_field( $_POST['rate'] );
+	$download_id = sanitize_text_field( $_POST['download_id'] );
+	$price_id    = false;
 
-	$commission = array(
-		'post_type'   => 'edd_commission',
-		'post_title'  => $user_info->user_email . ' - ' . get_the_title( $download_id ),
-		'post_status' => 'publish'
+	// Since it supports variable prices, we need to detect variable pricing.
+	if ( strpos( $download_id, '_' ) ) {
+		$price_parts = explode( '_', $download_id );
+		$download_id = absint( $price_parts[0] );
+		$price_id    = absint( $price_parts[1] );
+	}
+
+	$payment_id  = isset( $_POST['payment_id'] ) ? absint( $_POST['payment_id'] ) : 0;
+	$type        = sanitize_text_field( $_POST['type'] );
+	$amount      = edd_sanitize_amount( $_POST['amount'] );
+	$rate        = ! empty( $_POST['rate'] ) ? sanitize_text_field( $_POST['rate'] ) : $amount;
+
+	$types = array( 'percentage', 'flat' );
+	if ( ! in_array( $type, $types ) ) {
+		wp_die( __( 'Invalid commission type.', 'eddc' ) );
+	}
+
+	// set a flag so downloads with commissions awarded are easy to query
+	update_post_meta( $download_id, '_edd_has_commission', true );
+
+	$commission = new EDD_Commission;
+	$commission->description = $user_info->user_email . ' - ' . get_the_title( $download_id );
+	$commission->status      = 'unpaid';
+	$commission->user_ID     = absint( $_POST['user_id'] );
+	$commission->rate        = $rate;
+	$commission->amount      = $amount;
+	$commission->currency    = edd_get_option( 'currency', 'USD' );
+	$commission->download_ID = $download_id;
+	$commission->payment_ID  = $payment_id;
+	$commission->type        = $type;
+
+	// If we are dealing with a variation, then save variation info
+	if ( false !== $price_id ) {
+		$commission->download_variation = $price_id;
+	}
+
+	$commission->save();
+
+	$args = array(
+		'user_id'  => $commission->user_ID,
+		'rate'     => $commission->rate,
+		'amount'   => $commission->amount,
+		'currency' => $commission->currency,
+		'type'     => $commission->type,
 	);
 
-	$commission_id = wp_insert_post( apply_filters( 'edd_commission_post_data', $commission ) );
+	$commission_info = apply_filters( 'edd_commission_info', $args, $commission->ID, $commission->payment_ID, $commission->download_ID );
+	$items_changed   = false;
+	foreach ( $commission_info as $key => $value ) {
+		if ( $value === $args[ $key ] ) {
+			continue;
+		}
 
-	$commission_info = apply_filters( 'edd_commission_info', array(
-		'user_id'  => absint( $_POST['user_id'] ),
-		'rate'     => $rate,
-		'amount'   => $amount,
-		'currency' => edd_get_currency(),
-		'type'     => eddc_get_commission_type( $download_id )
-	), $commission_id, $payment_id, $download_id );
+		$commission->$key = $value;
+		$items_changed    = true;
+	}
 
-	eddc_set_commission_status( $commission_id, 'unpaid' );
+	if ( $items_changed ) {
+		$commission->save();
+	}
 
-	update_post_meta( $commission_id, '_edd_commission_info', $commission_info );
-	update_post_meta( $commission_id, '_download_id', $download_id );
-	update_post_meta( $commission_id, '_user_id', absint( $_POST['user_id'] ) );
-	update_post_meta( $commission_id, '_edd_commission_payment_id', $payment_id );
-
-	do_action( 'eddc_insert_commission', absint( $_POST['user_id'] ), $amount, $rate, $download_id, $commission_id, $payment_id );
+	do_action( 'eddc_insert_commission', $commission->user_ID, $commission->amount, $commission->rate, $commission->download_ID, $commission->ID, $payment_id );
 
 	wp_redirect( add_query_arg( array( 'view' => false, 'edd-message' => 'add' ) ) );
 	exit;

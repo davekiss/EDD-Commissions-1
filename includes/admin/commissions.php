@@ -170,7 +170,7 @@ function eddc_render_add_commission_view() {
 	}
 	?>
 	<div class="wrap">
-		<h2><?php _e( 'Commission Details', 'eddc' ); ?></h2>
+		<h2><?php _e( 'Add New Commission', 'eddc' ); ?></h2>
 		<?php if ( edd_get_errors() ) : ?>
 			<div class="error settings-error">
 				<?php edd_print_errors(); ?>
@@ -178,12 +178,12 @@ function eddc_render_add_commission_view() {
 		<?php endif; ?>
 
 		<?php if ( $render ) : ?>
-			<div id="edd-item-card-wrapper" class="eddc-commission-card" style="float: left">
+			<div id="edd-item-card-wrapper" class="eddc-commission-card eddc-add-commission" style="float: left">
 				<div class="info-wrapper item-section">
 					<form id="add-item-info" method="post" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions' ); ?>">
 						<div class="item-info">
 							<table class="widefat striped">
-								<tr>
+								<tr id="eddc-add-user-id-row">
 									<td class="row-title">
 										<label for="user_id"><?php _e('User ID', 'eddc'); ?></label>
 									</td>
@@ -192,7 +192,7 @@ function eddc_render_add_commission_view() {
 										<p class="description"><?php _e('The ID of the user that received this commission.', 'eddc'); ?></p>
 									</td>
 								</tr>
-								<tr>
+								<tr id="eddc-add-download-id-row">
 									<td class="row-title">
 										<label for="download_id"><?php _e('Download ID', 'eddc'); ?></label>
 									</td>
@@ -201,7 +201,7 @@ function eddc_render_add_commission_view() {
 										<p class="description"><?php _e('The ID of the product this commission was for.', 'eddc'); ?></p>
 									</td>
 								</tr>
-								<tr>
+								<tr id="eddc-add-payment-id-row">
 									<td class="row-title">
 										<label for="payment_id_id"><?php _e('Payment ID', 'eddc'); ?></label>
 									</td>
@@ -210,7 +210,18 @@ function eddc_render_add_commission_view() {
 										<p class="description"><?php _e('The payment ID this commission is related to (optional).', 'eddc'); ?></p>
 									</td>
 								</tr>
-								<tr>
+								<tr id="eddc-add-type-row">
+									<td class="row-title">
+										<label for="type"><?php _e('Type', 'eddc'); ?></label>
+									</td>
+									<td style="word-wrap: break-word">
+										<input type="radio" id="type-percentage" name="type" value="percentage" checked="checked" /> <label for="type-percentage"><?php _e( 'Percentage', 'eddc' ); ?></label>
+										<br />
+										<input type="radio" id="type-flat" name="type" value="flat"/> <label for="type-flat"><?php _e( 'Flat', 'eddc' ); ?></label>
+										<p class="description"><?php _e('The type of commission to be recorded.', 'eddc'); ?></p>
+									</td>
+								</tr>
+								<tr id="eddc-add-rate-row">
 									<td class="row-title">
 										<label for="rate"><?php _e('Rate', 'eddc'); ?></label>
 									</td>
@@ -219,7 +230,7 @@ function eddc_render_add_commission_view() {
 										<p class="description"><?php _e('The percentage rate of this commission.', 'eddc'); ?></p>
 									</td>
 								</tr>
-								<tr>
+								<tr id="eddc-add-amount-row">
 									<td class="row-title">
 										<label for="amount"><?php _e('Amount', 'eddc'); ?></label>
 									</td>

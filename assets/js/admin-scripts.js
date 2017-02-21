@@ -52,6 +52,17 @@ jQuery(document).ready(function($) {
 		}
 	});
 
+	$('.eddc-add-commission input[name="type"]').on('change', function () {
+		var value  = $(this).val();
+		var target = $('#eddc-add-rate-row');
+
+		if ( value === 'percentage' ) {
+			target.find('input').prop('disabled', '');
+		} else {
+			target.find('input').prop('disabled','disabled');
+		}
+	});
+
 	/**
 	 * Commission Configuration Metabox
 	 */
@@ -208,13 +219,7 @@ jQuery(document).ready(function($) {
 	$('.eddc-edit-commission').on('click', function(e) {
 		e.preventDefault();
 
-		var link, user_input, download_input, rate_input, amount_input;
-
-		link = $(this);
-		user_input = $('input.eddc-commission-user');
-		download_input = $('input.eddc-commission-download');
-		rate_input = $('input.eddc-commission-rate');
-		amount_input = $('input.eddc-commission-amount');
+		var link = $(this);
 
 		if (link.text() === eddc_vars.action_edit) {
 			link.text(eddc_vars.action_cancel);
