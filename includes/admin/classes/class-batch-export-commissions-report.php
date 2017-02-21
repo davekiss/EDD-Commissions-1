@@ -64,7 +64,7 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 	 *
 	 * @access      public
 	 * @since       3.3
-	 * @return      array $cols The generated CSV header row
+	 * @return      string $cols The generated CSV header row
 	 */
 	public function print_csv_cols() {
 		$cols = array(

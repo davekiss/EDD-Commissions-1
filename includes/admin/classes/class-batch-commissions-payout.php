@@ -386,7 +386,7 @@ class EDD_Batch_Commissions_Payout extends EDD_Batch_Export {
 	/**
 	 * Set the parameters necessary for this request
 	 *
-	 * @access      private
+	 * @access      public
 	 * @since       3.2
 	 * @param       array $request The Form data sent in from the export request
 	 */
