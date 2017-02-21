@@ -11,14 +11,28 @@
  * @since       2.3
  */
 
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
 
-if( ! class_exists( 'EDD_Export' ) ) {
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+
+// Bootstrap export class if necessary
+if ( ! class_exists( 'EDD_Export' ) ) {
 	require_once EDD_PLUGIN_DIR . 'includes/admin/reporting/class-export.php';
 }
 
+
+/**
+ * Exprt commissions class
+ *
+ * Handles exporting commissions
+ *
+ * @since       2.3
+ */
 class EDD_Commissions_Export extends EDD_Export {
+
 
 	/**
 	 * Our export type.
@@ -29,6 +43,7 @@ class EDD_Commissions_Export extends EDD_Export {
 	 */
 	public $export_type = 'commissions';
 
+
 	/**
 	 * User ID to export commissions for.
 	 *
@@ -37,6 +52,7 @@ class EDD_Commissions_Export extends EDD_Export {
 	 * @since       2.3
 	 */
 	public $user_id = 0;
+
 
 	/**
 	 * Export Year.
@@ -47,6 +63,7 @@ class EDD_Commissions_Export extends EDD_Export {
 	 */
 	public $year = 0;
 
+
 	/**
 	 * Export month.
 	 *
@@ -56,35 +73,39 @@ class EDD_Commissions_Export extends EDD_Export {
 	 */
 	public $month = 0;
 
+
 	/**
 	 * Can we export?
 	 *
-	 * @access public
-	 * @since 2.3
-	 * @return bool Whether we can export or not
+	 * @access      public
+	 * @since       2.3
+	 * @return      bool Whether we can export or not
 	 */
 	public function can_export() {
 		return (bool) apply_filters( 'edd_export_capability', current_user_can( 'read' ) );
 	}
 
+
 	/**
 	 * Set the export headers
 	 *
-	 * @access public
-	 * @since 2.3
-	 * @return void
+	 * @access      public
+	 * @since       2.3
+	 * @return      void
 	 */
 	public function headers() {
 		ignore_user_abort( true );
 
-		if ( ! edd_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) )
+		if ( ! edd_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
 			set_time_limit( 0 );
+		}
 
 		nocache_headers();
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename=edd-export-' . $this->export_type . '-' . $this->year . '-' . $this->month . '.csv' );
 		header( "Expires: 0" );
 	}
+
 
 	/**
 	 * Set the CSV columns
@@ -99,8 +120,10 @@ class EDD_Commissions_Export extends EDD_Export {
 			'amount'   => __( 'Amount',  'eddc' ) . ' (' . html_entity_decode( edd_currency_filter( '' ) ) . ')',
 			'date'     => __( 'Date',    'eddc' )
 		);
+
 		return $cols;
 	}
+
 
 	/**
 	 * Get the data being exported
@@ -110,7 +133,6 @@ class EDD_Commissions_Export extends EDD_Export {
 	 * @return      array
 	 */
 	public function get_data() {
-
 		$data = array();
 
 		$args = array(
@@ -122,14 +144,12 @@ class EDD_Commissions_Export extends EDD_Export {
 
 		if ( $commissions ) {
 			foreach ( $commissions as $commission ) {
-
 				$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
 
 				$data[]        = array(
 					'download' => get_the_title( get_post_meta( $commission->ID, '_download_id', true ) ),
 					'amount'   => $commission_info['amount'],
 					'date'     => $commission->post_date
-
 				);
 			}
 		}

@@ -1,16 +1,31 @@
 <?php
+/**
+ * Widgets
+ *
+ * @package     EDD
+ * @subpackage  Admin/Export
+ * @copyright   Copyright (c) 2017, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       1.6
+ */
+
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 
 /**
  * Register Dashboard Widgets
  *
  * Registers the dashboard widgets.
  *
- * @access      private
  * @since       1.6
-*/
-
+ * @return      void
+ */
 function eddc_register_dashboard_commission_widgets() {
-	if( eddc_user_has_commissions() ) {
+	if ( eddc_user_has_commissions() ) {
 		wp_add_dashboard_widget( 'edd_dashboard_user_commissions', __('Commissions Summary', 'edd'), 'eddc_dashboard_commissions_widget' );
 	}
 }
@@ -20,9 +35,10 @@ add_action('wp_dashboard_setup', 'eddc_register_dashboard_commission_widgets', 1
 /**
  * Commissions Summary Dashboard Widget
  *
- * @access      private
  * @since       1.6
-*/
+ * @global      int $user_ID The ID of the currently logged in user
+ * @return      void
+ */
 
 function eddc_dashboard_commissions_widget() {
 	global $user_ID;
@@ -32,7 +48,7 @@ function eddc_dashboard_commissions_widget() {
 	$paid_paged   = isset( $_GET['eddcp'] ) ? absint( $_GET['eddcp'] ) : 1;
 
 	$unpaid_commissions = eddc_get_unpaid_commissions( array( 'user_id' => $user_ID, 'number' => $per_page, 'paged' => $unpaid_paged ) );
-	$paid_commissions 	= eddc_get_paid_commissions( array( 'user_id' => $user_ID, 'number' => $per_page, 'paged' => $paid_paged ) );
+	$paid_commissions   = eddc_get_paid_commissions( array( 'user_id' => $user_ID, 'number' => $per_page, 'paged' => $paid_paged ) );
 
 	$total_unpaid       = eddc_count_user_commissions( $user_ID, 'unpaid' );
 	$total_paid         = eddc_count_user_commissions( $user_ID, 'paid' );
@@ -43,9 +59,9 @@ function eddc_dashboard_commissions_widget() {
 	$paid_offset        = $per_page * ( $paid_paged - 1 );
 	$paid_total_pages   = ceil( $total_paid / $per_page );
 
-	$stats 				= '';
+	$stats              = '';
 
-	if( ! empty( $unpaid_commissions ) || ! empty( $paid_commissions ) ) : // only show tables if user has commission data
+	if ( ! empty( $unpaid_commissions ) || ! empty( $paid_commissions ) ) : // only show tables if user has commission data
 		ob_start(); ?>
 			<div id="edd_user_commissions" class="edd_dashboard_widget">
 				<style>#edd_user_commissions_unpaid { margin-top: 30px; }#edd_user_commissions_unpaid_total,#edd_user_commissions_paid_total { padding-bottom: 20px; } .edd_user_commissions { width: 100%; margin: 0 0 20px; }.edd_user_commissions th, .edd_user_commissions td { text-align:left; padding: 4px 4px 4px 0; }</style>
@@ -63,15 +79,15 @@ function eddc_dashboard_commissions_widget() {
 						</thead>
 						<tbody>
 						<?php $total = (float) 0; ?>
-						<?php if( ! empty( $unpaid_commissions ) ) : ?>
+						<?php if ( ! empty( $unpaid_commissions ) ) : ?>
 							<?php foreach( $unpaid_commissions as $commission ) : ?>
 								<tr class="edd_user_commission_row">
 									<?php
-									$item_name 			= get_the_title( get_post_meta( $commission->ID, '_download_id', true ) );
-									$commission_info 	= get_post_meta( $commission->ID, '_edd_commission_info', true );
-									$amount 			= $commission_info['amount'];
-									$rate 				= $commission_info['rate'];
-									$total 				+= $amount;
+									$item_name       = get_the_title( get_post_meta( $commission->ID, '_download_id', true ) );
+									$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
+									$amount          = $commission_info['amount'];
+									$rate            = $commission_info['rate'];
+									$total          += $amount;
 									?>
 									<td class="edd_commission_item"><?php echo esc_html( $item_name ); ?></td>
 									<td class="edd_commission_amount">
@@ -122,15 +138,15 @@ function eddc_dashboard_commissions_widget() {
 						</thead>
 						<tbody>
 						<?php $total = (float) 0; ?>
-						<?php if( ! empty( $paid_commissions ) ) : ?>
-							<?php foreach( $paid_commissions as $commission ) : ?>
+						<?php if ( ! empty( $paid_commissions ) ) : ?>
+							<?php foreach ( $paid_commissions as $commission ) : ?>
 								<tr class="edd_user_commission_row">
 									<?php
-									$item_name 			= get_the_title( get_post_meta( $commission->ID, '_download_id', true ) );
-									$commission_info 	= get_post_meta( $commission->ID, '_edd_commission_info', true );
-									$amount 			= $commission_info['amount'];
-									$rate 				= $commission_info['rate'];
-									$total 				+= $amount;
+									$item_name       = get_the_title( get_post_meta( $commission->ID, '_download_id', true ) );
+									$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
+									$amount          = $commission_info['amount'];
+									$rate            = $commission_info['rate'];
+									$total          += $amount;
 									?>
 									<td class="edd_commission_item"><?php echo esc_html( $item_name ); ?></td>
 									<td class="edd_commission_amount">

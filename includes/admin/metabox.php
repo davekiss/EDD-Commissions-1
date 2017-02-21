@@ -1,25 +1,53 @@
 <?php
+/**
+ * Metabox functions
+ *
+ * @package     EDD
+ * @subpackage  Admin/Export
+ * @copyright   Copyright (c) 2017, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       3.3
+ */
 
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+
+/**
+ * Register the new meta box
+ *
+ * @since       3.3
+ * @return      void
+ */
 function eddc_add_commission_meta_box() {
-
-	if( current_user_can( 'manage_shop_settings' ) ) {
+	if ( current_user_can( 'manage_shop_settings' ) ) {
 		add_meta_box( 'edd_download_commissions', __( 'Commission', 'edd' ), 'eddc_render_commissions_meta_box', 'download', 'normal', 'high' );
 	}
 }
 add_action( 'add_meta_boxes', 'eddc_add_commission_meta_box', 100 );
 
-// render the download information meta box
+
+/**
+ * Render the new meta box
+ *
+ * @since       3.3
+ * @global      object $post The WordPress post object for this download
+ * @return      void
+ */
 function eddc_render_commissions_meta_box() {
 	global $post;
 
 	$enabled = get_post_meta( $post->ID, '_edd_commisions_enabled', true ) ? true : false;
 	$meta    = get_post_meta( $post->ID, '_edd_commission_settings', true );
-	$type    = isset( $meta['type']    ) ? $meta['type']    : 'percentage';
+	$type    = isset( $meta['type'] ) ? $meta['type'] : 'percentage';
 	$display = $enabled ? '' : ' style="display:none";';
 
 	// Convert to array
 	$user_id = isset( $meta['user_id'] ) ? $meta['user_id'] : '';
-	$amounts = isset( $meta['amount']  ) ? $meta['amount']  : '';
+	$amounts = isset( $meta['amount'] ) ? $meta['amount'] : '';
 	$users   = ! empty( $user_id ) ? array_map( 'trim', explode( ',', $user_id ) ) : array();
 	$amounts = ! empty( $amounts ) ? array_map( 'trim', explode( ',', $amounts ) ) : array();
 	$rates   = array();
@@ -30,16 +58,6 @@ function eddc_render_commissions_meta_box() {
 			'amount'  => array_key_exists( $i, $amounts ) ? $amounts[ $i ] : ''
 		);
 	}
-
-	/**
-	 * TODO: Remove once issue/148 is merged.
-	 * Issue 148 reworks the logic behind when/where to load admin scripts,
-	 * allowing them to load on individual download pages. To prevent a merge
-	 * conflict, it is not being re-added here. As such, this injected script
-	 * is left for testing purposes.
-	 */
-	wp_register_script( 'eddc-admin-scripts', EDDC_PLUGIN_URL . 'assets/js/admin-scripts.js', array( 'jquery' ), EDD_COMMISSIONS_VERSION, true );
- 	wp_enqueue_script( 'eddc-admin-scripts' );
 
 	do_action( 'eddc_metabox_before_options', $post->ID );
 
@@ -61,7 +79,7 @@ function eddc_render_commissions_meta_box() {
 			<td class="edd_field_type_select">
 				<?php do_action( 'eddc_metabox_before_type', $post->ID ); ?>
 				<label for="edd_commission_settings[type]"><strong><?php _e( 'Type:', 'eddc' ); ?></strong></label>
-				<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong><?php _e( 'Type', 'eddc' ); ?></strong>:<?php _e( 'With commissions enabled, you will need to specify who to assign commissions to. Commissions can be given based on a percentage of the purchase cost, or at a flat rate.', 'eddc' ); ?>"></span><br/>
+				<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong><?php _e( 'Type', 'eddc' ); ?></strong>: <?php _e( 'With commissions enabled, you will need to specify who to assign commissions to. Commissions can be given based on a percentage of the purchase cost, or at a flat rate.', 'eddc' ); ?>"></span><br/>
 				<p>
 					<input type="radio" name="edd_commission_settings[type]" value="percentage" <?php checked( $type, 'percentage', true ); ?>/>&nbsp;<?php _e( 'Percentage', 'eddc' ); ?>
 					<br/ >
@@ -141,7 +159,15 @@ function eddc_render_commissions_meta_box() {
 	do_action( 'eddc_metabox_after_commission_users', $post->ID );
 }
 
-// Save data from meta box
+
+/**
+ * Save data when save_post is called
+ *
+ * @since       3.3
+ * @param       int $post_id The ID of the post being saved
+ * @global      object $post The WordPress post object for this download
+ * @return      void
+ */
 function eddc_download_meta_box_save( $post_id ) {
 	global $post;
 
@@ -187,7 +213,7 @@ function eddc_download_meta_box_save( $post_id ) {
 		}
 
 		if ( $new ) {
-			if( ! empty( $new['user_id'] ) ) {
+			if ( ! empty( $new['user_id'] ) ) {
 				$new['amount'] = str_replace( '%', '', $new['amount'] );
 				$new['amount'] = str_replace( '$', '', $new['amount'] );
 
@@ -196,7 +222,7 @@ function eddc_download_meta_box_save( $post_id ) {
 
 				foreach ( $values as $key => $value ) {
 
-					switch( $type ) {
+					switch ( $type ) {
 						case 'flat':
 							$value = $value < 0 || ! is_numeric( $value ) ? '' : $value;
 							break;

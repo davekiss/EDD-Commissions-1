@@ -1,6 +1,6 @@
 <?php
 /**
- * Commissions Functions.
+ * Commissions Filters
  *
  * @package 	EDD_Commissions
  * @subpackage 	Admin
@@ -10,14 +10,17 @@
  */
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 
 /**
  * Register a view for the single commission view
  *
- * @since  3.3
- * @param  array $views An array of existing views
- * @return array        The altered list of views
+ * @since       3.3
+ * @param       array $views An array of existing views
+ * @return      array The altered list of views
  */
 function eddc_register_default_commission_views( $views ) {
 	$default_views = array(
@@ -33,12 +36,11 @@ add_filter( 'eddc_commission_views', 'eddc_register_default_commission_views', 1
 /**
  * Register a tab for the single commission view
  *
- * @since  3.3
- * @param  array $tabs An array of existing tabs
- * @return array       The altered list of tabs
+ * @since       3.3
+ * @param       array $tabs An array of existing tabs
+ * @return      array The altered list of tabs
  */
 function eddc_register_default_commission_tabs( $tabs ) {
-
 	$default_tabs = array(
 		'overview' => array( 'dashicon' => 'dashicons-products', 'title' => __( 'Overview', 'eddc' ) ),
 	);
@@ -51,9 +53,9 @@ add_filter( 'eddc_commission_tabs', 'eddc_register_default_commission_tabs', 1, 
 /**
  * Register the Delete icon as late as possible so it's at the bottom
  *
- * @since  3.3
- * @param  array $tabs An array of existing tabs
- * @return array       The altered list of tabs, with 'delete' at the bottom
+ * @since       3.3
+ * @param       array $tabs An array of existing tabs
+ * @return      array The altered list of tabs, with 'delete' at the bottom
  */
 function eddc_register_delete_commission_tab( $tabs ) {
 	$tabs['delete'] = array( 'dashicon' => 'dashicons-trash', 'title' => __( 'Delete', 'eddc' ) );

@@ -1,33 +1,43 @@
 <?php
+/**
+ * Short codes
+ *
+ * @package     EDD_Commissions
+ * @subpackage  Core
+ * @copyright   Copyright (c) 2017, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       3.3
+ */
 
+
+// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+
 /**
  * Callback function for the edd_commissioned_products shortcode
  *
- * @since  3.2.1
- * @param  array $atts Attributes from the shortcode
- * @return string      HTML Markup for the Commissioned Products
+ * @since       3.2.1
+ * @param       array $atts Attributes from the shortcode
+ * @return      string HTML Markup for the Commissioned Products
  */
 function eddc_user_product_list_shortcode( $atts ) {
-
 	$user_id = eddc_userid_from_shortcode_atts( $atts );
 
 	return eddc_user_product_list( $user_id );
-
 }
 add_shortcode( 'edd_commissioned_products', 'eddc_user_product_list_shortcode' );
+
 
 /**
  * Given a User ID, return the markup for the list of user's products that earn commissions
  *
- * @param  integer $user_id The User ID to get the commissioned products for
- * @return string           HTML markup for the list of products
+ * @param       integer $user_id The User ID to get the commissioned products for
+ * @return      string HTML markup for the list of products
  */
 function eddc_user_product_list( $user_id = 0 ) {
-
 	$user_id = empty ( $user_id ) ? get_current_user_id() : $user_id;
 
 	if ( empty( $user_id ) ) {
@@ -36,13 +46,13 @@ function eddc_user_product_list( $user_id = 0 ) {
 
 	$products = eddc_get_download_ids_of_user( $user_id );
 
-	if( empty( $products ) ) {
+	if ( empty( $products ) ) {
 		return;
 	}
 
 	$header_text = __( 'Your Products', 'eddc' );
 	if ( $user_id != get_current_user_id() ) {
-		$user_info = get_userdata( $user_id );
+		$user_info   = get_userdata( $user_id );
 		$header_text = sprintf( __( '%s\'s Products', 'eddc' ), $user_info->display_name );
 	}
 	ob_start(); ?>
@@ -58,8 +68,8 @@ function eddc_user_product_list( $user_id = 0 ) {
 				</tr>
 			</thead>
 			<tbody>
-			<?php if( ! empty( $products ) ) : ?>
-				<?php foreach( $products as $product ) : if( ! get_post( $product ) ) continue; ?>
+			<?php if ( ! empty( $products ) ) : ?>
+				<?php foreach ( $products as $product ) : if ( ! get_post( $product ) ) continue; ?>
 					<tr class="edd_user_commission_row">
 						<?php
 						do_action( 'edd_commissioned_products_row_begin', $product, $user_id ); ?>
@@ -80,34 +90,33 @@ function eddc_user_product_list( $user_id = 0 ) {
 	return ob_get_clean();
 }
 
+
 /**
  * Callback function for the edd_commissions_overview shortcode
  *
- * @since  3.2.1
- * @param  array $atts Attributes from the Shotcode
- * @return string      The HTML markup for the commissions overview shortcode
+ * @since       3.2.1
+ * @param       array $atts Attributes from the Shotcode
+ * @return      string The HTML markup for the commissions overview shortcode
  */
 function eddc_user_commissions_overview_shortcode( $atts ) {
-
 	$user_id = eddc_userid_from_shortcode_atts( $atts );
 
 	return eddc_user_commissions_overview( $user_id );
-
 }
 add_shortcode( 'edd_commissions_overview', 'eddc_user_commissions_overview_shortcode' );
+
 
 /**
  * Given a User ID, return the markup for the user's commissions overview
  *
- * @param  integer $user_id User ID to get the commissions overview for
- * @return string           HTML markup for the overview
+ * @param       integer $user_id User ID to get the commissions overview for
+ * @return      string HTML markup for the overview
  */
 function eddc_user_commissions_overview( $user_id = 0 ) {
-
 	$user_id = empty ( $user_id ) ? get_current_user_id() : $user_id;
 
 	// If still empty, exit
-	if( empty( $user_id ) ) {
+	if ( empty( $user_id ) ) {
 		return;
 	}
 
@@ -172,34 +181,33 @@ function eddc_user_commissions_overview( $user_id = 0 ) {
 	return $stats;
 }
 
+
 /**
  * Callback for the edd_commissions shortcode
  *
- * @since  3.2.1
- * @param  array $atts Array of Shortcode attributes
- * @return string      HTML markup for the commissions
+ * @since       3.2.1
+ * @param       array $atts Array of Shortcode attributes
+ * @return      string HTML markup for the commissions
  */
 function eddc_edd_commissions_shortcode( $atts ) {
-
 	$user_id = eddc_userid_from_shortcode_atts( $atts );
 
 	return eddc_user_commissions( $user_id );
-
 }
 add_shortcode( 'edd_commissions', 'eddc_edd_commissions_shortcode' );
+
 
 /**
  * Given a user id, provide a detailed list of commissions
  *
- * @param  integer $user_id Given a user id, get their commissions details
- * @return string           HTML markup for the commissions details
+ * @param       integer $user_id Given a user id, get their commissions details
+ * @return      string HTML markup for the commissions details
  */
 function eddc_user_commissions( $user_id = 0 ) {
-
 	$user_id = empty ( $user_id ) ? get_current_user_id() : $user_id;
 
 	// If still empty, exit
-	if( empty( $user_id ) ) {
+	if ( empty( $user_id ) ) {
 		return;
 	}
 
@@ -228,7 +236,7 @@ function eddc_user_commissions( $user_id = 0 ) {
 	$page_prefix         = false !== strpos( edd_get_current_page_url(), '?' ) ? '&' : '?';
 
 	$stats = '';
-	if( eddc_user_has_commissions( $user_id ) ) : // only show tables if user has commission data
+	if ( eddc_user_has_commissions( $user_id ) ) : // only show tables if user has commission data
 		ob_start(); ?>
 			<div id="edd_user_commissions">
 
@@ -248,8 +256,8 @@ function eddc_user_commissions( $user_id = 0 ) {
 						</thead>
 						<tbody>
 						<?php $total = (float) 0; ?>
-						<?php if( ! empty( $unpaid_commissions ) ) : ?>
-							<?php foreach( $unpaid_commissions as $commission ) : ?>
+						<?php if ( ! empty( $unpaid_commissions ) ) : ?>
+							<?php foreach ( $unpaid_commissions as $commission ) : ?>
 								<tr class="edd_user_commission_row">
 									<?php
 									do_action( 'eddc_user_commissions_unpaid_row_begin', $commission );
@@ -446,8 +454,6 @@ function eddc_user_commissions( $user_id = 0 ) {
 					</form>
 				</div>
 				<?php endif; ?>
-
-
 			</div><!--end #edd_user_commissions-->
 		<?php
 		$stats = apply_filters( 'edd_user_commissions_display', ob_get_clean() );
@@ -456,40 +462,39 @@ function eddc_user_commissions( $user_id = 0 ) {
 	return $stats;
 }
 
+
 /**
  * Callback foro the edd_commissions_graph shortcode
  *
- * @since  3.2.1
- * @param  array $atts Array of shortcode attributes
- * @return string      HTML markup for the commissions graph
+ * @since       3.2.1
+ * @param       array $atts Array of shortcode attributes
+ * @return      string HTML markup for the commissions graph
  */
 function eddc_user_commissions_graph_shortcode( $atts ) {
-
 	$user_id = eddc_userid_from_shortcode_atts( $atts );
 
 	return eddc_user_commissions_graph( $user_id );
-
 }
 add_shortcode( 'edd_commissions_graph', 'eddc_user_commissions_graph_shortcode' );
+
 
 /**
  * Given a user id, display a graph of commissions
  *
- * @since  3.2
- * @param  integer $user_id The user id to display commissions graph for
- * @return string           HTML markup of the commissions graph for the user
+ * @since       3.2
+ * @param       integer $user_id The user id to display commissions graph for
+ * @return      string HTML markup of the commissions graph for the user
  */
 function eddc_user_commissions_graph( $user_id = 0 ) {
-
 	$user_id = empty ( $user_id ) ? get_current_user_id() : $user_id;
 
 	// If still empty, exit
-	if( empty( $user_id ) ) {
+	if ( empty( $user_id ) ) {
 		return;
 	}
 
 	$graph = '';
-	if( eddc_user_has_commissions( $user_id ) ) :
+	if ( eddc_user_has_commissions( $user_id ) ) :
 		include_once( EDD_PLUGIN_DIR . 'includes/admin/reporting/class-edd-graph.php' );
 		global $post;
 		$month = ! isset( $_GET['month'] ) ? date( 'n' ) : absint( $_GET['month'] );
@@ -567,13 +572,11 @@ function eddc_user_commissions_graph( $user_id = 0 ) {
 						$grouped_data[ $key ]['earnings'] += (float) $commission_meta['amount'];
 						$grouped_data[ $key ]['sales']++;
 					}
-
 				}
 			}
 
 			$d = 1;
 			while ( $d <= $num_of_days ) {
-
 				$key      = $month . $d . $year;
 				$date     = mktime( 0, 0, 0, $month, $d, $year ) * 1000;
 				$sales    = isset( $grouped_data[ $key ]['sales'] )    ? $grouped_data[ $key ]['sales']    : 0;
@@ -582,7 +585,6 @@ function eddc_user_commissions_graph( $user_id = 0 ) {
 				$sales_data[]    = array( $date, $sales );
 				$earnings_data[] = array( $date, $earnings );
 				$d++;
-
 			}
 
 			$data = array(
@@ -590,7 +592,6 @@ function eddc_user_commissions_graph( $user_id = 0 ) {
 				__( 'Sales', 'edd' )    => $sales_data
 			);
 			?>
-
 			<div class="inside">
 				<?php
 				$graph = new EDD_Graph( $data );
@@ -607,11 +608,12 @@ function eddc_user_commissions_graph( $user_id = 0 ) {
 	return $graph;
 }
 
+
 /**
  * Display the field to edit the PayPal email address in the profile editor
  *
- * @since  3.2
- * @return void
+ * @since       3.2
+ * @return      void
  */
 function eddc_profile_editor_paypal() {
 	$user_id = get_current_user_id();
@@ -631,13 +633,14 @@ function eddc_profile_editor_paypal() {
 }
 add_action( 'edd_profile_editor_after_password', 'eddc_profile_editor_paypal', 9999 );
 
+
 /**
  * Save and sanitize the PayPal email address from the profile editor
  *
- * @since  3.2
- * @param  int $user_id  The User ID being edited
- * @param  array $userdata The array of user info
- * @return void
+ * @since       3.2
+ * @param       int $user_id  The User ID being edited
+ * @param       array $userdata The array of user info
+ * @return      void
  */
 function eddc_update_paypal_email( $user_id, $userdata ) {
 	if ( ! empty( $_POST['eddc_paypal_email'] ) ) {
@@ -653,19 +656,19 @@ function eddc_update_paypal_email( $user_id, $userdata ) {
 }
 add_action( 'edd_pre_update_user_profile', 'eddc_update_paypal_email', 10, 2 );
 
+
 /**
  * Helper function for shortcodes that take a user ID
  * Allows the shortcodes to be used with a provided user_id attribute,
  * or without to get the currently logged in user's data
  *
- * @since  3.2.1
- * @param  mixed $atts Either the user id, or array of shortcode attributes
- * @return integer     The user id parsed from the provided data
+ * @since       3.2.1
+ * @param       mixed $atts Either the user id, or array of shortcode attributes
+ * @return      integer The user id parsed from the provided data
  */
 function eddc_userid_from_shortcode_atts( $atts ) {
-
 	// If still empty, exit
-	if( empty( $atts ) ) {
+	if ( empty( $atts ) ) {
 		return false;
 	}
 
@@ -676,6 +679,7 @@ function eddc_userid_from_shortcode_atts( $atts ) {
 
 	// We've gotten to an array of items (shortcode attributes)
 	$shortcode_atts = array();
+	
 	if ( is_array( $atts ) ) {
 		$shortcode_atts = shortcode_atts( array(
 			'user_id' => get_current_user_id(),

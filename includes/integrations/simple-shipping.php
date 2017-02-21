@@ -9,12 +9,19 @@
  * @since       3.3
  */
 
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+
 /**
  * Add new site-wide settings under "Downloads" > "Extensions" > "Commissions" for determining how shipping is split for commissions by default.
  *
- * @since    3.3
- * @param  	 array $commission_settings The array of settings for the Commissions settings page.
- * @return   array $commission_settings The array of settings for the Commissions settings page.
+ * @since       3.3
+ * @param       array $commission_settings The array of settings for the Commissions settings page.
+ * @return      array $commission_settings The array of settings for the Commissions settings page.
  */
 function eddc_settings_add_shipping_options( $commission_settings ){
 	$commission_settings[] = array(
@@ -37,15 +44,14 @@ function eddc_settings_add_shipping_options( $commission_settings ){
 }
 add_filter( 'eddc_settings', 'eddc_settings_add_shipping_options' );
 
+
 /**
  * Output a new option in commissions for Simple Shipping which allows the site owner to choose how shipping fees are split in Commissions.
  *
- * @since    3.3
- * @param  	 void
- * @return   void
+ * @since       3.3
+ * @return      void
  */
 function eddc_metabox_add_shipping_options(){
-
 	global $post;
 
 	// Use minified libraries if SCRIPT_DEBUG is turned off
@@ -54,8 +60,8 @@ function eddc_metabox_add_shipping_options(){
 	wp_register_script( 'eddc-shipping-admin-scripts', EDDC_PLUGIN_URL . 'assets/js/admin-eddc-shipping-integration' . $suffix . '.js', array( 'jquery' ), EDD_COMMISSIONS_VERSION, true );
 	wp_enqueue_script( 'eddc-shipping-admin-scripts' );
 
-	$enabled       = get_post_meta( $post->ID, '_edd_commisions_enabled', true ) ? true : false;
-	$meta          = get_post_meta( $post->ID, '_edd_commission_settings', true );
+	$enabled      = get_post_meta( $post->ID, '_edd_commisions_enabled', true ) ? true : false;
+	$meta         = get_post_meta( $post->ID, '_edd_commission_settings', true );
 	$shipping_fee = isset( $meta['shipping_fee'] ) ? $meta['shipping_fee'] : 'site_default';
 
 	echo '<tr style="display:none;" class="eddc_commission_row" id="edd_commissions_shipping_fee_split">';
@@ -82,38 +88,34 @@ add_action( 'eddc_metabox_options_table_after', 'eddc_metabox_add_shipping_optio
 /**
  * Make the commission calulation include shipping fees from Simple Shipping (if the site owner chose that).
  *
- * @since    3.3
- * @param  	 int $commission_amount The amount already calculated for the commission
- * @param  	 array $args The args passed to the eddc_calc_commission_amount function
- * @return   int $amount The commission amount including shipping fee calculations
+ * @since       3.3
+ * @param       int $commission_amount The amount already calculated for the commission
+ * @param       array $args The args passed to the eddc_calc_commission_amount function
+ * @return      int $amount The commission amount including shipping fee calculations
  */
 function eddc_include_shipping_calc_in_commission( $commission_amount, $args ){
-
 	$defaults = array(
-		'price'         	=> NULL,
-		'rate'         	 	=> NULL,
-		'type' 				=> 'percentage',
-		'download_id'   	=> 0,
-		'cart_item' 		=> NULL,
-		'recipient'     	=> NULL,
+		'price'             => NULL,
+		'rate'              => NULL,
+		'type'              => 'percentage',
+		'download_id'       => 0,
+		'cart_item'         => NULL,
+		'recipient'         => NULL,
 		'recipient_counter' => 0,
-		'payment_id'    	=> NULL
+		'payment_id'        => NULL
 	);
 
 	$args = wp_parse_args( $args, $defaults );
 
 	$commission_settings = get_post_meta( $args['download_id'], '_edd_commission_settings', true );
-
-	$shipping = edd_get_option( 'edd_commissions_shipping', 'split_shipping' );
+	$shipping            = edd_get_option( 'edd_commissions_shipping', 'split_shipping' );
 
 	//Reset shipping fee value because originally they didn't make sense and are kept that way for backwards compatibility only.
 	if ( $shipping == 'ignored' ){
 		$shipping = 'split_shipping';
-	}
-	elseif( $shipping == 'include_shipping' ){
+	} elseif( $shipping == 'include_shipping' ){
 		$shipping = 'pay_to_first_user';
-	}
-	elseif( $shipping == 'exclude_shipping' ){
+	} elseif( $shipping == 'exclude_shipping' ){
 		$shipping = 'pay_to_store';
 	}
 
@@ -123,16 +125,12 @@ function eddc_include_shipping_calc_in_commission( $commission_amount, $args ){
 	}
 
 	// If there are fees
-	if( ! empty( $args['cart_item']['fees'] ) ) {
-
+	if ( ! empty( $args['cart_item']['fees'] ) ) {
 		//Loop through each fee
-		foreach( $args['cart_item']['fees'] as $fee_id => $fee ) {
-
+		foreach ( $args['cart_item']['fees'] as $fee_id => $fee ) {
 			if ( 'split_shipping' == $shipping ){
 				$commission_amount += $fee['amount'] * ( $args['rate'] / 100 );
-			}
-			elseif( 'pay_to_first_user' == $shipping ) {
-
+			} elseif( 'pay_to_first_user' == $shipping ) {
 				if ( eddc_get_recipient_position( $args['recipient'], $args['download_id'] ) == 0 ){
 					$commission_amount += $fee['amount'];
 				}
@@ -141,6 +139,5 @@ function eddc_include_shipping_calc_in_commission( $commission_amount, $args ){
 	}
 
 	return $commission_amount;
-
 }
 add_filter( 'eddc_calc_commission_amount', 'eddc_include_shipping_calc_in_commission', 10, 2 );

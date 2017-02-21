@@ -1,9 +1,25 @@
 <?php
+/**
+ * Scripts
+ *
+ * @package     EDD_Commissions
+ * @subpackage  Core
+ * @copyright   Copyright (c) 2017, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       3.3
+ */
+
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Enqueue admin scripts
  *
- * @since 3.3
+ * @since       3.3
+ * @return      void
  */
 function eddc_admin_scripts() {
 	$screen = get_current_screen();
@@ -13,12 +29,13 @@ function eddc_admin_scripts() {
 	}
 
 	$allowed_screens = array(
-		'download_page_edd-commissions'
+		'download_page_edd-commissions',
+		'download',
 	);
 
 	$allowed_screens = apply_filters( 'eddc-admin-script-screens', $allowed_screens );
 
-	if( ! in_array( $screen->id, $allowed_screens ) ) {
+	if ( ! in_array( $screen->id, $allowed_screens ) ) {
 		return;
 	}
 
