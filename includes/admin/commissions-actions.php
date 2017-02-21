@@ -134,7 +134,7 @@ function eddc_process_commission_update() {
 		return;
 	}
 
-	if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'eddc_commission_nonce' ) ) {
+	if ( isset( $_GET['_wpnonce'] ) && ! wp_verify_nonce( $_GET['_wpnonce'], 'eddc_commission_nonce' ) ) {
 		return;
 	}
 
