@@ -79,7 +79,7 @@ function eddc_render_commissions_meta_box() {
 			<td class="edd_field_type_select">
 				<?php do_action( 'eddc_metabox_before_type', $post->ID ); ?>
 				<label for="edd_commission_settings[type]"><strong><?php _e( 'Type:', 'eddc' ); ?></strong></label>
-				<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong><?php _e( 'Type', 'eddc' ); ?></strong>:<?php _e( 'With commissions enabled, you will need to specify who to assign commissions to. Commissions can be given based on a percentage of the purchase cost, or at a flat rate.', 'eddc' ); ?>"></span><br/>
+				<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong><?php _e( 'Type', 'eddc' ); ?></strong>: <?php _e( 'With commissions enabled, you will need to specify who to assign commissions to. Commissions can be given based on a percentage of the purchase cost, or at a flat rate.', 'eddc' ); ?>"></span><br/>
 				<p>
 					<input type="radio" name="edd_commission_settings[type]" value="percentage" <?php checked( $type, 'percentage', true ); ?>/>&nbsp;<?php _e( 'Percentage', 'eddc' ); ?>
 					<br/ >
