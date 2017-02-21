@@ -11,20 +11,25 @@
  * @since       3.2.8
  */
 
+
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 
 /**
  * EDD_Batch_Commissions_Mark_Paid Class
  *
- * @since 3.2.8
+ * @since       3.2.8
  */
 class EDD_Batch_Commissions_Mark_Paid extends EDD_Batch_Export {
 
 	/**
 	 * Our export type. Used for export-type specific filters/actions
-	 * @var string
-	 * @since 3.2.8
+	 *
+	 * @var         string
+	 * @since       3.2.8
 	 */
 	public $export_type = 'commissions_paid';
 	public $is_void     = true;
@@ -33,14 +38,12 @@ class EDD_Batch_Commissions_Mark_Paid extends EDD_Batch_Export {
 	/**
 	 * Get the Export Data
 	 *
-	 * @access public
-	 * @since 3.2.8
-	 * @global object $wpdb Used to query the database using the WordPress
-	 *   Database API
-	 * @return array $data The data for the CSV file
+	 * @access      public
+	 * @since       3.2.8
+	 * @global      object $wpdb Used to query the database using the WordPress Database API
+	 * @return      bool
 	 */
 	public function get_data() {
-
 		$items = get_option( '_eddc_ids_to_pay', array() );
 
 		if ( ! is_array( $items ) ) {
@@ -63,45 +66,47 @@ class EDD_Batch_Commissions_Mark_Paid extends EDD_Batch_Export {
 		return false;
 	}
 
+
 	/**
 	 * Return the calculated completion percentage
 	 *
-	 * @since 3.2.8
-	 * @return int
+	 * @access      public
+	 * @since       3.2.8
+	 * @return      int $percentage The calculated completion percentage
 	 */
 	public function get_percentage_complete() {
-
 		$ids_to_pay = get_option( '_eddc_ids_to_pay', array() );
 		$total      = count( $ids_to_pay );
 
 		$percentage = 100;
 
-		if( $total > 0 ) {
+		if ( $total > 0 ) {
 			$percentage = ( ( $this->per_step * $this->step ) / $total ) * 100;
 		}
 
-		if( $percentage > 100 ) {
+		if ( $percentage > 100 ) {
 			$percentage = 100;
 		}
 
 		return $percentage;
 	}
 
+
 	/**
 	 * Process a step
 	 *
-	 * @since 3.2.8
-	 * @return bool
+	 * @access      public
+	 * @since       3.2.8
+	 * @return      bool
 	 */
 	public function process_step() {
-
 		if ( ! $this->can_export() ) {
 			wp_die( __( 'You do not have permission to export data.', 'easy-digital-downloads' ), __( 'Error', 'easy-digital-downloads' ), array( 'response' => 403 ) );
 		}
 
 		$had_data = $this->get_data();
 
-		if( $had_data ) {
+		if ( $had_data ) {
 			$this->done = false;
 			return true;
 		} else {
@@ -113,5 +118,4 @@ class EDD_Batch_Commissions_Mark_Paid extends EDD_Batch_Export {
 			return false;
 		}
 	}
-
 }

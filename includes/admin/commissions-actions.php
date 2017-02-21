@@ -1,4 +1,15 @@
 <?php
+/**
+ * Commissions Actions
+ *
+ * @package 	EDD_Commissions
+ * @subpackage 	Admin
+ * @copyright   Copyright (c) 2017, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       1.0
+ */
+
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -9,8 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Add Commissions link
  *
  * @since       1.0
+ * @global      object $eddc_commissions_page Reference for the commissions edit page
  * @return      void
-*/
+ */
 function eddc_add_commissions_link() {
 	global $eddc_commissions_page;
 
@@ -30,7 +42,7 @@ function eddc_add_manual_commission() {
 		return;
 	}
 
-	if( ! current_user_can( 'edit_shop_payments' ) ) {
+	if ( ! current_user_can( 'edit_shop_payments' ) ) {
 		wp_die( __( 'You do not have permission to record commissions', 'eddc' ) );
 	}
 
@@ -41,19 +53,19 @@ function eddc_add_manual_commission() {
 	$rate        = sanitize_text_field( $_POST['rate'] );
 
 	$commission = array(
-		'post_type'     => 'edd_commission',
-		'post_title'    => $user_info->user_email . ' - ' . get_the_title( $download_id ),
-		'post_status'   => 'publish'
+		'post_type'   => 'edd_commission',
+		'post_title'  => $user_info->user_email . ' - ' . get_the_title( $download_id ),
+		'post_status' => 'publish'
 	);
 
 	$commission_id = wp_insert_post( apply_filters( 'edd_commission_post_data', $commission ) );
 
 	$commission_info = apply_filters( 'edd_commission_info', array(
-		'user_id'   => absint( $_POST['user_id'] ),
-		'rate'      => $rate,
-		'amount'    => $amount,
-		'currency'  => edd_get_currency(),
-		'type'      => eddc_get_commission_type( $download_id )
+		'user_id'  => absint( $_POST['user_id'] ),
+		'rate'     => $rate,
+		'amount'   => $amount,
+		'currency' => edd_get_currency(),
+		'type'     => eddc_get_commission_type( $download_id )
 	), $commission_id, $payment_id, $download_id );
 
 	eddc_set_commission_status( $commission_id, 'unpaid' );
@@ -74,8 +86,8 @@ add_action( 'admin_init', 'eddc_add_manual_commission' );
 /**
  * Process commission actions for single view
  *
- * @since 3.3
- * @return void
+ * @since       3.3
+ * @return      void
  */
 function eddc_process_commission_update() {
 	if ( empty( $_GET['commission'] ) || empty( $_GET['action'] ) ) {
@@ -93,7 +105,7 @@ function eddc_process_commission_update() {
 	$action = sanitize_text_field( $_GET['action'] );
 	$id     = absint( $_GET['commission'] );
 
-	switch( $action ) {
+	switch ( $action ) {
 		case 'mark_as_paid':
 			eddc_set_commission_status( $id, 'paid' );
 			break;
@@ -117,8 +129,8 @@ add_action( 'admin_init', 'eddc_process_commission_update', 1 );
 /**
  * Update commission data
  *
- * @since 3.3
- * @return void
+ * @since       3.3
+ * @return      void
  */
 function eddc_update_commission() {
 	if ( ! current_user_can( 'edit_shop_payments' ) ) {
@@ -160,8 +172,8 @@ add_action( 'admin_init', 'eddc_update_commission', 1 );
 /**
  * Delete a commission
  *
- * @since 3.3
- * @return void
+ * @since       3.3
+ * @return      void
  */
 function eddc_delete_commission( $args ) {
 	$commission_id = absint( $_POST['commission_id'] );

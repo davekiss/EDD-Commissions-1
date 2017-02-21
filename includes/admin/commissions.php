@@ -1,4 +1,15 @@
 <?php
+/**
+ * Commissions Filters
+ *
+ * @package     EDD_Commissions
+ * @subpackage  Admin
+ * @copyright   Copyright (c) 2017, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       1.0
+ */
+
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,8 +39,8 @@ function eddc_commissions_page() {
 /**
  * Register the views for commission management
  *
- * @since  3.3
- * @return array Array of views and their callbacks
+ * @since       3.3
+ * @return      array Array of views and their callbacks
  */
 function eddc_commission_views() {
 	$views = array();
@@ -40,8 +51,8 @@ function eddc_commission_views() {
 /**
  * Register the tabs for commission management
  *
- * @since  3.3
- * @return array Array of tabs for the customer
+ * @since       3.3
+ * @return      array Array of tabs for the customer
  */
 function eddc_commission_tabs() {
 	$tabs = array();
@@ -130,10 +141,10 @@ function eddc_commissions_list() {
 
 	$redirect = get_transient( '_eddc_bulk_actions_redirect' );
 
-	if( false !== $redirect ) : delete_transient( '_eddc_bulk_actions_redirect' );
+	if ( false !== $redirect ) : delete_transient( '_eddc_bulk_actions_redirect' );
 	$redirect = admin_url( 'edit.php?post_type=download&page=edd-commissions' );
 
-	if( isset( $_GET['s'] ) ) {
+	if ( isset( $_GET['s'] ) ) {
 		$redirect = add_query_arg( 's', $_GET['s'], $redirect );
 	}
 	?>
@@ -147,26 +158,26 @@ function eddc_commissions_list() {
 /**
  * Renders the add commission view
  *
- * @since 3.3
- * @return void
+ * @since       3.3
+ * @return      void
  */
 function eddc_render_add_commission_view() {
 	$render = true;
 
-	if( ! current_user_can( 'edit_shop_payments' ) ) {
+	if ( ! current_user_can( 'edit_shop_payments' ) ) {
 		edd_set_error( 'edd-no-access', __( 'You are not permitted to add commissions.', 'eddc' ) );
 		$render = false;
 	}
 	?>
 	<div class="wrap">
 		<h2><?php _e( 'Commission Details', 'eddc' ); ?></h2>
-		<?php if( edd_get_errors() ) : ?>
+		<?php if ( edd_get_errors() ) : ?>
 			<div class="error settings-error">
 				<?php edd_print_errors(); ?>
 			</div>
 		<?php endif; ?>
 
-		<?php if( $render ) : ?>
+		<?php if ( $render ) : ?>
 			<div id="edd-item-card-wrapper" class="eddc-commission-card" style="float: left">
 				<div class="info-wrapper item-section">
 					<form id="add-item-info" method="post" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions' ); ?>">
@@ -236,38 +247,37 @@ function eddc_render_add_commission_view() {
 /**
  * Renders the commission view wrapper
  *
- * @since  3.3
- * @param  string $view      The View being requested
- * @param  array $callbacks  The Registered views and their callback functions
- * @return void
+ * @since       3.3
+ * @param       string $view The View being requested
+ * @param       array $callbacks The Registered views and their callback functions
+ * @return      void
  */
 function eddc_render_commission_view( $view, $callbacks ) {
 	$render = true;
 
-	if( ! current_user_can( 'edit_shop_payments' ) ) {
+	if ( ! current_user_can( 'edit_shop_payments' ) ) {
 		edd_set_error( 'edd-no-access', __( 'You are not permitted to view this data.', 'eddc' ) );
 		$render = false;
 	}
 
-	if( ! isset( $_GET['commission'] ) || ! is_numeric( $_GET['commission'] ) ) {
+	if ( ! isset( $_GET['commission'] ) || ! is_numeric( $_GET['commission'] ) ) {
 		edd_set_error( 'edd-invalid-commission', __( 'Invalid commission ID provided.', 'eddc' ) );
 		$render = false;
 	}
 
-	$commission_id  = (int) $_GET['commission'];
-	$commission     = get_post( $commission_id );
-
+	$commission_id   = (int) $_GET['commission'];
+	$commission      = get_post( $commission_id );
 	$commission_tabs = eddc_commission_tabs();
 	?>
 	<div class="wrap">
 		<h2><?php _e( 'Commission Details', 'eddc' ); ?></h2>
-		<?php if( edd_get_errors() ) : ?>
+		<?php if ( edd_get_errors() ) : ?>
 			<div class="error settings-error">
 				<?php edd_print_errors(); ?>
 			</div>
 		<?php endif; ?>
 
-		<?php if( $render ) : ?>
+		<?php if ( $render ) : ?>
 			<div id="edd-item-wrapper" class="edd-item-has-tabs edd-clearfix">
 				<div id="edd-item-tab-wrapper" class="commission-tab-wrapper">
 					<ul id="edd-item-tab-wrapper-list" class="commission-tab-wrapper-list">
@@ -317,9 +327,9 @@ function eddc_render_commission_view( $view, $callbacks ) {
 /**
  * View a commission
  *
- * @since  3.5
- * @param  $commission The commission object being displayed
- * @return void
+ * @since       3.3
+ * @param       object $commission The commission object being displayed
+ * @return      void
  */
 function eddc_commissions_view( $commission ) {
 	if ( ! $commission ) {
@@ -508,9 +518,9 @@ function eddc_commissions_view( $commission ) {
 /**
  * Delete a commission
  *
- * @since 3.3
- * @param object $commission The commission being deleted
- * @return void
+ * @since       3.3
+ * @param       object $commission The commission being deleted
+ * @return      void
  */
 function eddc_commissions_delete_view( $commission ) {
 	if ( ! $commission ) {

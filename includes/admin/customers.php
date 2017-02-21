@@ -1,23 +1,29 @@
 <?php
-
 /**
  * Add Commissions to the EDD Customer Interface
- * *
+ *
+ * @package     EDD_Commissions
+ * @subpackage  Admin
+ * @copyright   Copyright (c) 2017, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       3.2
-*/
+ */
+
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 
 /**
  * Add the commissions tab to the customer interface if the customer has commissions
  *
- * @since  3.2
- * @param  array $tabs The tabs currently added to the customer view
- * @return array       Updated tabs array
+ * @since       3.2
+ * @param       array $tabs The tabs currently added to the customer view
+ * @return      array Updated tabs array
  */
 function eddc_customer_tab( $tabs ) {
-
 	$customer_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : false;
 	$customer    = new EDD_Customer( $customer_id );
 	$downloads   = eddc_get_download_ids_of_user( $customer->user_id );
@@ -27,9 +33,7 @@ function eddc_customer_tab( $tabs ) {
 
 		// This makes it so former commission recievers get the tab and new commission users with no sales see it
 		$tabs['commissions'] = array( 'dashicon' => 'dashicons-money', 'title' => __( 'Commissions', 'eddc' ) );
-
 	}
-
 
 	return $tabs;
 }
@@ -38,34 +42,31 @@ add_filter( 'edd_customer_tabs', 'eddc_customer_tab', 10, 1 );
 /**
  * Register the commissions view for the customer interface
  *
- * @since  3.2
- * @param  array $tabs The tabs currently added to the customer views
- * @return array       Updated tabs array
+ * @since       3.2
+ * @param       array $tabs The tabs currently added to the customer views
+ * @return      array Updated tabs array
  */
 function eddc_customer_view( $views ) {
-
 	$customer_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : false;
 	$customer    = new EDD_Customer( $customer_id );
 
 	if ( $customer->user_id && eddc_user_has_commissions( $customer->user_id ) ) {
-
 		$views['commissions'] = 'eddc_customer_commissions_view';
-
 	}
 
 	return $views;
 }
 add_filter( 'edd_customer_views', 'eddc_customer_view', 10, 1 );
 
+
 /**
  * Display the commissions area for the customer view
  *
- * @since  3.2
- * @param  object $customer The Customer being displayed
- * @return void
+ * @since       3.2
+ * @param       object $customer The Customer being displayed
+ * @return      void
  */
 function eddc_customer_commissions_view( $customer ) {
-
 	?>
 	<div class="edd-item-notes-header">
 		<?php echo get_avatar( $customer->email, 30 ); ?> <span><?php echo $customer->name; ?></span>

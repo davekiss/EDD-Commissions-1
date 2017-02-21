@@ -13,7 +13,9 @@
 
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 
 /**
@@ -27,9 +29,9 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 	/**
 	 * Our export type. Used for export-type specific filters/actions.
 	 *
-	 * @since 3.3
-	 * @access public
-	 * @var string
+	 * @since       3.3
+	 * @access      public
+	 * @var         string
 	 */
 	public $export_type = 'commissions_report';
 
@@ -37,9 +39,9 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 	/**
 	 * Set the export headers.
 	 *
-	 * @since 3.3
-	 * @access public
-	 * @return void
+	 * @since       3.3
+	 * @access      public
+	 * @return      void
 	 */
 	public function headers() {
 		ignore_user_abort( true );
@@ -60,9 +62,9 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 	 *
 	 * We make use of this function to set up the header of the earnings report.
 	 *
-	 * @access public
-	 * @since 3.3
-	 * @return array $cols CSV header.
+	 * @access      public
+	 * @since       3.3
+	 * @return      array $cols The generated CSV header row
 	 */
 	public function print_csv_cols() {
 		$cols = array(
@@ -117,9 +119,9 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 	/**
 	 * Print the CSV rows for the current step.
 	 *
-	 * @since 3.3
-	 * @access public
-	 * @return mixed string|false
+	 * @since       3.3
+	 * @access      public
+	 * @return      mixed false|string $row_data The data for a given row
 	 */
 	public function print_csv_rows() {
 		$row_data = '';
@@ -179,16 +181,14 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 	/**
 	 * Get the Export Data.
 	 *
-	 * @since 3.3
-	 * @access public
-	 * @return array $data The data for the CSV file
+	 * @since       3.3
+	 * @access      public
+	 * @return      mixed false|array $data The data for the CSV file
 	 */
 	public function get_data() {
-		global $wpdb;
-
 		$data = array();
 
-		$start_date = date( 'Y-m-d', strtotime( $this->start ) );
+		$start_date     = date( 'Y-m-d', strtotime( $this->start ) );
 		$maybe_end_date = date( 'Y-m-d', strtotime( 'first day of +1 month', strtotime( $start_date ) ) );
 
 		if ( $this->count() == 0 ) {
@@ -249,15 +249,15 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 
 		$data = array(
 			'paid' => array(
-				'count' => ! empty( $paid ) ? count( $paid ) : 0,
+				'count'  => ! empty( $paid ) ? count( $paid ) : 0,
 				'amount' => edd_sanitize_amount( $paid_total )
 			),
 			'unpaid' => array(
-				'count' => ! empty( $unpaid ) ? count( $unpaid ) : 0,
+				'count'  => ! empty( $unpaid ) ? count( $unpaid ) : 0,
 				'amount' => edd_sanitize_amount( $unpaid_total )
 			),
 			'revoked' => array(
-				'count' => ! empty( $revoked ) ? count( $revoked ) : 0,
+				'count'  => ! empty( $revoked ) ? count( $revoked ) : 0,
 				'amount' => edd_sanitize_amount( $revoked_total )
 			)
 		);
@@ -272,9 +272,9 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 	/**
 	 * Count the number of months we are dealing with.
 	 *
-	 * @since 3.3
-	 * @access private
-	 * @return void
+	 * @since       3.3
+	 * @access      private
+	 * @return      int The calculated number of months for this CSV
 	 */
 	private function count() {
 		return abs( ( date( 'Y', strtotime( $this->end ) ) - date( 'Y', strtotime( $this->start ) ) ) * 12 + ( date( 'm', strtotime( $this->end ) ) - date( 'm', strtotime( $this->start ) ) ) );
@@ -284,9 +284,9 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 	/**
 	 * Return the calculated completion percentage
 	 *
-	 * @since 3.3
-	 * @access public
-	 * @return int Percentage of batch processing complete.
+	 * @since       3.3
+	 * @access      public
+	 * @return      int $percentage Percentage of batch processing complete
 	 */
 	public function get_percentage_complete() {
 		$percentage = 100;
@@ -294,7 +294,7 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 		$total = $this->count();
 
 		if ( $total > 0 ) {
-			$percentage =  ( $this->step / $total ) * 100;
+			$percentage = ( $this->step / $total ) * 100;
 		}
 
 		if ( $percentage > 100 ) {
@@ -308,10 +308,10 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 	/**
 	 * Set the properties specific to the commissions report.
 	 *
-	 * @since 3.3
-	 * @access public
-	 * @param array $request The Form Data passed into the batch processing
-	 * @return void
+	 * @since       3.3
+	 * @access      public
+	 * @param       array $request The Form Data passed into the batch processing
+	 * @return      void
 	 */
 	public function set_properties( $request ) {
 		$this->start = ( isset( $request['start_month'] ) && isset( $request['start_year'] ) ) ? sanitize_text_field( $request['start_year'] ) . '-' . sanitize_text_field( $request['start_month'] ) . '-1' : '';

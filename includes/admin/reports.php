@@ -1,14 +1,28 @@
 <?php
+/**
+ * Commission Reports
+ *
+ * @package     EDDC
+ * @subpackage  Admin/Reports
+ * @copyright   Copyright (c) 2015, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       3.3
+ */
+
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 
 /**
  * Adds "Commissions" to the report views
  *
- * @access      public
  * @since       1.4
- * @return      void
-*/
-
+ * @param       array $views The existing report views
+ * @return      array $views The views updated with commissions
+ */
 function eddc_add_commissions_view( $views ) {
 	$views['commissions'] = __( 'Commissions', 'edd' );
 	return $views;
@@ -19,17 +33,16 @@ add_filter( 'edd_report_views', 'eddc_add_commissions_view' );
 /**
  * Show Commissions Graph
  *
- * @access      public
  * @since       1.0
  * @return      void
-*/
+ */
 function edd_show_commissions_graph() {
 	// Retrieve the queried dates
 	$dates      = edd_get_report_dates();
 	$day_by_day = true;
 
 	// Determine graph options
-	switch( $dates['range'] ) :
+	switch ( $dates['range'] ) :
 		case 'today' :
 		case 'yesterday' :
 			$day_by_day	= true;
@@ -82,8 +95,9 @@ function edd_show_commissions_graph() {
 			$data[]      = array( $date * 1000, $commissions );
 			$hour++;
 		endwhile;
-	} elseif( $dates['range'] == 'this_week' || $dates['range'] == 'last_week' ) {
+	} elseif ( $dates['range'] == 'this_week' || $dates['range'] == 'last_week' ) {
 		$report_dates = array();
+
 		$i = 0;
 		while ( $i <= 6 ) {
 			if ( ( $dates['day'] + $i ) <= $dates['day_end'] ) {
@@ -101,8 +115,9 @@ function edd_show_commissions_graph() {
 			}
 			$i++;
 		}
+
 		$start_date = $report_dates[0];
-		$end_date = end( $report_dates );
+		$end_date   = end( $report_dates );
 
 		$i = 0;
 		foreach ( $report_dates as $report_date ) {
@@ -137,6 +152,7 @@ function edd_show_commissions_graph() {
 			$m = date( 'm', strtotime( $date_start ) );
 			$y = date( 'Y', strtotime( $date_start ) );
 			$d = date( 'd', strtotime( $date_start ) );
+
 			$commissions = edd_get_commissions_by_date( $d, $m, $y, null, $user );
 			$total += $commissions;
 			$commissions_data[ $y ][ $m ][ $d ] = $commissions;
@@ -187,7 +203,7 @@ function edd_show_commissions_graph() {
 			<h3><span><?php _e('Commissions Paid Over Time', 'edd'); ?></span></h3>
 
 			<div class="inside">
-				<?php if( ! empty( $user ) ) : $user_data = get_userdata( $user ); ?>
+				<?php if ( ! empty( $user ) ) : $user_data = get_userdata( $user ); ?>
 				<p>
 					<?php printf( __( 'Showing commissions paid to %s', 'eddc' ), $user_data->display_name ); ?>
 					&nbsp;&ndash;&nbsp;<a href="<?php echo esc_url( remove_query_arg( 'user' ) ); ?>"><?php _e( 'clear', 'eddc' ); ?></a>
@@ -207,3 +223,39 @@ function edd_show_commissions_graph() {
 	echo ob_get_clean();
 }
 add_action('edd_reports_view_commissions', 'edd_show_commissions_graph');
+
+
+/**
+ * Report Box
+ *
+ * Renders the EDDC report box on the Reports page
+ *
+ * @since       3.3
+ * @return      void
+ */
+function eddc_add_reports_metabox() {
+	?>
+	<div class="postbox edd-export-commissions-history">
+		<h3><span><?php _e('Export Commissions', 'eddc' ); ?></span></h3>
+		<div class="inside">
+			<p><?php _e( 'Download a CSV giving a detailed look into commissions over time.', 'eddc' ); ?></p>
+
+			<form id="edd-export-commissions" class="edd-export-form edd-import-export-form" method="post">
+				<?php echo EDD()->html->month_dropdown( 'start_month' ); ?>
+				<?php echo EDD()->html->year_dropdown( 'start_year' ); ?>
+				<?php echo _x( 'to', 'Date one to date two', 'eddc' ); ?>
+				<?php echo EDD()->html->month_dropdown( 'end_month' ); ?>
+				<?php echo EDD()->html->year_dropdown( 'end_year' ); ?>
+				<?php wp_nonce_field( 'edd_ajax_export', 'edd_ajax_export' ); ?>
+				<input type="hidden" name="edd-export-class" value="EDD_Batch_Commissions_Report_Export"/>
+				<span>
+					<input type="submit" value="<?php _e( 'Generate CSV', 'eddc' ); ?>" class="button-secondary"/>
+					<span class="spinner"></span>
+				</span>
+			</form>
+
+		</div><!-- .inside -->
+	</div><!-- .postbox -->
+	<?php
+}
+add_action( 'edd_reports_tab_export_content_bottom', 'eddc_add_reports_metabox' );
