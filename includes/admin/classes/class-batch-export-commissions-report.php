@@ -138,15 +138,15 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 			}
 
 			if ( $this->step == 1 ) {
-				$row_data .= $start_date . ',';
+				$row_data .= date( 'Y-m', strtotime( $start_date ) ) . ',';
 			} elseif ( $this->step > 1 ) {
 				$start_date = date( 'Y-m-d', strtotime( 'first day of +' . ( $this->step - 1 ) . ' month', strtotime( $start_date ) ) );
 
 				if ( date( 'Y-m', strtotime( $start_date ) ) == date( 'Y-m', strtotime( $this->end ) ) ) {
 					$end_date = date( 'Y-m-d', strtotime( $this->end ) );
-					$row_data .= $end_date . ',';
+					$row_data .= date( 'Y-m', strtotime( $end_date ) ) . ',';
 				} else {
-					$row_data .= $start_date . ',';
+					$row_data .= date( 'Y-m', strtotime( $start_date ) ) . ',';
 				}
 			}
 
@@ -211,11 +211,14 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 			return false;
 		}
 
-		$args['query_args']['date_query'] = array(
-			array(
-				'after'     => $start_date,
-				'before'    => $end_date,
-				'inclusive' => true
+		$args['query_args'] = array(
+			'posts_per_page' => -1,
+			'date_query' => array(
+				array(
+					'after'     => $start_date,
+					'before'    => $end_date,
+					'inclusive' => true
+				)
 			)
 		);
 
