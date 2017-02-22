@@ -211,11 +211,14 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 			return false;
 		}
 
-		$args['query_args']['date_query'] = array(
-			array(
-				'after'     => $start_date,
-				'before'    => $end_date,
-				'inclusive' => true
+		$args['query_args'] = array(
+			'posts_per_page' => -1,
+			'date_query' => array(
+				array(
+					'after'     => $start_date,
+					'before'    => $end_date,
+					'inclusive' => true
+				)
 			)
 		);
 
