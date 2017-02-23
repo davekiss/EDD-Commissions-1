@@ -183,6 +183,7 @@ function eddc_render_add_commission_view() {
 					<form id="add-item-info" method="post" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions' ); ?>">
 						<div class="item-info">
 							<table class="widefat striped">
+								<?php do_action( 'eddc_commission_edit_fields_top', $commission_id ); ?>
 								<tr id="eddc-add-user-id-row">
 									<td class="row-title">
 										<label for="user_id"><?php _e('User ID', 'eddc'); ?></label>
@@ -239,6 +240,7 @@ function eddc_render_add_commission_view() {
 										<p class="description"><?php _e('The total amount of this commission.', 'eddc'); ?></p>
 									</td>
 								</tr>
+								<?php do_action( 'eddc_commission_edit_fields_bottom', $commission_id ); ?>
 							</table>
 						</div>
 						<div id="item-edit-actions" class="edit-item" style="float: right; margin: 10px 0 0; display: block;">
