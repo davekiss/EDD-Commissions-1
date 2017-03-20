@@ -104,6 +104,7 @@ class EDD_Batch_Commissions_Payout extends EDD_Batch_Export {
 						'amount'     => $commission_meta['amount'],
 						'currency'   => $commission_meta['currency'],
 						'ids'        => array( $commission->ID ),
+						'user_id'    => $user_id
 					);
 				}
 			}
@@ -199,6 +200,7 @@ class EDD_Batch_Commissions_Payout extends EDD_Batch_Export {
 						'amount'   => $entry['amount'],
 						'currency' => $entry['currency'],
 						'ids'      => $entry['ids'],
+						'user_id'  => $entry['user_id']
 					);
 				}
 			}
@@ -334,15 +336,16 @@ class EDD_Batch_Commissions_Payout extends EDD_Batch_Export {
 					}
 
 					$row_data .= '"' . addslashes( $column ) . '"';
-					$row_data .= $i == 3 ? '' : ',';
+					$row_data .= $i == 4 ? '' : ',';
 					$i++;
 				}
 
 				$row_data .= "\r\n";
 
 				$this->final_data[] = array(
-					'email'  => $row->email,
-					'amount' => edd_currency_symbol( $row->currency ) . edd_format_amount( $row->amount, edd_currency_decimal_filter() ),
+					'email'   => $row->email,
+					'amount'  => edd_currency_symbol( $row->currency ) . edd_format_amount( $row->amount, edd_currency_decimal_filter() ),
+					'user_id' => $row->user_id
 				);
 
 				$ids_to_pay = array_merge( $ids_to_pay, $row->ids );
