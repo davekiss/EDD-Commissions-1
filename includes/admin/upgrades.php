@@ -1,20 +1,33 @@
 <?php
+/**
+ * Upgrade routines
+ *
+ * @package     EDDC
+ * @subpackage  Admin/Reports
+ * @copyright   Copyright (c) 2015, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       1.3
+ */
+
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 
 /**
  * Shows upgrade notices
  *
- * @access      private
  * @since       2.8
  * @return      void
-*/
-
+ */
 function eddc_upgrade_notices() {
-
-	if( ! current_user_can( 'manage_shop_settings' ) ) {
+	if ( ! current_user_can( 'manage_shop_settings' ) ) {
 		return;
 	}
 
-	if( ! empty( $_GET['page'] ) && 'edd-upgrades' == $_GET['page'] ) {
+	if ( ! empty( $_GET['page'] ) && 'edd-upgrades' == $_GET['page'] ) {
 		return;
 	}
 
@@ -27,43 +40,41 @@ function eddc_upgrade_notices() {
 			'</a>'
 		);
 	}
-
 }
 add_action( 'admin_notices', 'eddc_upgrade_notices' );
+
 
 /**
  * Upgrade all commissions with user ID meta
  *
  * Prior to 1.3 it wasn't possible to query commissions by user ID (dumb)
  *
- * @access      private
  * @since       1.3
  * @return      void
-*/
-
+ */
 function eddc_upgrade_user_ids() {
-
-	if( get_option( 'eddc_upgraded_user_ids' ) )
+	if ( get_option( 'eddc_upgraded_user_ids' ) ) {
 		return; // don't perform the upgrade if we have already done it
+	}
 
 	$args = array(
-		'post_type' => 'edd_commission',
+		'post_type'      => 'edd_commission',
 		'posts_per_page' => -1
 	);
 
 	$commissions = get_posts( $args );
 
-	if( $commissions ) {
-		foreach( $commissions as $commission ) {
+	if ( $commissions ) {
+		foreach ( $commissions as $commission ) {
 			$info = maybe_unserialize( get_post_meta( $commission->ID, '_edd_commission_info', true ) );
 
 			update_post_meta( $commission->ID, '_user_id', $info['user_id'] );
 		}
 		add_option( 'eddc_upgraded_user_ids', '1' );
 	}
-
 }
 add_action( 'admin_init', 'eddc_upgrade_user_ids' );
+
 
 /**
  * Upgrades all commission records to use a taxonomy for tracking the status of the commission
@@ -72,8 +83,7 @@ add_action( 'admin_init', 'eddc_upgrade_user_ids' );
  * @return void
  */
 function eddc_upgrade_commission_statuses() {
-
-	if( ! current_user_can( 'manage_shop_settings' ) ) {
+	if ( ! current_user_can( 'manage_shop_settings' ) ) {
 		return;
 	}
 
@@ -98,18 +108,16 @@ function eddc_upgrade_commission_statuses() {
 
 	$commissions = get_posts( $args );
 
-	if( $commissions ) {
-
+	if ( $commissions ) {
 		// Commissions found so upgrade them
-
-		foreach( $commissions as $commission_id ) {
-
+		foreach ( $commissions as $commission_id ) {
 			$status = get_post_meta( $commission_id, '_commission_status', true );
-			if( 'paid' !== $status ) {
+
+			if ( 'paid' !== $status ) {
 				$status = 'unpaid';
 			}
-			eddc_set_commission_status( $commission_id, $status );
 
+			eddc_set_commission_status( $commission_id, $status );
 		}
 
 		$step++;
@@ -120,17 +128,14 @@ function eddc_upgrade_commission_statuses() {
 			'step'        => $step
 		), admin_url( 'index.php' ) );
 
-		wp_safe_redirect( $redirect ); exit;
-
+		wp_safe_redirect( $redirect );
+		exit;
 	} else {
-
 		// No more commissions found, finish up
-
 		update_option( 'eddc_version', EDD_COMMISSIONS_VERSION );
 
 		// No more commissions found, finish up
 		wp_redirect( admin_url() ); exit;
 	}
-
 }
 add_action( 'edd_upgrade_commission_statuses', 'eddc_upgrade_commission_statuses' );

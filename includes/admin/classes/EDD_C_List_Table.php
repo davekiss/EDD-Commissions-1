@@ -1,9 +1,32 @@
 <?php
+/**
+ * Commission list table
+ *
+ * @package     Easy Digital Downloads - Commissions
+ * @subpackage  Classes/Discount
+ * @copyright   Copyright (c) 2017, Sunny Ratilal
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       1.7
+ */
 
-if ( !class_exists( 'WP_List_Table' ) ) {
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+
+// Bootstrap WP_List_Table if necessary
+if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
+
+/**
+ * The list table class
+ *
+ * @since       1.7
+ */
 class EDD_C_List_Table extends WP_List_Table {
 
 
@@ -15,35 +38,50 @@ class EDD_C_List_Table extends WP_List_Table {
 	 */
 	public $per_page = 10;
 
+
 	/**
 	 * Term counts
+	 *
 	 * @var null
 	 */
 	public $term_counts = null;
 
 
+	/**
+	 * Get things started
+	 *
+	 * @since       1.7
+	 * @return      void
+	 */
 	function __construct() {
 		global $status, $page;
 
 		//Set parent defaults
 		parent::__construct( array(
-				'singular'  => 'commission',     //singular name of the listed records
-				'plural'    => 'commissions',    //plural name of the listed records
-				'ajax'      => false             //does this table support ajax?
-			) );
-
+			'singular' => 'commission',     //singular name of the listed records
+			'plural'   => 'commissions',    //plural name of the listed records
+			'ajax'     => false             //does this table support ajax?
+		) );
 	}
 
 
+	/**
+	 * Setup default column data
+	 *
+	 * @since       1.7
+	 * @return      void
+	 */
 	function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 			case 'rate':
-				$download = get_post_meta( $item['ID'], '_download_id', true );
-				$type     = eddc_get_commission_type( $download );
-				if( 'percentage' == $type )
+				$download        = get_post_meta( $item['ID'], '_download_id', true );
+				$commission_info = get_post_meta( $item['ID'], '_edd_commission_info', true );
+				$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download ) );
+				if ( 'percentage' == $type ) {
 					return $item[ $column_name ] . '%';
-				else
+				} else {
 					return edd_currency_filter( edd_sanitize_amount( $item[ $column_name ] ) );
+				}
 			case 'status':
 				return $item[ $column_name ];
 			case 'amount':
@@ -56,16 +94,29 @@ class EDD_C_List_Table extends WP_List_Table {
 			case 'payment':
 				$payment = get_post_meta( $item['ID'], '_edd_commission_payment_id', true );
 				return $payment ? '<a href="' . esc_url( admin_url( 'edit.php?post_type=download&page=edd-payment-history&view=view-order-details&id=' . $payment ) ) . '" title="' . __( 'View payment details', 'eddc' ) . '">#' . $payment . '</a> - ' . edd_get_payment_status( get_post( $payment ), true  ) : '';
+			case 'actions':
+				echo '<a href="' . add_query_arg( array( 'view' => 'overview', 'commission' => $item['ID'] ) ) . '">' . __( 'View', 'eddc' ) . '</a>';
+				break;
 			default:
 				return print_r( $item, true ); //Show the whole array for troubleshooting purposes
 		}
+
+		do_action( 'manage_edd_commissions_custom_column', $column_name, $item['ID'] );
 	}
 
-	function column_title( $item ) {
 
+	/**
+	 * Setup column titles
+	 *
+	 * @since       1.7
+	 * @param       array $item The data for a given column
+	 * @return      void
+	 */
+	function column_title( $item ) {
 		//Build row actions
 		$actions = array();
-		$base = admin_url( 'edit.php?post_type=download&page=edd-commissions' );
+		$base    = admin_url( 'edit.php?post_type=download&page=edd-commissions' );
+
 		if ( $item['status'] == 'revoked' ) {
 			$actions['mark_as_accepted'] = sprintf( '<a href="%s&action=%s&commission=%s">' . __( 'Accept', 'eddc' ) . '</a>', $base, 'mark_as_accepted', $item['ID'] );
 		} elseif ( $item['status'] == 'paid' ) {
@@ -74,9 +125,9 @@ class EDD_C_List_Table extends WP_List_Table {
 			$actions['mark_as_paid'] = sprintf( '<a href="%s&action=%s&commission=%s">' . __( 'Mark as Paid', 'eddc' ) . '</a>', $base, 'mark_as_paid', $item['ID'] );
 			$actions['mark_as_revoked'] = sprintf( '<a href="%s&action=%s&commission=%s">' . __( 'Revoke', 'eddc' ) . '</a>', $base, 'mark_as_revoked', $item['ID'] );
 		}
-		$actions['edit'] = sprintf( '<a href="%s&action=%s&commission=%s">' . __( 'Edit' ) . '</a>', $base, 'edit', $item['ID'] );
-		$actions['delete'] = sprintf( '<a href="%s&action=%s&commission=%s">' . __( 'Delete' ) . '</a>', $base, 'delete', $item['ID'] );
+		$actions['delete'] = sprintf( '<a href="%s&view=%s&commission=%s">' . __( 'Delete' ) . '</a>', $base, 'delete', $item['ID'] );
 
+		$actions = apply_filters( 'edd_commission_row_actions', $actions, $item );
 
 		$user = get_userdata( $item['user'] );
 
@@ -92,6 +143,14 @@ class EDD_C_List_Table extends WP_List_Table {
 		}
 	}
 
+
+	/**
+	 * Output the checkbox for select all function
+	 *
+	 * @since       1.7
+	 * @param       array $item The data for a given column
+	 * @return      string
+	 */
 	function column_cb( $item ) {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
@@ -101,23 +160,41 @@ class EDD_C_List_Table extends WP_List_Table {
 	}
 
 
+	/**
+	 * Get available columns
+	 *
+	 * @since       1.7
+	 * @return      array $columns The available columns
+	 */
 	function get_columns() {
 		$columns = array(
-			'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
-			'title'     => __( 'User', 'eddc' ),
-			'download'  => edd_get_label_singular(),
-			'payment'   => __( 'Payment', 'eddc' ),
-			'rate'      => __( 'Rate', 'eddc' ),
-			'amount'    => __( 'Amount', 'eddc' ),
-			'status'    => __( 'Status', 'eddc' ),
-			'date'      => __( 'Date', 'eddc' )
+			'cb'       => '<input type="checkbox" />', //Render a checkbox instead of text
+			'title'    => __( 'User', 'eddc' ),
+			'download' => edd_get_label_singular(),
+			'payment'  => __( 'Payment', 'eddc' ),
+			'rate'     => __( 'Rate', 'eddc' ),
+			'amount'   => __( 'Amount', 'eddc' ),
+			'status'   => __( 'Status', 'eddc' ),
+			'date'     => __( 'Date', 'eddc' ),
+			'actions'  => __( 'Actions', 'eddc' )
 		);
+
+		$columns = apply_filters( 'manage_edd_commissions_columns', $columns );
+
 		return $columns;
 	}
 
+
+	/**
+	 * Get relevant table views
+	 *
+	 * @since       1.7
+	 * @return      void
+	 */
 	function get_views() {
 		$base    = admin_url( 'edit.php?post_type=download&page=edd-commissions' );
 		$user_id = $this->get_filtered_user();
+
 		if ( ! empty( $user_id ) ) {
 			$base = add_query_arg( array( 'user' => $user_id, $base ) );
 		}
@@ -131,17 +208,25 @@ class EDD_C_List_Table extends WP_List_Table {
 			'revoked'   => sprintf( '<a href="%s"%s>%s</a>', esc_url( add_query_arg( 'view', 'revoked', $base ) ), $current === 'revoked' ? ' class="current"' : '', __( 'Revoked', 'eddc' ), $status_counts['revoked'] ) . sprintf( _x( '(%d)', 'post count', 'eddc' ), $status_counts['revoked'] ),
 			'paid'      => sprintf( '<a href="%s"%s>%s</a>', esc_url( add_query_arg( 'view', 'paid', $base ) ), $current === 'paid' ? ' class="current"' : '', __( 'Paid', 'eddc' ), $status_counts['paid'] ) . sprintf( _x( '(%d)', 'post count', 'eddc' ), $status_counts['paid'] ),
 		);
+
 		return $views;
 	}
 
 
+	/**
+	 * Setup bulk actions
+	 *
+	 * @since       1.7
+	 * @return      array $actions The registered bulk actions
+	 */
 	function get_bulk_actions() {
 		$actions = array(
-			'mark_as_paid'      => __( 'Mark as Paid', 'eddc' ),
-			'mark_as_unpaid'    => __( 'Mark as Unpaid', 'eddc' ),
-			'mark_as_revoked'   => __( 'Mark as Revoked', 'eddc' ),
-			'delete'            => __( 'Delete', 'eddc' )
+			'mark_as_paid'    => __( 'Mark as Paid', 'eddc' ),
+			'mark_as_unpaid'  => __( 'Mark as Unpaid', 'eddc' ),
+			'mark_as_revoked' => __( 'Mark as Revoked', 'eddc' ),
+			'delete'          => __( 'Delete', 'eddc' )
 		);
+
 		return $actions;
 	}
 
@@ -149,7 +234,6 @@ class EDD_C_List_Table extends WP_List_Table {
 	/**
 	 * Retrieve the current page number
 	 *
-	 * @access      private
 	 * @since       1.7
 	 * @return      int
 	 */
@@ -167,6 +251,7 @@ class EDD_C_List_Table extends WP_List_Table {
 	 */
 	function get_filtered_user() {
 		$user_id = ! empty( $_GET['user'] ) ? sanitize_text_field( $_GET['user'] ) : 0;
+
 		if ( ! is_numeric( $user_id ) ) {
 			$user    = get_user_by( 'login', $_GET['user'] );
 			$user_id = $user->data->ID;
@@ -199,6 +284,15 @@ class EDD_C_List_Table extends WP_List_Table {
 		return ! empty( $_GET['payment'] ) ? absint( $_GET['payment'] ) : false;
 	}
 
+
+	/**
+	 * Setup column titles
+	 *
+	 * @access      public
+	 * @since       1.7
+	 * @param       array $item The data for a given column
+	 * @return      void
+	 */
 	function get_filtered_view() {
 		return ! empty( $_GET['view'] ) ? sanitize_text_field( $_GET['view'] ) : 'all';
 	}
@@ -214,14 +308,13 @@ class EDD_C_List_Table extends WP_List_Table {
 	 * @return      array
 	 */
 	function get_meta_query() {
-
 		$meta_query = array();
 
 		$user     = $this->get_filtered_user();
 		$download = $this->get_filtered_download();
 		$payment  = $this->get_filtered_payment();
 
-		if( $user ) {
+		if ( $user ) {
 			// Show only commissions from a specific user
 			$meta_query[] = array(
 				'key'   => '_user_id',
@@ -230,26 +323,25 @@ class EDD_C_List_Table extends WP_List_Table {
 
 		}
 
-		if( $download ) {
+		if ( $download ) {
 			// Show only commissions from a specific download
 			$meta_query[] = array(
 				'key'   => '_download_id',
 				'value' => $download
 			);
-
 		}
 
-		if( $payment ) {
+		if ( $payment ) {
 			// Show only commissions from a specific payment
 			$meta_query[] = array(
 				'key'   => '_edd_commission_payment_id',
 				'value' => $payment
 			);
-
 		}
 
 		return $meta_query;
 	}
+
 
 	/**
 	 * Gets the tax query
@@ -261,46 +353,53 @@ class EDD_C_List_Table extends WP_List_Table {
 	 * @return      array
 	 */
 	function get_tax_query() {
-
-		$tax_query  = array();
-		$view = isset( $_GET['view'] ) ? $_GET['view'] : false;
+		$tax_query = array();
+		$view      = isset( $_GET['view'] ) ? $_GET['view'] : false;
 
 		if ( $view ) {
-
 			// Show only commissions of a specific status
 			$tax_query[] = array(
 				'taxonomy' => 'edd_commission_status',
 				'terms'    => $view,
 				'field'    => 'slug'
 			);
-
 		}
 
 		return $tax_query;
-
 	}
 
-	function process_bulk_action() {
 
+	/**
+	 * Process bulk actions
+	 *
+	 * @since       1.7
+	 * @return      array
+	 */
+	function process_bulk_action() {
 		$ids = isset( $_GET['commission'] ) ? $_GET['commission'] : false;
 
-		if ( !is_array( $ids ) )
+		if ( ! is_array( $ids ) ) {
 			$ids = array( $ids );
+		}
 
 		foreach ( $ids as $id ) {
 			// Detect when a bulk action is being triggered...
 			if ( 'delete' === $this->current_action() ) {
 				wp_delete_post( $id );
 			}
+
 			if ( 'mark_as_paid' === $this->current_action() ) {
 				eddc_set_commission_status( $id, 'paid' );
 			}
+
 			if ( 'mark_as_unpaid' === $this->current_action() ) {
 				eddc_set_commission_status( $id, 'unpaid' );
 			}
+
 			if ( 'mark_as_revoked' === $this->current_action() ) {
 				eddc_set_commission_status( $id, 'revoked' );
 			}
+
 			if ( 'mark_as_accepted' === $this->current_action() ) {
 				eddc_set_commission_status( $id, 'unpaid' );
 			}
@@ -308,12 +407,17 @@ class EDD_C_List_Table extends WP_List_Table {
 	}
 
 
+	/**
+	 * Gets commissions data
+	 *
+	 * @since       1.7
+	 * @return      array
+	 */
 	function commissions_data() {
-
 		$commissions_data = array();
 
-		$paged    = $this->get_paged();
-		$user     = $this->get_filtered_user();
+		$paged = $this->get_paged();
+		$user  = $this->get_filtered_user();
 
 		$commission_args = array(
 			'post_type'      => 'edd_commission',
@@ -323,24 +427,28 @@ class EDD_C_List_Table extends WP_List_Table {
 		);
 
 		$meta_query = $this->get_meta_query();
+
 		if ( ! empty( $meta_query ) ) {
 			$commission_args['meta_query'] = $meta_query;
 		}
 
 		$tax_query = $this->get_tax_query();
+
 		if ( ! empty( $tax_query ) ) {
 			$commission_args['tax_query'] = $tax_query;
 		}
 
 		$commissions = new WP_Query( $commission_args );
+
 		if ( $commissions->have_posts() ) :
 			while ( $commissions->have_posts() ) : $commissions->the_post();
 				$commission_id   = get_the_ID();
 				$commission_info = get_post_meta( $commission_id, '_edd_commission_info', true );
 				$download_id     = get_post_meta( $commission_id, '_download_id', true );
 
-				$variation = '';
+				$variation           = '';
 				$has_variable_prices = edd_has_variable_prices( $download_id );
+
 				if ( $has_variable_prices ) {
 					$variation = get_post_meta( $commission_id, '_edd_commission_download_variation', true );
 				}
@@ -362,8 +470,14 @@ class EDD_C_List_Table extends WP_List_Table {
 		return $commissions_data;
 	}
 
-	public function get_commission_status_counts() {
 
+	/**
+	 * Gets status counts
+	 *
+	 * @since       1.7
+	 * @return      array
+	 */
+	function get_commission_status_counts() {
 		if ( ! is_null( $this->term_counts ) ) {
 			return $this->term_counts;
 		}
@@ -393,17 +507,17 @@ class EDD_C_List_Table extends WP_List_Table {
 			);
 
 			$term_counts['all'] = $term_counts['paid'] + $term_counts['unpaid'] + $term_counts['revoked'];
-
 		} else {
-			$found_terms = get_terms( 'edd_commission_status' );
-
+			$found_terms      = get_terms( 'edd_commission_status' );
 			$total_term_count = 0;
+
 			foreach ( $found_terms as $term ) {
 				if ( array_key_exists( $term->slug, $term_counts ) ) {
 					$term_counts[ $term->slug ] = $term->count;
 					$total_term_count += $term->count;
 				}
 			}
+
 			$term_counts['all'] = $total_term_count;
 		}
 
@@ -411,7 +525,6 @@ class EDD_C_List_Table extends WP_List_Table {
 
 		return $this->term_counts;
 	}
-
 
 
 	/** ************************************************************************
@@ -424,10 +537,8 @@ class EDD_C_List_Table extends WP_List_Table {
 	 * @uses $this->set_pagination_args()
 	 * *************************************************************************/
 	function prepare_items() {
-
-		$columns = $this->get_columns();
-		$hidden = array(); // no hidden columns
-
+		$columns  = $this->get_columns();
+		$hidden   = array(); // no hidden columns
 		$sortable = $this->get_sortable_columns();
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
@@ -446,5 +557,4 @@ class EDD_C_List_Table extends WP_List_Table {
 			'total_pages' => ceil( $total_items/$this->per_page )   //WE have to calculate the total number of pages
 		) );
 	}
-
 }

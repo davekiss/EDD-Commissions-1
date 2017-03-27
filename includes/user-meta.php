@@ -1,4 +1,19 @@
 <?php
+/**
+ * User meta functions
+ *
+ * @package     EDD_Commissions
+ * @subpackage  Core
+ * @copyright   Copyright (c) 2017, Pippin Williamson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ */
+
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 
 function eddc_user_paypal_email( $user ) {
 	?>
@@ -36,12 +51,11 @@ add_action( 'edit_user_profile', 'eddc_user_paypal_email' );
 
 
 function eddc_save_user_paypal( $user_id ) {
-
 	if ( ! current_user_can( 'edit_user', $user_id ) ) {
 		return false;
 	}
 
-	if( is_email( $_POST['eddc_user_paypal'] ) ) {
+	if ( is_email( $_POST['eddc_user_paypal'] ) ) {
 		update_user_meta( $user_id, 'eddc_user_paypal', sanitize_text_field( $_POST['eddc_user_paypal'] ) );
 	} else {
 		delete_user_meta( $user_id, 'eddc_user_paypal' );
@@ -49,7 +63,7 @@ function eddc_save_user_paypal( $user_id ) {
 
 	if ( current_user_can( 'manage_shop_settings' ) ) {
 
-		if( ! empty( $_POST['eddc_user_rate'] ) ) {
+		if ( ! empty( $_POST['eddc_user_rate'] ) ) {
 			update_user_meta( $user_id, 'eddc_user_rate', sanitize_text_field( $_POST['eddc_user_rate'] ) );
 		} else {
 			delete_user_meta( $user_id, 'eddc_user_rate' );
