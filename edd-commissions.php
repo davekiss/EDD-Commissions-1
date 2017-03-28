@@ -108,11 +108,11 @@ function edd_commissions_load() {
 
 	add_action( 'fes_load_fields_require', 'eddc_add_fes_functionality' );
 }
-add_action( 'plugins_loaded', 'edd_commissions_load', 11 );
+add_action( 'plugins_loaded', 'edd_commissions_load', 1 );
 
 
 function eddc_add_fes_functionality(){
-	if ( class_exists( 'EDD_Front_End_Submissions' ) ){
+	if ( class_exists( 'EDD_Front_End_Submissions' ) ) {
 		if ( version_compare( fes_plugin_version, '2.3', '>=' ) ) {
 			include_once( EDDC_PLUGIN_DIR . 'includes/integrations/fes-commissions-email-field.php' );
 			add_filter(  'fes_load_fields_array', 'eddc_add_commissions_email', 10, 1 );
