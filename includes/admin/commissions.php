@@ -136,6 +136,13 @@ function eddc_commissions_list() {
 			$commissions_table->display();
 			?>
 		</form>
+		<div class="commission-totals">
+			<?php
+				$user_id      = $commissions_table->get_filtered_user();
+				$total_unpaid = edd_currency_filter( edd_format_amount( eddc_get_unpaid_totals( $user_id ) ) );
+			?>
+			<?php _e( 'Total Unpaid:', 'eddc' ); ?>&nbsp;<strong><?php echo $total_unpaid; ?></strong>
+		</div>
 	</div>
 	<?php
 
