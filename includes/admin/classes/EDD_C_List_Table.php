@@ -97,8 +97,6 @@ class EDD_C_List_Table extends WP_List_Table {
 			case 'actions':
 				echo '<a href="' . add_query_arg( array( 'view' => 'overview', 'commission' => $item['ID'] ) ) . '">' . __( 'View', 'eddc' ) . '</a>';
 				break;
-			default:
-				return print_r( $item, true ); //Show the whole array for troubleshooting purposes
 		}
 
 		do_action( 'manage_edd_commissions_custom_column', $column_name, $item['ID'] );
