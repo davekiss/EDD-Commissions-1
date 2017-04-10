@@ -67,8 +67,8 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 	// loop through each calculated commission and award commissions
 	foreach ( $commissions_calculated as $commission_calculated ) {
 		
-		// Bail if the commission amount is $0
-		if ( $commission_calculated['commission_amount'] === (float) 0 ) {
+		// Bail if the commission amount is $0 and the zero-dollar setting is disabled
+		if ( $commission_calculated['commission_amount'] === (float) 0 && edd_get_option( 'edd_commissions_allow_zero_value', 'yes' ) == 'no' ) {
 			continue;
 		}
 		
