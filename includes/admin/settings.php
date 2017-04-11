@@ -68,16 +68,16 @@ function eddc_settings_extensions( $settings ) {
 		),
 		array(
 			'id'      => 'edd_commissions_allow_zero_value',
-			'name'    => __( 'Allow $0.00 commissions', 'eddc' ),
-			'desc'    => __( 'This option determines whether or not zero-dollar commissions are recorded.', 'eddc' ),
+			'name'    => sprintf( __( 'Allow %s commissions', 'eddc' ), edd_currency_filter( edd_format_amount( 0.00 ) ) ),
+			'desc'    => __( 'This option determines whether or not zero-value commissions are recorded.', 'eddc' ),
 			'type'    => 'radio',
 			'std'     => 'yes',
 			'options' => array(
-				'yes' => __( 'Yes, record $0.00 commissions', 'eddc' ),
-				'no'  => __( 'No, do not record $0.00 commissions', 'eddc' ),
+				'yes' => __( 'Yes, record zero value commissions', 'eddc' ),
+				'no'  => __( 'No, do not record zero value commissions', 'eddc' ),
 			),
-			'tooltip_title' => __( 'Allow $0.00 commissions', 'eddc' ),
-			'tooltip_desc'  => __( 'By default, EDD records commissions even if the value of the commission is $0.00. While this may be useful for tracking purposes in some situations, some users may find it confusing. If you prefer not to see $0.00 commissions, disable theme here.', 'eddc' ),
+			'tooltip_title' => __( 'Allow zero value commissions', 'eddc' ),
+			'tooltip_desc'  => sprintf( __( 'By default, EDD records commissions even if the value of the commission is %s. While this may be useful for tracking purposes in some situations, some users may find it confusing. If you prefer not to see $0.00 commissions, disable theme here.', 'eddc' ), edd_currency_filter( edd_format_amount( 0.00 ) ) ),
 		),
 		array(
 			'id'      => 'edd_commissions_autopay_pa',
