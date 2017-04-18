@@ -69,6 +69,10 @@ function edd_commissions_load() {
 		include_once EDDC_PLUGIN_DIR . 'includes/integrations/recurring-payments.php';
 	}
 
+	if ( defined( 'EDD_STRIPE_VERSION' ) ) {
+		include_once EDDC_PLUGIN_DIR . 'includes/integrations/stripe-payment-gateway.php';
+	}
+
 	include_once EDDC_PLUGIN_DIR . 'includes/commission-actions.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/commission-functions.php';
 	include_once EDDC_PLUGIN_DIR . 'includes/email-functions.php';

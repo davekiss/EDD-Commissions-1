@@ -616,6 +616,11 @@ function eddc_user_commissions_graph( $user_id = 0 ) {
  * @return      void
  */
 function eddc_profile_editor_paypal() {
+	$payout_method = edd_get_option( 'commissions_payout_method', 'paypal' );
+	if ( 'paypal' !== $payout_method ) {
+		return;
+	}
+
 	$user_id = get_current_user_id();
 	if ( ! eddc_user_has_commissions( $user_id ) ) {
 		return;
@@ -643,6 +648,11 @@ add_action( 'edd_profile_editor_after_password', 'eddc_profile_editor_paypal', 9
  * @return      void
  */
 function eddc_update_paypal_email( $user_id, $userdata ) {
+	$payout_method = edd_get_option( 'commissions_payout_method', 'paypal' );
+	if ( 'paypal' !== $payout_method ) {
+		return;
+	}
+
 	if ( ! empty( $_POST['eddc_paypal_email'] ) ) {
 		$email = sanitize_text_field( $_POST['eddc_paypal_email'] );
 		if ( ! is_email( $email ) ) {
@@ -656,6 +666,126 @@ function eddc_update_paypal_email( $user_id, $userdata ) {
 }
 add_action( 'edd_pre_update_user_profile', 'eddc_update_paypal_email', 10, 2 );
 
+/**
+ * Display the field to edit the PayPal email address in the profile editor
+ *
+ * @since       3.2
+ * @return      void
+ */
+function eddc_profile_editor_stripe() {
+	$payout_method = edd_get_option( 'commissions_payout_method', 'paypal' );
+	if ( 'stripe' !== $payout_method ) {
+		return;
+	}
+
+	$user_id = get_current_user_id();
+	if ( ! eddc_user_has_commissions( $user_id ) ) {
+		return;
+	}
+
+	$stripe_info = get_user_meta( $user_id, 'eddc_user_stripe', true );
+	if ( ! wp_script_is ( 'edd-stripe-js' ) ) {
+		edd_stripe_js( true );
+	}
+	wp_enqueue_script( 'eddc-stripe', EDDC_PLUGIN_URL . 'assets/js/frontend-eddc-stripe-integration.js', array( 'jquery' ), EDD_COMMISSIONS_VERSION );
+	?>
+	<strong><?php _e( 'Commissions', 'eddc' ); ?></strong><br />
+	<div class="eddc-stripe-wrapper">
+		<?php if ( ! empty( $stripe_info ) ) : ?>
+			<?php eddc_stripe_step_2_form( get_current_user_id() ); ?>
+		<?php else: ?>
+			<p>
+				<label for="eddc_stripe_account_type"><?php _e( 'Account Type', 'eddc' ); ?></label>
+				<select name="eddc_stripe_account_type" id="eddc_stripe_account_type" class="select edd-select">
+					<option value="individual"><?php _e( 'Individual', 'eddc' ); ?></option>
+					<option value="company"><?php _e( 'Company', 'eddc' ); ?></option>
+				</select>
+			</p>
+			<p id="eddc_stripe_account_country">
+				<label for="eddc_stripe_account_country"><?php _e( 'Country', 'eddc' ); ?></label>
+				<select name="eddc_stripe_county" id="eddc_stripe_county" class="select edd-select">
+					<?php foreach( edd_get_country_list() as $key => $country ) : ?>
+					<option value="<?php echo $key; ?>"><?php echo esc_html( $country ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</p>
+			<p id="eddc_stripe_account_email">
+				<label for="eddc_stripe_account_email"><?php _e( 'Email Address', 'eddc' ); ?></label>
+				<?php $customer = new EDD_Customer( $user_id, true ); ?>
+				<?php if ( $customer->id > 0 ) : ?>
+
+					<?php if ( 1 === count( $customer->emails ) ) : ?>
+						<input name="eddc_stripe_email" id="eddc_stripe_email" class="text edd-input required" type="email" value="<?php echo esc_attr( $customer->email ); ?>" />
+					<?php else: ?>
+						<?php
+							$emails           = array();
+							$customer->emails = array_reverse( $customer->emails, true );
+
+							foreach ( $customer->emails as $email ) {
+								$emails[ $email ] = $email;
+							}
+
+							$email_select_args = array(
+								'options'          => $emails,
+								'name'             => 'eddc_stripe_email',
+								'id'               => 'eddc_stripe_email',
+								'selected'         => $customer->email,
+								'show_option_none' => false,
+								'show_option_all'  => false,
+							);
+
+							echo EDD()->html->select( $email_select_args );
+						?>
+					<?php endif; ?>
+				<?php else: ?>
+					<?php $current_user = wp_get_current_user(); ?>
+					<input name="eddc_stripe_email" id="eddc_stripe_email" class="text edd-input required" type="email" value="<?php echo esc_attr( $current_user->user_email ); ?>" />
+				<?php endif; ?>
+			</p>
+			<p>
+				<input type="checkbox" id="eddc_stripe_agreement" name="eddc_stripe_agreement" value="1" />
+				<span>
+					<?php printf( __( 'I Agree to the <a target="_blank" href="%s">Stripe Connected Account Agreement</a>.', 'eddc' ), 'https://stripe.com/us/connect-account/legal' ); ?>
+				</span>
+			</p>
+			<p>
+				<input type="button" value="<?php _e( 'Setup Commissions Account', 'eddc' ); ?>" name="eddc_stripe_apply" id="eddc_stripe_apply" />
+				<input type="hidden" value="<?php echo get_current_user_id(); ?>" name="eddc_stripe_user_id" id="eddc_stripe_user_id" />
+			</p>
+		<?php endif; ?>
+	</div>
+	<div class="eddc-stripe-errors"></div>
+	<?php
+}
+add_action( 'edd_profile_editor_after_password', 'eddc_profile_editor_stripe', 9999 );
+
+
+/**
+ * Save and sanitize the PayPal email address from the profile editor
+ *
+ * @since       3.2
+ * @param       int $user_id  The User ID being edited
+ * @param       array $userdata The array of user info
+ * @return      void
+ */
+function eddc_update_paypal_stripe( $user_id, $userdata ) {
+	$payout_method = edd_get_option( 'commissions_payout_method', 'paypal' );
+	if ( 'stripe' !== $payout_method ) {
+		return;
+	}
+
+	if ( ! empty( $_POST['eddc_paypal_email'] ) ) {
+		$email = sanitize_text_field( $_POST['eddc_paypal_email'] );
+		if ( ! is_email( $email ) ) {
+			edd_set_error( 'eddc-invalid-paypal-email', __( 'PayPal email address must be a valid email address', 'eddc' ) );
+		} else {
+			$success = update_user_meta( $user_id, 'eddc_user_paypal', $email );
+		}
+	} else {
+		delete_user_meta( $user_id, 'eddc_user_paypal' );
+	}
+}
+add_action( 'edd_pre_update_user_profile', 'eddc_update_paypal_stripe', 10, 2 );
 
 /**
  * Helper function for shortcodes that take a user ID

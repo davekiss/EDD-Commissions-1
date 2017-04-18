@@ -80,6 +80,20 @@ function eddc_settings_extensions( $settings ) {
 		),
 	);
 
+	$payout_methods = array( 'paypal' => __( 'PayPal', 'eddc' ) );
+	if ( defined( 'EDD_STRIPE_VERSION' ) ) {
+		$payout_methods['stripe'] = __( 'Stripe', 'eddc' );
+	}
+
+	$commission_settings[] = array(
+		'id'      => 'commissions_payout_method',
+		'name'    => __( 'Payout Method', 'eddc' ),
+		'desc'    => __( 'Choose how you will payout commissions', 'eddc' ),
+		'type'    => 'select',
+		'options' => $payout_methods,
+		'std'     => 'paypal',
+	);
+
 	$commission_settings = apply_filters( 'eddc_settings', $commission_settings );
 
 	if ( version_compare( EDD_VERSION, 2.5, '>=' ) ) {
