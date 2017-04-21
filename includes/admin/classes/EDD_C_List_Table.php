@@ -80,7 +80,7 @@ class EDD_C_List_Table extends WP_List_Table {
 				if ( 'percentage' == $type ) {
 					return $item[ $column_name ] . '%';
 				} else {
-					return edd_currency_filter( edd_sanitize_amount( $item[ $column_name ] ) );
+					return apply_filters( 'eddc_format_rate', edd_currency_filter( edd_sanitize_amount( $item[ $column_name ] ) ), $item[ $column_name ], $type );
 				}
 			case 'status':
 				return $item[ $column_name ];
