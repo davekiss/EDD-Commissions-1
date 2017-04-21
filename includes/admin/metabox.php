@@ -75,6 +75,8 @@ function eddc_render_commissions_meta_box() {
 			</td>
 		</tr>
 
+		<?php do_action( 'eddc_metabox_after_enable', $post->ID ); ?>
+
 		<tr <?php echo $display; ?> class="eddc_toggled_row">
 			<td class="edd_field_type_select">
 				<?php do_action( 'eddc_metabox_before_type', $post->ID ); ?>
