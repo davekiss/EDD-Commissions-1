@@ -261,10 +261,12 @@ function eddc_user_commissions( $user_id = 0 ) {
 								<tr class="edd_user_commission_row">
 									<?php
 									do_action( 'eddc_user_commissions_unpaid_row_begin', $commission );
-									$item_name       = get_the_title( get_post_meta( $commission->ID, '_download_id', true ) );
+									$download_id     = get_post_meta( $commission->ID, '_download_id', true ) ;
+									$item_name       = get_the_title( $download_id );
 									$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
 									$amount          = $commission_info['amount'];
 									$rate            = $commission_info['rate'];
+									$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download_id ) );
 									?>
 									<td class="edd_commission_item"><?php echo esc_html( $item_name ); ?></td>
 									<td class="edd_commission_amount">
@@ -273,7 +275,7 @@ function eddc_user_commissions( $user_id = 0 ) {
 											&nbsp;&olarr;
 										<?php endif; ?>
 									</td>
-									<td class="edd_commission_rate"><?php echo $rate . '%'; ?></td>
+									<td class="edd_commission_rate"><?php echo eddc_format_rate( $rate, $type ); ?></td>
 									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->post_date ) ); ?></td>
 									<?php do_action( 'eddc_user_commissions_unpaid_row_end', $commission ); ?>
 								</tr>
@@ -324,10 +326,12 @@ function eddc_user_commissions( $user_id = 0 ) {
 								<tr class="edd_user_commission_row">
 									<?php
 									do_action( 'eddc_user_commissions_paid_row_begin', $commission );
-									$item_name       = get_the_title( get_post_meta( $commission->ID, '_download_id', true ) );
+									$download_id     = get_post_meta( $commission->ID, '_download_id', true ) ;
+									$item_name       = get_the_title( $download_id );
 									$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
 									$amount          = $commission_info['amount'];
 									$rate            = $commission_info['rate'];
+									$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download_id ) );
 									?>
 									<td class="edd_commission_item"><?php echo esc_html( $item_name ); ?></td>
 									<td class="edd_commission_amount">
@@ -336,7 +340,7 @@ function eddc_user_commissions( $user_id = 0 ) {
 											&nbsp;&olarr;
 										<?php endif; ?>
 									</td>
-									<td class="edd_commission_rate"><?php echo $rate . '%'; ?></td>
+									<td class="edd_commission_rate"><?php echo eddc_format_rate( $rate, $type ); ?></td>
 									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->post_date ) ); ?></td>
 									<?php do_action( 'eddc_user_commissions_paid_row_end', $commission ); ?>
 								</tr>
@@ -387,10 +391,12 @@ function eddc_user_commissions( $user_id = 0 ) {
 								<tr class="edd_user_commission_row">
 									<?php
 									do_action( 'eddc_user_commissions_revoked_row_begin', $commission );
-									$item_name       = get_the_title( get_post_meta( $commission->ID, '_download_id', true ) );
+									$download_id     = get_post_meta( $commission->ID, '_download_id', true ) ;
+									$item_name       = get_the_title( $download_id );
 									$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
 									$amount          = $commission_info['amount'];
 									$rate            = $commission_info['rate'];
+									$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download_id ) );
 									?>
 									<td class="edd_commission_item"><?php echo esc_html( $item_name ); ?></td>
 									<td class="edd_commission_amount">
@@ -399,7 +405,7 @@ function eddc_user_commissions( $user_id = 0 ) {
 											&nbsp;&olarr;
 										<?php endif; ?>
 									</td>
-									<td class="edd_commission_rate"><?php echo $rate . '%'; ?></td>
+									<td class="edd_commission_rate"><?php echo eddc_format_rate( $rate, $type ); ?></td>
 									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->post_date ) ); ?></td>
 									<?php do_action( 'eddc_user_commissions_revoked_row_end', $commission ); ?>
 								</tr>
