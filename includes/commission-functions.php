@@ -817,3 +817,35 @@ function eddc_filter_post_meta_for_status( $check, $object_id, $meta_key, $singl
 	return $check;
 }
 add_filter( 'get_post_metadata', 'eddc_filter_post_meta_for_status', 10, 4 );
+
+/**
+ * This will take a rate and a commission type and format it correctly for output.
+ * For example, if the rate is 5 and the commission type is "percentage", it will return "5%" as a string.
+ * If the rate is 5 and the commission type is "flat", it will return "$5" as a string.
+ *
+ *
+ * The status for commission records used to be stored in postmeta, now it's stored in a taxonomy
+ *
+ * @since       3.3.2
+ * @param       int $unformatted_rate This is the number representing the rate.
+ * @param       string $commission_type This is the type of commission.
+ * @return      string $formatted_rate This is the rate formatted for output.
+ */
+function eddc_format_rate( $unformatted_rate, $commission_type ){
+
+	// If the commission type is "percentage"
+	if ( 'percentage' == $commission_type ){
+
+		// Format the rate to have the percentage sign after it.
+		$formatted_rate = $unformatted_rate . '%';
+
+	}else{
+
+		// If the rate is anything else, format it as if it were a flat rate, or "dollar" amount. We add the currency symbol before it. For example, "$5".
+		$formatted_rate = edd_currency_filter( edd_sanitize_amount( $unformatted_rate ) );
+
+	}
+
+	// Filter the formatted rate so it can be modified if needed
+	return apply_filters( 'eddc_format_rate', $formatted_rate, $unformatted_rate, $commission_type );
+}
