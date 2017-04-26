@@ -77,11 +77,7 @@ class EDD_C_List_Table extends WP_List_Table {
 				$download        = get_post_meta( $item['ID'], '_download_id', true );
 				$commission_info = get_post_meta( $item['ID'], '_edd_commission_info', true );
 				$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download ) );
-				if ( 'percentage' == $type ) {
-					return $item[ $column_name ] . '%';
-				} else {
-					return apply_filters( 'eddc_format_rate', edd_currency_filter( edd_sanitize_amount( $item[ $column_name ] ) ), $item[ $column_name ], $type );
-				}
+				return eddc_format_rate( $item[ $column_name ], $type );
 			case 'status':
 				return $item[ $column_name ];
 			case 'amount':
