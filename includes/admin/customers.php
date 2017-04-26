@@ -121,11 +121,7 @@ function eddc_customer_commissions_view( $customer ) {
 						<tr>
 							<td><?php echo $download->post_title; ?></td>
 							<td>
-								<?php if ( $commission_type === 'percentage' ) : ?>
-									<?php echo $commission_rate; ?>%
-								<?php else: ?>
-									<?php echo edd_currency_filter( edd_format_amount( $commission_rate ) ); ?>
-								<?php endif; ?>
+								<?php echo eddc_format_rate( $commission_rate, $commission_type ); ?>
 
 							</td>
 							<td>
