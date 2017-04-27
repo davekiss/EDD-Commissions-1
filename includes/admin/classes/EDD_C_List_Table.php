@@ -252,7 +252,7 @@ class EDD_C_List_Table extends WP_List_Table {
 
 		if ( ! is_numeric( $user_id ) ) {
 			$user    = get_user_by( 'login', $_GET['user'] );
-			$user_id = $user->data->ID;
+			$user_id = $user ? $user->data->ID : false;
 		}
 
 		return ! empty( $user_id ) ? absint( $user_id ) : false;
