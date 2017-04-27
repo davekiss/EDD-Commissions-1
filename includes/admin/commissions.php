@@ -389,11 +389,7 @@ function eddc_commissions_view( $commission ) {
 		$variation = get_post_meta( $commission_id, '_edd_commission_download_variation', true );
 	}
 
-	if ( 'percentage' == $type ) {
-		$rate = $commission_info['rate'] . '%';
-	} else {
-		$rate = edd_currency_filter( edd_sanitize_amount( $commission_info['rate'] ) );
-	}
+	$rate = eddc_format_rate( $commission_info['rate'], $type );
 
 	do_action( 'eddc_commission_card_top', $commission_id );
 	?>

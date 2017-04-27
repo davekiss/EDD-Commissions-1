@@ -66,7 +66,7 @@ function eddc_render_commissions_meta_box() {
 	<input type="hidden" name="edd_download_commission_meta_box_nonce" value="<?php echo wp_create_nonce( basename( __FILE__ ) ); ?>" />
 	<table class="form-table">
 		<?php do_action( 'eddc_metabox_options_table_begin', $post->ID ); ?>
-		<tr>
+		<tr id="eddc_commission_enable_wrapper">
 			<td class="edd_field_type_text" colspan="2">
 				<?php do_action( 'eddc_metabox_before_commissions_enabled', $post->ID ); ?>
 				<input type="checkbox" name="edd_commisions_enabled" id="edd_commisions_enabled" value="1" <?php checked( true, $enabled, true ); ?>/>&nbsp;
@@ -75,15 +75,27 @@ function eddc_render_commissions_meta_box() {
 			</td>
 		</tr>
 
-		<tr <?php echo $display; ?> class="eddc_toggled_row">
+		<?php do_action( 'eddc_metabox_after_enable', $post->ID ); ?>
+
+		<tr <?php echo $display; ?> class="eddc_toggled_row" id="eddc_commission_type_wrapper">
 			<td class="edd_field_type_select">
 				<?php do_action( 'eddc_metabox_before_type', $post->ID ); ?>
 				<label for="edd_commission_settings[type]"><strong><?php _e( 'Type:', 'eddc' ); ?></strong></label>
 				<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong><?php _e( 'Type', 'eddc' ); ?></strong>: <?php _e( 'With commissions enabled, you will need to specify who to assign commissions to. Commissions can be given based on a percentage of the purchase cost, or at a flat rate.', 'eddc' ); ?>"></span><br/>
-				<p>
-					<input type="radio" name="edd_commission_settings[type]" value="percentage" <?php checked( $type, 'percentage', true ); ?>/>&nbsp;<?php _e( 'Percentage', 'eddc' ); ?>
-					<br/ >
-					<input type="radio" name="edd_commission_settings[type]" value="flat" <?php checked( $type, 'flat', true ); ?>/>&nbsp;<?php _e( 'Flat', 'eddc' ); ?><br/>
+				<p><?php
+
+				// Filter in the types of commissions there could be.
+				$commission_types = apply_filters( 'eddc_commission_types', array(
+					'percentage' => __( 'Percentage', 'eddc' ),
+					'flat'		 => __( 'Flat', 'eddc' ),
+				) );
+
+				foreach( $commission_types as $commission_type => $commission_pretty_string ){?>
+
+						<span id="eddc_type_<?php echo $commission_type; ?>_wrapper"><input id="eddc_type_<?php echo $commission_type; ?>" type="radio" name="edd_commission_settings[type]" value="<?php echo $commission_type; ?>" <?php checked( $type, $commission_type, true ); ?>/> <?php echo $commission_pretty_string;
+						?></span><br /><?php
+				}
+				?>
 				</p>
 				<p><?php _e( 'Select the type of commission(s) to record.', 'eddc' ); ?></p>
 				<?php do_action( 'eddc_metabox_after_type', $post->ID ); ?>
