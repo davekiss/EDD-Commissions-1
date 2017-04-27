@@ -110,7 +110,7 @@ function eddc_calculate_payment_commissions( $payment_id ) {
 		}
 
 		// If we need to award a commission, and the price is greater than zero
-		if ( ! floatval( $price ) > '0' ) {
+		if ( ! floatval( $price ) > '0' && edd_get_option( 'edd_commissions_allow_zero_value', 'yes' ) == 'no' ) {
 			continue;
 		}
 

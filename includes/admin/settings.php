@@ -67,6 +67,19 @@ function eddc_settings_extensions( $settings ) {
 			'options' => $calc_options,
 		),
 		array(
+			'id'      => 'edd_commissions_allow_zero_value',
+			'name'    => sprintf( __( 'Allow %s commissions', 'eddc' ), edd_currency_filter( edd_format_amount( 0.00 ) ) ),
+			'desc'    => __( 'This option determines whether or not zero-value commissions are recorded.', 'eddc' ),
+			'type'    => 'radio',
+			'std'     => 'yes',
+			'options' => array(
+				'yes' => __( 'Yes, record zero value commissions', 'eddc' ),
+				'no'  => __( 'No, do not record zero value commissions', 'eddc' ),
+			),
+			'tooltip_title' => __( 'Allow zero value commissions', 'eddc' ),
+			'tooltip_desc'  => sprintf( __( 'By default, EDD records commissions even if the value of the commission is %s. While this may be useful for tracking purposes in some situations, some users may find it confusing. If you prefer not to see $0.00 commissions, disable theme here.', 'eddc' ), edd_currency_filter( edd_format_amount( 0.00 ) ) ),
+		),
+		array(
 			'id'      => 'edd_commissions_autopay_pa',
 			'name'    => __('Instant Pay Commmissions', 'eddc'),
 			'desc'    => sprintf( __('If checked and <a href="%s">PayPal Adaptive Payments</a> gateway is installed, EDD will automatically pay commissions at the time of purchase', 'eddc'), 'https://easydigitaldownloads.com/downloads/paypal-adaptive-payments/' ),

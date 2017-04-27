@@ -131,11 +131,27 @@ function eddc_commissions_list() {
 			<?php
 			$commissions_table = new edd_C_List_Table();
 			$commissions_table->prepare_items();
-			$commissions_table->search_box( 'search', 'eddc_search' );
 			$commissions_table->views();
+			
+			$user_id      = $commissions_table->get_filtered_user();
+			$total_unpaid = edd_currency_filter( edd_format_amount( eddc_get_unpaid_totals( $user_id ) ) );
+			?>
+			<div class="eddc-user-search-wrapper">
+				<?php if ( ! empty( $user_id ) ) : ?>
+					<?php $user = get_userdata( $user_id ); ?>
+					<?php printf( __( 'Showing commissions for: %s', 'eddc' ), $user->user_nicename ); ?> <a class="eddc-clear-search" href="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions' ); ?>">&times;</a>
+				<?php else: ?>
+					<?php echo EDD()->html->ajax_user_search( array( 'name' => 'user', 'placeholder' => __( 'Search Users', 'eddc' ) ) ); ?>
+					<input type="submit" class="button-secondary" value="Filter" />
+				<?php endif; ?>
+			</div>
+			<?php
 			$commissions_table->display();
 			?>
 		</form>
+		<div class="commission-totals">
+			<?php _e( 'Total Unpaid:', 'eddc' ); ?>&nbsp;<strong><?php echo $total_unpaid; ?></strong>
+		</div>
 	</div>
 	<?php
 

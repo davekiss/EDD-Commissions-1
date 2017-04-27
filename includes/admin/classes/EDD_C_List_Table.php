@@ -93,8 +93,6 @@ class EDD_C_List_Table extends WP_List_Table {
 			case 'actions':
 				echo '<a href="' . add_query_arg( array( 'view' => 'overview', 'commission' => $item['ID'] ) ) . '">' . __( 'View', 'eddc' ) . '</a>';
 				break;
-			default:
-				return print_r( $item, true ); //Show the whole array for troubleshooting purposes
 		}
 
 		do_action( 'manage_edd_commissions_custom_column', $column_name, $item['ID'] );
@@ -250,7 +248,7 @@ class EDD_C_List_Table extends WP_List_Table {
 
 		if ( ! is_numeric( $user_id ) ) {
 			$user    = get_user_by( 'login', $_GET['user'] );
-			$user_id = $user->data->ID;
+			$user_id = $user ? $user->data->ID : false;
 		}
 
 		return ! empty( $user_id ) ? absint( $user_id ) : false;
