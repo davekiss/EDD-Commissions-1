@@ -629,7 +629,7 @@ function eddc_profile_editor_paypal() {
 
 			<legend id="eddc_profile_paypal_label"><?php _e( 'Commissions', 'eddc' ); ?></legend>
 
-			<p id="edd_profile_paypal_wrap">
+			<p id="eddc_profile_paypal_wrap">
 				<label for="eddc-paypal-email"><?php _e( 'PayPal Email Address', 'eddc' ); ?></label>
 				<input name="eddc_paypal_email" id="eddc-paypal-email" class="text edd-input" type="email" value="<?php echo esc_attr( $email ); ?>" />
 			</p>
