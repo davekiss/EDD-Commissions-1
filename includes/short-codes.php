@@ -635,7 +635,12 @@ function eddc_profile_editor_paypal() {
 	</fieldset>
 	<?php
 }
-add_action( 'edd_profile_editor_after_address_fields', 'eddc_profile_editor_paypal', 9999 );
+if ( version_compare( EDD_VERSION, '2.7.8', '>=' ) ) {
+	add_action( 'edd_profile_editor_after_address_fields', 'eddc_profile_editor_paypal', 9999 );
+} else {
+	add_action( 'edd_profile_editor_after_password', 'eddc_profile_editor_paypal', 9999 );
+}
+
 
 
 /**
