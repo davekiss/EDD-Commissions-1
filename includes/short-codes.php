@@ -623,15 +623,34 @@ function eddc_profile_editor_paypal() {
 
 	$custom_paypal = get_user_meta( $user_id, 'eddc_user_paypal', true );
 	$email         = is_email( $custom_paypal ) ? $custom_paypal : '';
-	?>
-	<p>
-		<strong><?php _e( 'Commissions', 'eddc' ); ?></strong><br />
-		<label for="eddc-paypal-email"><?php _e( 'PayPal Email Address', 'eddc' ); ?></label>
-		<input name="eddc_paypal_email" id="eddc-paypal-email" class="text edd-input" type="email" value="<?php echo esc_attr( $email ); ?>" />
-	</p>
-	<?php
+	if ( version_compare( EDD_VERSION, '2.7.8', '>=' ) ) {
+		?>
+		<fieldset id="eddc_profile_paypal_fieldset">
+
+			<legend id="eddc_profile_paypal_label"><?php _e( 'Commissions', 'eddc' ); ?></legend>
+
+			<p id="eddc_profile_paypal_wrap">
+				<label for="eddc-paypal-email"><?php _e( 'PayPal Email Address', 'eddc' ); ?></label>
+				<input name="eddc_paypal_email" id="eddc-paypal-email" class="text edd-input" type="email" value="<?php echo esc_attr( $email ); ?>" />
+			</p>
+		</fieldset>
+		<?php
+	} else {
+		?>
+		<p>
+			<strong><?php _e( 'Commissions', 'eddc' ); ?></strong><br />
+			<label for="eddc-paypal-email"><?php _e( 'PayPal Email Address', 'eddc' ); ?></label>
+			<input name="eddc_paypal_email" id="eddc-paypal-email" class="text edd-input" type="email" value="<?php echo esc_attr( $email ); ?>" />
+		</p>	
+		<?php
+	}
 }
-add_action( 'edd_profile_editor_after_password', 'eddc_profile_editor_paypal', 9999 );
+if ( defined( 'EDD_VERSION' ) && version_compare( EDD_VERSION, '2.7.8', '>=' ) ) {
+	add_action( 'edd_profile_editor_after_address_fields', 'eddc_profile_editor_paypal', 9999 );
+} else {
+	add_action( 'edd_profile_editor_after_password', 'eddc_profile_editor_paypal', 9999 );
+}
+
 
 
 /**
