@@ -360,10 +360,24 @@ function eddc_get_download_ids_of_user( $user_id = 0 ) {
 
 	foreach ( $downloads as $key => $download ) {
 		$settings = maybe_unserialize( $download->settings );
-		$user_ids = explode( ',', $settings['user_id'] );
 
-		if ( ! in_array( $user_id, $user_ids ) ) {
+		// If no user id exists here, something went wrong with the saving of this commission and the product needs to be re-saved.
+		if ( ! isset( $settings['user_id'] ) ){
+
 			unset( $downloads[ $key ] );
+
+		}elseif( empty( get_post_meta( $download->post_id, '_edd_commisions_enabled', true ) ) ){
+
+			// If commissions are not enabled for this product (they likely were on at one point but are now disabled)
+			unset( $downloads[ $key ] );
+
+		}else{
+
+			$user_ids = explode( ',', $settings['user_id'] );
+
+			if ( ! in_array( $user_id, $user_ids ) ) {
+				unset( $downloads[ $key ] );
+			}
 		}
 	}
 
