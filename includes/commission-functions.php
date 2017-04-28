@@ -359,6 +359,10 @@ function eddc_get_download_ids_of_user( $user_id = 0 ) {
 	$downloads = $wpdb->get_results( "SELECT post_id, meta_value AS settings FROM $wpdb->postmeta WHERE meta_key='_edd_commission_settings' AND meta_value LIKE '%{$user_id}%';" );
 
 	foreach ( $downloads as $key => $download ) {
+
+		// Check if commissions are enabled
+		$commissions_enabled = get_post_meta( $download->post_id, '_edd_commisions_enabled', true );
+
 		$settings = maybe_unserialize( $download->settings );
 
 		// If no user id exists here, something went wrong with the saving of this commission and the product needs to be re-saved.
@@ -366,7 +370,7 @@ function eddc_get_download_ids_of_user( $user_id = 0 ) {
 
 			unset( $downloads[ $key ] );
 
-		}elseif( empty( get_post_meta( $download->post_id, '_edd_commisions_enabled', true ) ) ) {
+		}elseif( empty( $commissions_enabled ) ) {
 
 			// If commissions are not enabled for this product (they likely were on at one point but are now disabled)
 			unset( $downloads[ $key ] );
