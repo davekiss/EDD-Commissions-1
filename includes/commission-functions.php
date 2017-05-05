@@ -311,7 +311,7 @@ function eddc_get_recipient_rate( $download_id = 0, $user_id = 0 ) {
 		$rate = 0;
 	}
 
-	return apply_filters( 'eddc_get_recipient_rate', intval( $rate ), $download_id, $user_id );
+	return apply_filters( 'eddc_get_recipient_rate', floatval( $rate ), $download_id, $user_id );
 }
 
 

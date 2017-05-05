@@ -233,26 +233,7 @@ function eddc_download_meta_box_save( $post_id ) {
 				$sanitized_values = array();
 
 				foreach ( $values as $key => $value ) {
-
-					switch ( $type ) {
-						case 'flat':
-							$value = $value < 0 || ! is_numeric( $value ) ? '' : $value;
-							break;
-						case 'percentage':
-						default:
-							if ( $value < 0 || ! is_numeric( $value ) ) {
-								$value = '';
-							}
-
-							$value = ( is_numeric( $value ) && $value < 1 ) ? $value * 100 : $value;
-							break;
-					}
-
-					if ( is_numeric( $value ) ) {
-						$sanitized_values[ $key ] = round( $value, 2 );
-					} else {
-						$sanitized_values[ $key ] = $value;
-					}
+					$sanitized_values[ $key ] = $value < 0 || ! is_numeric( $value ) ? '' : round( $value, 2 );
 				}
 
 				$new_values    = implode( ',', $sanitized_values );
