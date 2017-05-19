@@ -249,7 +249,7 @@ function eddc_download_meta_box_save( $post_id ) {
 					}
 
 					if ( is_numeric( $value ) ) {
-						$sanitized_values[ $key ] = round( $value, 2 );
+						$sanitized_values[ $key ] = round( $value, edd_currency_decimal_filter() );
 					} else {
 						$sanitized_values[ $key ] = $value;
 					}
