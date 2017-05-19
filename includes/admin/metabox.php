@@ -237,6 +237,7 @@ function eddc_download_meta_box_save( $post_id ) {
 					switch ( $type ) {
 						case 'flat':
 							$value = $value < 0 || ! is_numeric( $value ) ? '' : $value;
+							$value = round( $value, edd_currency_decimal_filter() );
 							break;
 						case 'percentage':
 						default:
@@ -245,14 +246,15 @@ function eddc_download_meta_box_save( $post_id ) {
 							}
 
 							$value = ( is_numeric( $value ) && $value < 1 ) ? $value * 100 : $value;
+							if ( is_numeric( $value ) ) {
+								$value = round( $value, 2 );
+							}
+
 							break;
 					}
 
-					if ( is_numeric( $value ) ) {
-						$sanitized_values[ $key ] = round( $value, edd_currency_decimal_filter() );
-					} else {
-						$sanitized_values[ $key ] = $value;
-					}
+					$sanitized_values[ $key ] = $value;
+
 				}
 
 				$new_values    = implode( ',', $sanitized_values );
