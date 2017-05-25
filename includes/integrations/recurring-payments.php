@@ -27,7 +27,7 @@ function eddc_settings_add_recurring_options( $commission_settings ){
 	$commission_settings[] = array(
 		'id'   => 'edd_commissions_recurring_renewals',
 		'name' => __( 'Recurring Payments Commissions', 'eddc' ),
-		'desc' => sprintf( __('If checked and <a href="%s">Recurring Payments</a> is installed, EDD will automatically pay commissions when subscription renewals are recorded.', 'eddc'), 'https://easydigitaldownloads.com/downloads/recurring-payments/' ),
+		'desc' => sprintf( __('If checked and <a href="%s">Recurring Payments</a> is installed, EDD will automatically record commissions when subscription renewals are recorded.', 'eddc'), 'https://easydigitaldownloads.com/downloads/recurring-payments/' ),
 		'type' => 'checkbox',
 	);
 
