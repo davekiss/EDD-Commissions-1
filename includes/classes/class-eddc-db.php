@@ -26,7 +26,7 @@ class EDDC_DB extends EDD_DB {
 
 		$this->table_name  = $wpdb->prefix . 'edd_commissions';
 		$this->primary_key = 'id';
-		$this->version     = '1.2';
+		$this->version     = '1.0';
 
 	}
 
@@ -39,7 +39,7 @@ class EDDC_DB extends EDD_DB {
 	public function get_columns() {
 		return array(
 			'id'           => '%d',
-			'customer_id'  => '%d',
+			'user_id'      => '%d',
 			'amount'       => '%s',
 			'status'       => '%s',
 			'download_id'  => '%d',
@@ -59,7 +59,7 @@ class EDDC_DB extends EDD_DB {
 	 */
 	public function get_column_defaults() {
 		return array(
-			'customer_id'  => 0,
+			'user_id'      => 0,
 			'amount'       => '',
 			'status'       => '',
 			'download_id'  => 0,
@@ -81,12 +81,12 @@ class EDDC_DB extends EDD_DB {
 		global $wpdb;
 
 		$defaults = array(
-			'number'       => 20,
-			'offset'       => 0,
-			'search'       => '',
-			'customer_id'  => 0,
-			'orderby'      => 'id',
-			'order'        => 'DESC'
+			'number'  => 20,
+			'offset'  => 0,
+			'search'  => '',
+			'user_id' => 0,
+			'orderby' => 'id',
+			'order'   => 'DESC',
 		);
 
 		$args  = wp_parse_args( $args, $defaults );
@@ -97,16 +97,16 @@ class EDDC_DB extends EDD_DB {
 
 		$where = ' WHERE 1=1 ';
 
-		// Specific customers
-		if( ! empty( $args['customer_id'] ) ) {
+		// Specific users
+		if( ! empty( $args['user_id'] ) ) {
 
-			if( is_array( $args['customer_id'] ) ) {
-				$ids = implode( ',', array_map('intval', $args['customer_id'] ) );
+			if( is_array( $args['user_id'] ) ) {
+				$ids = implode( ',', array_map('intval', $args['user_id'] ) );
 			} else {
-				$ids = intval( $args['customer_id'] );
+				$ids = intval( $args['user_id'] );
 			}
 
-			$where .= " AND `customer_id` IN( {$ids} ) ";
+			$where .= " AND `user_id` IN( {$ids} ) ";
 
 		}
 
@@ -230,16 +230,16 @@ class EDDC_DB extends EDD_DB {
 
 		$where = ' WHERE 1=1 ';
 
-		// Specific customers
-		if( ! empty( $args['customer_id'] ) ) {
+		// Specific users
+		if( ! empty( $args['user_id'] ) ) {
 
-			if( is_array( $args['customer_id'] ) ) {
-				$ids = implode( ',', array_map('intval', $args['customer_id'] ) );
+			if( is_array( $args['user_id'] ) ) {
+				$ids = implode( ',', array_map('intval', $args['user_id'] ) );
 			} else {
-				$ids = intval( $args['customer_id'] );
+				$ids = intval( $args['user_id'] );
 			}
 
-			$where .= " AND `customer_id` IN( {$ids} ) ";
+			$where .= " AND `user_id` IN( {$ids} ) ";
 
 		}
 
@@ -351,7 +351,7 @@ class EDDC_DB extends EDD_DB {
 
 		$sql = "CREATE TABLE " . $this->table_name . " (
 		id bigint(20) NOT NULL AUTO_INCREMENT,
-		customer_id bigint(20) NOT NULL,
+		user_id bigint(20) NOT NULL,
 		amount mediumtext NOT NULL,
 		status varchar(20) NOT NULL,
 		download_id bigint(20) NOT NULL,
@@ -363,10 +363,10 @@ class EDDC_DB extends EDD_DB {
 		PRIMARY KEY  (id),
 		KEY download_id (download_id),
 		KEY payment_id (payment_id),
-		KEY customer_id (customer_id),
+		KEY user_id (user_id),
 		KEY payment_id_and_cart_index ( payment_id, cart_index),
 		KEY download_id_and_price_id ( download_id, price_id ),
-		KEY customer_id_and_download_id ( customer_id, download_id )
+		KEY user_id ( user_id, download_id )
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
 		dbDelta( $sql );
