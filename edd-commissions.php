@@ -144,6 +144,7 @@ if ( ! class_exists( 'EDDC' ) ) {
 				require_once EDDC_PLUGIN_DIR . 'includes/admin/classes/class-admin-notices.php';
 
 				require_once EDDC_PLUGIN_DIR . 'includes/admin/upgrades.php';
+				require_once EDDC_PLUGIN_DIR . 'includes/deprecated-functions.php';
 			}
 		}
 
@@ -229,7 +230,6 @@ function edd_commissions() {
 	return EDDC::instance();
 }
 add_action( 'plugins_loaded', 'edd_commissions', 1 );
-
 
 /**
  * Process install/upgrades
