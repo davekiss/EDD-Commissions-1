@@ -366,12 +366,14 @@ class EDDC_DB extends EDD_DB {
 		KEY user_id (user_id),
 		KEY payment_id_and_cart_index ( payment_id, cart_index),
 		KEY download_id_and_price_id ( download_id, price_id ),
-		KEY user_id ( user_id, download_id )
+		KEY user_id_download_id ( user_id, download_id )
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
 		dbDelta( $sql );
 
-		update_option( $this->table_name . '_db_version', $this->version );
+		if ( $this->table_exists( $this->table_name ) ) {
+			update_option( $this->table_name . '_db_version', $this->version );
+		}
 	}
 
 }

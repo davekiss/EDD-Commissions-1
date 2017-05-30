@@ -238,6 +238,10 @@ add_action( 'plugins_loaded', 'edd_commissions', 1 );
  * @return      void
  */
 function edd_commissions_install() {
+
+	// We need the main Commissions plugin loaded to add the table.
+	edd_commissions();
+
 	if ( class_exists( 'EDDC_DB' ) ) {
 
 		$db = new EDDC_DB;
