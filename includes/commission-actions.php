@@ -90,22 +90,22 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 		$commission_calculated['download_id'] = absint( $commission_calculated['download_id'] );
 
 		// set a flag so downloads with commissions awarded are easy to query
+		/** TODO: We we won't need this with the new table, since we can query the unique download IDs with commission records */
 		update_post_meta( $commission_calculated['download_id'], '_edd_has_commission', true );
 
 		$commission = new EDD_Commission;
-		$commission->description = $user_info['email'] . ' - ' . get_the_title( $commission_calculated['download_id'] );
 		$commission->status      = 'unpaid';
-		$commission->user_ID     = $commission_calculated['recipient'];
+		$commission->user_id     = $commission_calculated['recipient'];
 		$commission->rate        = $commission_calculated['rate'];
 		$commission->amount      = $commission_calculated['commission_amount'];
 		$commission->currency    = $commission_calculated['currency'];
-		$commission->download_ID = (int) $commission_calculated['download_id'];
-		$commission->payment_ID  = $payment_id;
+		$commission->download_id = (int) $commission_calculated['download_id'];
+		$commission->payment_id  = $payment_id;
 		$commission->type        = eddc_get_commission_type( $commission_calculated['download_id'] );
 
 		// If we are dealing with a variation, then save variation info
 		if ( $commission_calculated['has_variable_prices'] && ! empty( $commission_calculated['variation'] ) ) {
-			$commission->download_variation = $commission_calculated['variation'];
+			$commission->price_id = $commission_calculated['price_id'];
 		}
 
 		// If it's a renewal, save that detail

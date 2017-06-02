@@ -34,11 +34,16 @@ if ( ! class_exists( 'EDDC' ) ) {
 
 
 		/**
-		 * @var         object $db The EDDC database object
+		 * @var         object $commissions_db The EDDC database object
 		 * @since       3.4.0
 		 */
-		public $db;
+		public $commissions_db;
 
+		/**
+		 * @var         object $commission_meta_db The EDDC_Meta database object
+		 * @since       3.4.0
+		 */
+		public $commission_meta_db;
 
 		/**
 		 * Get active instance
@@ -54,7 +59,8 @@ if ( ! class_exists( 'EDDC' ) ) {
 				self::$instance->includes();
 				self::$instance->load_textdomain();
 				self::$instance->hooks();
-				self::$instance->db = new EDDC_DB();
+				self::$instance->commissions_db = new EDDC_DB();
+				self::$instance->commission_meta_db = new EDDC_Meta_DB();
 			}
 
 			return self::$instance;
@@ -108,6 +114,7 @@ if ( ! class_exists( 'EDDC' ) ) {
 
 			require_once EDDC_PLUGIN_DIR . 'includes/commission-actions.php';
 			require_once EDDC_PLUGIN_DIR . 'includes/commission-functions.php';
+			require_once EDDC_PLUGIN_DIR . 'includes/commission-filters.php';
 			require_once EDDC_PLUGIN_DIR . 'includes/email-functions.php';
 			require_once EDDC_PLUGIN_DIR . 'includes/post-type.php';
 			require_once EDDC_PLUGIN_DIR . 'includes/scripts.php';
@@ -115,7 +122,8 @@ if ( ! class_exists( 'EDDC' ) ) {
 			require_once EDDC_PLUGIN_DIR . 'includes/user-meta.php';
 
 			require_once EDDC_PLUGIN_DIR . 'includes/classes/class-edd-commission.php';
-			require_once EDDC_PLUGIN_DIR . 'includes/classes/class-eddc-db.php';
+			require_once EDDC_PLUGIN_DIR . 'includes/classes/class-edd-commission-db.php';
+			require_once EDDC_PLUGIN_DIR . 'includes/classes/class-edd-commission-meta-db.php';
 			require_once EDDC_PLUGIN_DIR . 'includes/classes/class-rest-api.php';
 
 			if ( is_admin() ) {
@@ -246,6 +254,9 @@ function edd_commissions_install() {
 
 		$db = new EDDC_DB;
 		@$db->create_table();
+
+		$meta_db = new EDDC_Meta_DB;
+		@$meta_db->create_table();
 
 		$version = get_option( 'eddc_version' );
 

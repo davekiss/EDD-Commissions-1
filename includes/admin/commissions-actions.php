@@ -182,7 +182,7 @@ function eddc_update_commission() {
 	}
 
 	$commission_id   = (int) $_POST['commission_id'];
-	$commission_data = get_post_meta( $commission_id, '_edd_commission_info', true);
+	$commission      = new EDD_Commission( $commission_id );
 
 	$rate = str_replace( '%', '', $_POST['eddc_rate'] );
 	if ( $rate < 1 ) {
@@ -191,13 +191,11 @@ function eddc_update_commission() {
 
 	$amount = str_replace( '%', '', $_POST['eddc_amount'] );
 
-	$commission_data['rate']    = (float) $rate;
-	$commission_data['amount']  = (float) $amount;
-	$commission_data['user_id'] = absint( $_POST['eddc_user'] );
-
-	update_post_meta( $commission_id, '_edd_commission_info', $commission_data );
-	update_post_meta( $commission_id, '_user_id', absint( $_POST['eddc_user'] ) );
-	update_post_meta( $commission_id, '_download_id', absint( $_POST['eddc_download'] ) );
+	$commission->rate        = (float) $rate;
+	$commission->amount      = (float) $amount;
+	$commission->user_id     = (int) $_POST['eddc_user'];
+	$commission->download_id = absint( $_POST['eddc_download'] );
+	$commission->save();
 
 	wp_redirect( add_query_arg( array( 'edd-message' => 'update' ) ) );
 	exit;
@@ -213,18 +211,15 @@ add_action( 'admin_init', 'eddc_update_commission', 1 );
  */
 function eddc_delete_commission( $args ) {
 	$commission_id = absint( $_POST['commission_id'] );
-	$payment_id    = get_post_meta( $commission_id, '_edd_commission_payment_id', true );
-	$confirm       = ! empty( $args['eddc-commission-delete-comfirm'] ) ? true : false;
-	$nonce         = $args['_wpnonce'];
 
-	if ( ! current_user_can( 'edit_shop_payments', $payment_id ) ) {
-		wp_die( __( 'You do not have permission to edit this commission', 'eddc' ), __( 'Error', 'eddc' ), array( 'response' => 403 ) );
-	}
-
+	// First verify the nonce.
+	$nonce = $args['_wpnonce'];
 	if ( ! wp_verify_nonce( $nonce, 'delete-commission' ) ) {
 		wp_die( __( 'Cheatin\' eh?!', 'eddc' ) );
 	}
 
+	// Check to see if they connfirmed they want to delete.
+	$confirm = ! empty( $args['eddc-commission-delete-comfirm'] ) ? true : false;
 	if ( ! $confirm ) {
 		edd_set_error( 'commission-delete-no-confirm', __( 'Please confirm you want to delete this commission', 'eddc' ) );
 	}
@@ -234,7 +229,13 @@ function eddc_delete_commission( $args ) {
 		exit;
 	}
 
-	wp_delete_post( $commission_id );
+	// Once nonce and verification have been passed, look up the data.
+	$commission    = new EDD_Commission( $commission_id );
+	if ( ! current_user_can( 'edit_shop_payments', $commission->payment_id ) ) {
+		wp_die( __( 'You do not have permission to edit this commission', 'eddc' ), __( 'Error', 'eddc' ), array( 'response' => 403 ) );
+	}
+
+	$commission->delete();
 
 	wp_redirect( admin_url( 'edit.php?post_type=download&page=edd-commissions&edd-message=delete' ) );
 	exit;
