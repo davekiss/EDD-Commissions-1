@@ -81,7 +81,7 @@ class EDD_C_List_Table extends WP_List_Table {
 			case 'amount':
 				return edd_currency_filter( edd_format_amount( $item[ $column_name ] ) );
 			case 'date':
-				return date_i18n( get_option( 'date_format' ), strtotime( get_post_field( 'post_date', $item['ID'] ) ) );
+				return date_i18n( get_option( 'date_format' ), strtotime( $item['date'] ) );
 			case 'download':
 				$download = ! empty( $item['download'] ) ? $item['download'] : false;
 				return $download ? '<a href="' . esc_url( add_query_arg( 'download', $download ) ) . '" title="' . __( 'View all commissions for this item', 'eddc' ) . '">' . get_the_title( $download ) . '</a>' . (!empty($item['variation']) ? ' - ' . $item['variation'] : '') : '';
@@ -422,9 +422,11 @@ class EDD_C_List_Table extends WP_List_Table {
 		$offset     = ( $this->per_page * ( $paged - 1 ) );
 
 		$commission_args = array(
-			'status' => $status,
-			'number' => $this->per_page,
-			'offset' => $offset,
+			'status'  => $status,
+			'number'  => $this->per_page,
+			'offset'  => $offset,
+			'orderby' => 'date_created',
+			'order'   => 'DESC',
 		);
 
 		if ( ! empty( $user ) ) {
@@ -454,6 +456,7 @@ class EDD_C_List_Table extends WP_List_Table {
 					'variation' => $commission->download_variation,
 					'status'    => $commission->status,
 					'payment'   => $commission->payment_id,
+					'date'      => $commission->date_created,
 				);
 
 			}

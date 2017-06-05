@@ -583,6 +583,7 @@ class EDD_Commission {
 		 * @param       int $payment_ID Payment ID linked to the commission.
 		 * @param       int $download_ID Download ID linked to the commission.
 		 */
+		$payment         = new EDD_Payment( $this->payment_id );
 		$commission_info = apply_filters( 'edd_commission_info', array(
 			'user_id'      => (int) $this->user_id,
 			'amount'       => (float) $this->amount,
@@ -591,7 +592,7 @@ class EDD_Commission {
 			'payment_id'   => absint( $this->payment_id ),
 			'cart_index'   => absint( $this->cart_index ),
 			'price_id'     => absint( $this->price_id ),
-			'date_created' => ! empty( $legacy_args['post_date'] ) ? $legacy_args['post_date'] : '',
+			'date_created' => ! empty( $legacy_args['post_date'] ) ? $legacy_args['post_date'] : $payment->date,
 			'date_paid'    => ! empty( $this->date_paid ) ? $this->date_paid : '',
 			'rate'         => (float) $this->rate,
 			'type'         => $this->type,
