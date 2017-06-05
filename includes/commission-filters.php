@@ -101,4 +101,5 @@ function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 
 }
 /** TODO: Enable this and find a way to relate old commission IDs to the new ones **/
+/** TODO: Re-enable this filter once deve is complete so I can find all the places we're referencing the meta in Commissions core */
 //add_filter( 'get_post_metadata', 'eddc_get_meta_backcompat', 10, 4 );

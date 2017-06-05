@@ -224,9 +224,10 @@ function eddc_commission_is_renewal( $commission_id = 0 ) {
 		return false;
 	}
 
-	$is_renewal = get_post_meta( $commission_id, '_edd_commission_is_renewal', true );
+	$commission = new EDD_Commission( $commission_id );
+	$is_renewal = $commission->get_meta( 'is_renewal' );
 
-	return apply_filters( 'eddc_commission_is_renewal', $is_renewal, $commission_id );
+	return $is_renewal;
 }
 
 

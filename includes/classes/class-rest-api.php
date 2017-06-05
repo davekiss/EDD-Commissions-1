@@ -72,36 +72,31 @@ class EDDC_REST_API {
 		$status = isset( $_REQUEST['status'] ) ? sanitize_text_field( $_REQUEST['status'] ) : 'unpaid';
 
 		$commission_args = array(
-			'post_type'      => 'edd_commission',
-			'post_status'    => 'publish',
-			'posts_per_page' => $api_object->per_page(),
-			'paged'          => $paged
+			'number' => $api_object->per_page(),
+			'paged'  => $paged,
+			'status' => $status,
 		);
-
-		if( $status ) {
-			$commission_args['tax_query'] = array( array(
-				'taxonomy' => 'edd_commission_status',
-				'terms'    => $status,
-				'field'    => 'slug'
-			) );
-		}
 
 		$commissions = get_posts( $commission_args );
 
+		// Cache the requested downloads for the following loop, to save requests.
+		$requested_downloads = array();
+
 		if ( $commissions ) {
 			foreach ( $commissions as $commission ) {
-				$commission_meta = get_post_meta( $commission->ID, '_edd_commission_info', true );
-				$commission_meta = get_post_meta( $commission->ID, '_edd_commission_info', true );
-				$renewal         = (bool) get_post_meta( $commission->ID, '_edd_commission_is_renewal', true );
+				if ( empty( $requested_downloads[ $commission->download_id ] ) ) {
+					$requested_downloads[ $commission->download_id ] = new EDD_Download( $commission->download_id );
+				}
+				$download = $requested_downloads[ $commission->download_id ];
 
 				$data['commissions'][] = array(
-					'amount'   => edd_sanitize_amount( $commission_meta['amount'] ),
-					'rate'     => $commission_meta['rate'],
-					'currency' => $commission_meta['currency'],
-					'item'     => get_the_title( get_post_meta( $commission->ID, '_download_id', true ) ),
-					'status'   => eddc_get_commission_status( $commission->ID ),
-					'date'     => $commission->post_date,
-					'renewal'  => $renewal ? 1 : 0
+					'amount'   => edd_sanitize_amount( $commission->amount ),
+					'rate'     => $commission->rate,
+					'currency' => $commission->currency,
+					'item'     => $download->get_name(),
+					'status'   => $commission->status,
+					'date'     => $commission->date_created,
+					'renewal'  => $commission->get_meta( 'is_renewal' ) ? 1 : 0
 				);
 			}
 
@@ -136,18 +131,23 @@ class EDDC_REST_API {
 
 		$unpaid = eddc_get_unpaid_commissions( array( 'user_id' => $user_id, 'number' => 30, 'paged' => $api_object->get_paged() ) );
 
+		// Cache the requested downloads for the following loops, to save requests.
+		$requested_downloads = array();
+
 		if ( ! empty( $unpaid ) ) {
 			foreach ( $unpaid as $commission ) {
-				$commission_meta = get_post_meta( $commission->ID, '_edd_commission_info', true );
-				$renewal         = (bool) get_post_meta( $commission->ID, '_edd_commission_is_renewal', true );
+				if ( empty( $requested_downloads[ $commission->download_id ] ) ) {
+					$requested_downloads[ $commission->download_id ] = new EDD_Download( $commission->download_id );
+				}
+				$download = $requested_downloads[ $commission->download_id ];
 
 				$data['unpaid'][] = array(
-					'amount'   => edd_sanitize_amount( $commission_meta['amount'] ),
-					'rate'     => $commission_meta['rate'],
-					'currency' => $commission_meta['currency'],
-					'item'     => get_the_title( get_post_meta( $commission->ID, '_download_id', true ) ),
-					'date'     => $commission->post_date,
-					'renewal'  => $renewal ? 1 : 0
+					'amount'   => edd_sanitize_amount( $commission->amount ),
+					'rate'     => $commission->rate,
+					'currency' => $commission->currency,
+					'item'     => $download->get_name(),
+					'date'     => $commission->date_created,
+					'renewal'  => $commission->get_meta( 'is_renewal' ) ? 1 : 0
 				);
 			}
 		}
@@ -156,16 +156,18 @@ class EDDC_REST_API {
 
 		if ( ! empty( $paid ) ) {
 			foreach ( $paid as $commission ) {
-				$commission_meta = get_post_meta( $commission->ID, '_edd_commission_info', true );
-				$renewal         = (bool) get_post_meta( $commission->ID, '_edd_commission_is_renewal', true );
+				if ( empty( $requested_downloads[ $commission->download_id ] ) ) {
+					$requested_downloads[ $commission->download_id ] = new EDD_Download( $commission->download_id );
+				}
+				$download = $requested_downloads[ $commission->download_id ];
 
 				$data['paid'][] = array(
-					'amount'   => edd_sanitize_amount( $commission_meta['amount'] ),
-					'rate'     => $commission_meta['rate'],
-					'currency' => $commission_meta['currency'],
-					'item'     => get_the_title( get_post_meta( $commission->ID, '_download_id', true ) ),
-					'date'     => $commission->post_date,
-					'renewal'  => $renewal ? 1 : 0
+					'amount'   => edd_sanitize_amount( $commission->amount ),
+					'rate'     => $commission->rate,
+					'currency' => $commission->currency,
+					'item'     => $download->get_name(),
+					'date'     => $commission->date_created,
+					'renewal'  => $commission->get_meta( 'is_renewal' ) ? 1 : 0
 				);
 			}
 		}
@@ -174,16 +176,18 @@ class EDDC_REST_API {
 
 		if ( ! empty( $revoked ) ) {
 			foreach ( $revoked as $commission ) {
-				$commission_meta = get_post_meta( $commission->ID, '_edd_commission_info', true );
-				$renewal         = (bool) get_post_meta( $commission->ID, '_edd_commission_is_renewal', true );
+				if ( empty( $requested_downloads[ $commission->download_id ] ) ) {
+					$requested_downloads[ $commission->download_id ] = new EDD_Download( $commission->download_id );
+				}
+				$download = $requested_downloads[ $commission->download_id ];
 
 				$data['revoked'][] = array(
-					'amount'   => edd_sanitize_amount( $commission_meta['amount'] ),
-					'rate'     => $commission_meta['rate'],
-					'currency' => $commission_meta['currency'],
-					'item'     => get_the_title( get_post_meta( $commission->ID, '_download_id', true ) ),
-					'date'     => $commission->post_date,
-					'renewal'  => $renewal ? 1 : 0
+					'amount'   => edd_sanitize_amount( $commission->amount ),
+					'rate'     => $commission->rate,
+					'currency' => $commission->currency,
+					'item'     => $download->get_name(),
+					'date'     => $commission->date_created,
+					'renewal'  => $commission->get_meta( 'is_renewal' ) ? 1 : 0
 				);
 			}
 		}

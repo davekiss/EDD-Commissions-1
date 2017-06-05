@@ -3,8 +3,8 @@
  * Commission Object
  *
  * @package     Easy Digital Downloads - Commissions
- * @subpackage  Classes/Discount
- * @copyright   Copyright (c) 2017, Sunny Ratilal
+ * @subpackage  Classes/Commission
+ * @copyright   Copyright (c) 2017, Easy Digital Downloads, LLC
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       3.3
  */
@@ -132,6 +132,14 @@ class EDD_Commission {
 	 */
 	protected $status = null;
 
+	/**
+	 * The position the item commissioned was in the cart
+	 *
+	 * @since   3.4
+	 * @access  protected
+	 * @var     string
+	 *
+	 */
 	protected $cart_index = 0;
 
 	/**
@@ -152,14 +160,30 @@ class EDD_Commission {
 	 */
 	protected $price_id = null;
 
+	/**
+	 * The date the commission was recorded
+	 *
+	 * @since   3.4
+	 * @access  protected
+	 * @var     string
+	 *
+	 */
 	protected $date_created = null;
 
+	/**
+	 * The date the commission was paid
+	 *
+	 * @since   3.4
+	 * @access  protected
+	 * @var     string
+	 *
+	 */
 	protected $date_paid = null;
 
 
 	/**
 	 * Array of items that have changed since the last save() was run.
-	 * This is for internal use, to allow fewer update_post_meta calls to be run.
+	 * This is for internal use, to allow fewer update calls to be run.
 	 *
 	 * @since       3.3
 	 * @access      private
@@ -386,6 +410,10 @@ class EDD_Commission {
 		}
 
 		$meta = edd_commissions()->commission_meta_db->get_meta( $this->id, '_edd_commission_' . $key, $single );
+
+		// Run a wildcard filter for any meta we're getting
+		$meta = apply_filters( 'eddc_commission_' . $key, $meta, $this->id );
+
 		return $meta;
 
 	}
@@ -409,6 +437,20 @@ class EDD_Commission {
 		return apply_filters( 'eddc_get_commission_status', $this->status, $this->id );
 	}
 
+	/**
+	 * Returns the commission rate type, accounting for a time for when we did not store the commission type on the record
+	 *
+	 * @since 3.4
+	 * @return string
+	 */
+	public function get_type() {
+		if ( empty( $this->type ) ) {
+			$this->type = eddc_get_commission_type( $this->download_id );
+		}
+
+		return $this->type;
+	}
+
 
 	/**
 	 * Update the status of a commission.
@@ -420,7 +462,12 @@ class EDD_Commission {
 	 */
 	public function set_status( $new_status = 'unpaid' ) {
 		do_action( 'eddc_pre_set_commission_status', $this->id, $new_status, $this->status );
-		$this->update_status( $new_status );
+
+		// Only run the update_status method if someone isn't using the save methods
+		if ( empty( $this->pending['status'] ) ) {
+			$this->update_status( $new_status );
+		}
+
 		do_action( 'eddc_set_commission_status', $this->id, $new_status, $this->status );
 	}
 
@@ -460,6 +507,19 @@ class EDD_Commission {
 		 * @param       int $ID Commission ID.
 		 */
 		return apply_filters( 'eddc_commission_description', $this->description, $this->id );
+	}
+
+	/**
+	 * When the post_date is requested, return the 'date_crated' property as that's the replacement in 3.4
+	 *
+	 * @since 3.4
+	 * @deprected     The 'post_date' is deprecated since 3.4, when we moved to custom tables and post_date was no longer relevant.
+	 * @return string
+	 */
+	private function get_post_date() {
+		$backtrace = debug_backtrace();
+		_edd_deprected_argument( 'post_date', 'EDD_Commission::$post_date', 3.4, 'date_created', $backtrace );
+		return $this->date_created;
 	}
 
 	/**
@@ -583,10 +643,12 @@ class EDD_Commission {
 
 		$base_columns = edd_commissions()->commissions_db->get_column_labels();
 		$base_values  = array();
+
 		if ( ! empty( $this->pending ) ) {
 
 			foreach ( $this->pending as $key => $value ) {
 
+				// If the property being updated is a core column, collect those in order to make one update call.
 				if ( in_array( $key, $base_columns ) ) {
 
 					$base_values[ $key ] = $value;
@@ -598,8 +660,10 @@ class EDD_Commission {
 
 			}
 
+			// If there were updates to core columns, update those in a single update statement
 			if ( ! empty( $base_values ) ) {
-				$updated = edd_commissions()->commissions_db->update( $base_values );
+
+				$updated = edd_commissions()->commissions_db->update( $this->id, $base_values );
 
 				if ( $updated ) {
 					$updated_columns = array_keys( $base_values );
@@ -640,6 +704,12 @@ class EDD_Commission {
 		return $saved;
 	}
 
+	/**
+	 * Delete this commission record
+	 *
+	 * @since 3.4
+	 * @return bool
+	 */
 	public function delete() {
 		$deleted = edd_commissions()->commissions_db->delete( $this->id );
 
@@ -672,6 +742,7 @@ class EDD_Commission {
 		$key   = sanitize_key( $key );
 		$value = apply_filters( 'eddc_update_commission_meta_' . $key, $value, $this->id );
 
+		// Backwards compatibility check in case someone tries to update one of the items in the old commission info meta key.
 		$commission_columns = edd_commissions()->commissions_db->get_column_labels();
 		if ( in_array( $key, $commission_columns ) ) {
 			switch( $key ) {
@@ -722,6 +793,7 @@ class EDD_Commission {
 		}
 
 		$this->pending['status'] = $new_status;
+		$this->save();
 
 		if ( $this->status !== $new_status ) {
 			return false;

@@ -445,7 +445,7 @@ function eddc_commissions_view( $commission ) {
 								<label for="tablecell"><?php _e( 'Rate', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
-								<?php echo $commission->rate; ?>
+								<?php echo eddc_format_rate( $commission->rate, $commission->type ); ?>
 								<input type="text" name="eddc_rate" class="hidden eddc-commission-rate" value="<?php echo esc_attr( $commission->rate ); ?>" />
 							</td>
 						</tr>
@@ -477,9 +477,9 @@ function eddc_commissions_view( $commission ) {
 								$base    = admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission->id );
 								$base    = wp_nonce_url( $base, 'eddc_commission_nonce' );
 
-								if ( $status == 'revoked' ) {
+								if ( $commission->status == 'revoked' ) {
 									$actions['mark_as_accepted'] = sprintf( '<a href="%s&action=%s">' . __( 'Accept', 'eddc' ) . '</a>', $base, 'mark_as_accepted' );
-								} elseif ( $status == 'paid' ) {
+								} elseif ( $commission->status == 'paid' ) {
 									$actions['mark_as_unpaid'] = sprintf( '<a href="%s&action=%s">' . __( 'Mark as Unpaid', 'eddc' ) . '</a>', $base, 'mark_as_unpaid' );
 								} else {
 									$actions['mark_as_paid'] = sprintf( '<a href="%s&action=%s">' . __( 'Mark as Paid', 'eddc' ) . '</a>', $base, 'mark_as_paid' );
