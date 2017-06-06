@@ -25,7 +25,7 @@ activate_plugin( 'easy-digital-downloads/easy-digital-downloads.php' );
 edd_run_install();
 
 echo "Installing Commissions...\n";
-activate_plugin( 'EDD-Commissions/edd-commissions.php' );
+edd_commissions_install();
 
 // Install Commissions
 global $current_user, $edd_options;
