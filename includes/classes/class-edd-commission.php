@@ -325,17 +325,19 @@ class EDD_Commission {
 		/**
 		 * Setup all object variables
 		 */
-		$this->rate        = $commission->rate;
+		$this->rate        = (float) $commission->rate;
 		$this->type        = $commission->type;
-		$this->amount      = $commission->amount;
+		$this->amount      = (float) $commission->amount;
 		$this->currency    = $commission->currency;
-		$this->download_id = $commission->download_id;
-		$this->payment_id  = $commission->payment_id;
+		$this->download_id = absint( $commission->download_id );
+		$this->payment_id  = absint( $commission->payment_id );
+		$this->user_id     = (int) $commission->user_id;
 		$this->status      = $commission->status;
-		$this->price_id    = $commission->price_id;
-		$this->is_renewal  = $this->setup_is_renewal();
+		$this->price_id    = absint( $commission->price_id );
+		$this->is_renewal  = (bool) $this->setup_is_renewal();
 		$this->download_variation = $this->setup_download_variation();
 		$this->description = $this->setup_description();
+		$this->cart_index  = absint( $commission->cart_index );
 
 		/**
 		 * Setup discount object vars with WP_Post vars

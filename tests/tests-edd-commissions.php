@@ -1,6 +1,6 @@
 <?php
 
-class Tests_EDD_Commissions extends WP_UnitTestCase {
+class Tests_EDD_Commissions extends EDD_Commissions_Unitestcase {
 	protected $object;
 
 	public function setUp() {

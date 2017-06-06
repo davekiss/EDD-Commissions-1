@@ -37,5 +37,6 @@ wp_update_user( array( 'ID' => 1, 'first_name' => 'Admin', 'last_name' => 'User'
 
 
 // Include helpers
+require_once 'helpers/class-edd-commissions-unittestcase.php';
 require_once 'helpers/class-helper-download.php';
 require_once 'helpers/class-helper-payment.php';
