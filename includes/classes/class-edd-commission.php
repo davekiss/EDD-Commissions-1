@@ -768,7 +768,7 @@ class EDD_Commission {
 			return edd_commissions()->commissions_db->update( array( $key => $value ) );
 		}
 
-		$updated = update_post_meta( $this->id, '_edd_commission_' . $key, $value, $prev_value );
+		$updated = edd_commissions()->commission_meta_db->update_meta( $this->id, '_edd_commission_' . $key, $value, $prev_value );
 
 		if ( true == $updated ) {
 			/**
