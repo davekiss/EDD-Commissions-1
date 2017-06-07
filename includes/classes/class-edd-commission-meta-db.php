@@ -55,7 +55,7 @@ class EDDC_Meta_DB extends EDD_DB {
 	 */
 	public function register_table() {
 		global $wpdb;
-		$wpdb->edd_commissionmeta = $this->table_name;
+		$wpdb->commissionmeta = $this->table_name;
 	}
 
 	/**
@@ -90,7 +90,7 @@ class EDDC_Meta_DB extends EDD_DB {
 			return false;
 		}
 
-		return get_metadata( 'edd_commission', $commission_id, $meta_key, $single );
+		return get_metadata( 'commission', $commission_id, $meta_key, $single );
 	}
 
 	/**
@@ -113,7 +113,7 @@ class EDDC_Meta_DB extends EDD_DB {
 			return false;
 		}
 
-		return add_metadata( 'edd_commission', $commission_id, $meta_key, $meta_value, $unique );
+		return add_metadata( 'commission', $commission_id, $meta_key, $meta_value, $unique );
 	}
 
 	/**
@@ -141,7 +141,7 @@ class EDDC_Meta_DB extends EDD_DB {
 			return false;
 		}
 
-		return update_metadata( 'edd_commission', $commission_id, $meta_key, $meta_value, $prev_value );
+		return update_metadata( 'commission', $commission_id, $meta_key, $meta_value, $prev_value );
 	}
 
 	/**
@@ -162,7 +162,7 @@ class EDDC_Meta_DB extends EDD_DB {
 	 * @since   2.6
 	 */
 	public function delete_meta( $commission_id = 0, $meta_key = '', $meta_value = '' ) {
-		return delete_metadata( 'edd_commission', $commission_id, $meta_key, $meta_value );
+		return delete_metadata( 'commission', $commission_id, $meta_key, $meta_value );
 	}
 
 	/**
