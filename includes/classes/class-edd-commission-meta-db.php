@@ -108,7 +108,7 @@ class EDDC_Meta_DB extends EDD_DB {
 	 * @since   2.6
 	 */
 	public function add_meta( $commission_id = 0, $meta_key = '', $meta_value, $unique = false ) {
-		$commission_id = $this->sanitize_customer_id( $commission_id );
+		$commission_id = $this->sanitize_commission_id( $commission_id );
 		if ( false === $commission_id ) {
 			return false;
 		}
@@ -136,7 +136,7 @@ class EDDC_Meta_DB extends EDD_DB {
 	 * @since   2.6
 	 */
 	public function update_meta( $commission_id = 0, $meta_key = '', $meta_value, $prev_value = '' ) {
-		$commission_id = $this->sanitize_customer_id( $commission_id );
+		$commission_id = $this->sanitize_commission_id( $commission_id );
 		if ( false === $commission_id ) {
 			return false;
 		}
