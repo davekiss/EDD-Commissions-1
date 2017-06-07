@@ -1,13 +1,6 @@
 <?php
 /**
- * Upgrade routines
- *
- * @package     EDDC
- * @subpackage  Admin/Reports
- * @copyright   Copyright (c) 2015, Pippin Williamson
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       1.3
- */
+*/
 
 
 // Exit if accessed directly
@@ -38,6 +31,22 @@ function eddc_upgrade_notices() {
 			'<div class="updated"><p>' . esc_html__( 'Easy Digital Downloads needs to upgrade the commission records, click %shere%s to start the upgrade.', 'eddc' ) . '</p></div>',
 			'<a href="' . esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=upgrade_commission_statuses' ) ) . '">',
 			'</a>'
+		);
+	}
+
+	if ( ! edd_has_upgrade_completed( 'migrate_commissions' ) ) {
+		printf(
+			'<div class="updated">' .
+			'<p>' .
+			__( 'Easy Digital Downloads - Commissions needs to upgrade the commission records database, click <a href="%s">here</a> to start the upgrade. <a href="#" onClick="jQuery(this).parent().next(\'p\').slideToggle()">Learn more about this upgrade</a>', 'eddc' ) .
+			'</p>' .
+			'<p style="display: none;">' .
+			__( '<strong>About this upgrade:</strong><br />This is a <strong><em>mandatory</em></strong> update that will migrate all commission records and their meta data to a new custom database table. This upgrade should provider better performance and scalability.', 'eddc' ) .
+			'<br /><br />' .
+			__( '<strong>Advanced User?</strong><br />This upgrade can also be run via WPCLI with the following command:<br /><code>wp edd-commissions migrate_commissions</code>', 'eddc' ) .
+			'</p>' .
+			'</div>',
+			esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=commissions_migration' ) )
 		);
 	}
 }

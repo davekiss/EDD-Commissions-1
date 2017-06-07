@@ -411,6 +411,10 @@ class EDD_Commission {
 			return $this->$key;
 		}
 
+		if ( 'description' === $key ) {
+			return $this->description;
+		}
+
 		$meta = edd_commissions()->commission_meta_db->get_meta( $this->id, '_edd_commission_' . $key, $single );
 
 		// Run a wildcard filter for any meta we're getting

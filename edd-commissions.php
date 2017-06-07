@@ -126,6 +126,10 @@ if ( ! class_exists( 'EDDC' ) ) {
 			require_once EDDC_PLUGIN_DIR . 'includes/classes/class-edd-commission-meta-db.php';
 			require_once EDDC_PLUGIN_DIR . 'includes/classes/class-rest-api.php';
 
+			if ( defined( 'WP_CLI' ) && WP_CLI ) {
+				require_once EDDC_PLUGIN_DIR . '/includes/integrations/wp-cli.php';
+			}
+
 			if ( is_admin() ) {
 				// Handle licensing
 				if ( class_exists( 'EDD_License' ) ) {
