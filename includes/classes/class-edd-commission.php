@@ -576,7 +576,7 @@ class EDD_Commission {
 		 * @param       array $args {
 		 *     Filterable metadata.
 		 *
-		 *     @type int             $user_ID  User ID.
+		 *     @type int             $user_id  User ID.
 		 *     @type mixed int|float $rate     Commission rate.
 		 *     @type mixed int|float $amount   Commission amount.
 		 *     @type string          $currency Currency (e.g. USD).
