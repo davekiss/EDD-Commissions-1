@@ -177,17 +177,8 @@ function eddc_calculate_payment_commissions( $payment_id ) {
  * @return      string
  */
 function eddc_get_commission_status( $commission_id = 0 ) {
-	$status = 'unpaid';
-	$terms  = get_the_terms( $commission_id, 'edd_commission_status' );
-
-	if ( is_array( $terms ) ) {
-		foreach ( $terms as $term ) {
-			$status = $term->slug;
-			break;
-		}
-	}
-
-	return apply_filters( 'eddc_get_commission_status', $status, $commission_id );
+	$commission = new EDD_Commission( $commission_id );
+	return apply_filters( 'eddc_get_commission_status', $commission->status, $commission_id );
 }
 
 
@@ -335,9 +326,9 @@ function eddc_get_commission_type( $download_id = 0 ) {
  * Get a cart item ID
  */
 function eddc_get_cart_item_id( $cart_details, $download_id ) {
-	foreach( (array) $cart_details as $postion => $item ) {
+	foreach( (array) $cart_details as $position => $item ) {
 		if ( $item['id'] == $download_id ) {
-			return $postion;
+			return $position;
 		}
 	}
 

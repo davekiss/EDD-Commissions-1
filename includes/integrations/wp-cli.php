@@ -113,10 +113,20 @@ class EDD_Commissions_CLI extends EDD_CLI {
 
 				}
 
+				$status = 'unpaid';
+				$terms  = get_the_terms( $result->ID, 'edd_commission_status' );
+
+				if ( is_array( $terms ) ) {
+					foreach ( $terms as $term ) {
+						$status = $term->slug;
+						break;
+					}
+				}
+
 				$commission_data = array(
 					'user_id'       => $commission_info['user_id'],
 					'amount'        => $commission_info['amount'],
-					'status'        => $post_meta['_edd_commission_status'],
+					'status'        => $status,
 					'download_id'   => $download->ID,
 					'payment_id'    => $payment->ID,
 					'cart_index'    => $cart_index,
