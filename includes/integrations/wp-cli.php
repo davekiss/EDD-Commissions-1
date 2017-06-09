@@ -144,6 +144,8 @@ class EDD_Commissions_CLI extends EDD_CLI {
 					foreach ( $post_meta as $key => $value ) {
 						$commission->update_meta( $key, $value );
 					}
+
+					$commission->update_meta( 'legacy_id', $result->ID );
 				}
 
 				$progress->tick();
