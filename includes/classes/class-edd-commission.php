@@ -415,7 +415,11 @@ class EDD_Commission {
 			return $this->description;
 		}
 
-		$meta = edd_commissions()->commission_meta_db->get_meta( $this->id, '_edd_commission_' . $key, $single );
+		if ( '_' !== mb_substr( $key, 0, 1, 'utf-8') ) {
+			$key = '_edd_commission_' . $key;
+		}
+
+		$meta = edd_commissions()->commission_meta_db->get_meta( $this->id, $key, $single );
 
 		// Run a wildcard filter for any meta we're getting
 		$meta = apply_filters( 'eddc_commission_' . $key, $meta, $this->id );
@@ -580,7 +584,7 @@ class EDD_Commission {
 		 * @param       array $args {
 		 *     Filterable metadata.
 		 *
-		 *     @type int             $user_ID  User ID.
+		 *     @type int             $user_id  User ID.
 		 *     @type mixed int|float $rate     Commission rate.
 		 *     @type mixed int|float $amount   Commission amount.
 		 *     @type string          $currency Currency (e.g. USD).
@@ -772,7 +776,11 @@ class EDD_Commission {
 			return edd_commissions()->commissions_db->update( array( $key => $value ) );
 		}
 
-		$updated = update_post_meta( $this->id, '_edd_commission_' . $key, $value, $prev_value );
+		if ( '_' !== mb_substr( $key, 0, 1, 'utf-8') ) {
+			$key = '_edd_commission_' . $key;
+		}
+
+		$updated = edd_commissions()->commission_meta_db->update_meta( $this->id, $key, $value, $prev_value );
 
 		if ( true == $updated ) {
 			/**
