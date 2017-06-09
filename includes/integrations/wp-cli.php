@@ -163,6 +163,15 @@ class EDD_Commissions_CLI extends EDD_CLI {
 
 			$progress->finish();
 			WP_CLI::line( __( 'Migration complete.', 'eddc' ) );
+			$new_count = edd_commissions()->commissions_db->count( array( 'number' => -1 ) );
+			$old_count = $wpdb->get_col( "SELECT count(ID) FROM $wpdb->posts WHERE post_type ='edd_commission'", 0 );
+			WP_CLI::line( __( 'Old Records: ', 'eddc' ) . $old_count[0] );
+			WP_CLI::line( __( 'New Records: ', 'eddc' ) . $new_count );
+			WP_CLI::confirm( __( 'Remove legacy commission records?', 'eddc' ), $remove_args = array() );
+			WP_CLI::line( __( 'Removing old commission data.', 'eddc' ) );
+			$commission_ids = $wpdb->get_var( "SELECT GROUP_CONCAT(ID SEPARATOR ',') FROM $wpdb->posts WHERE post_type = 'edd_commission' GROUP BY NULL" );
+			$wpdb->query( "DELETE FROM $wpdb->posts WHERE ID IN ({$commission_ids})" );
+			$wpdb->query( "DELETE FROM $wpdb->postmeta WHERE post_id IN ({$commission_ids})" );
 		} else {
 			WP_CLI::line( __( 'No commission records found.', 'eddc' ) );
 		}
