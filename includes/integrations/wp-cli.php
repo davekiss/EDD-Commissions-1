@@ -183,8 +183,8 @@ class EDD_Commissions_CLI extends EDD_CLI {
 			WP_CLI::line( __( 'No commission records found.', 'eddc' ) );
 		}
 
-		//update_option( 'edds_stripe_version', preg_replace( '/[^0-9.].*/', '', EDD_STRIPE_VERSION ) );
-		//edd_set_upgrade_complete( 'stripe_customer_id_migration' );
+		update_option( 'eddc_version', preg_replace( '/[^0-9.].*/', '', EDD_COMMISSIONS_VERSION ) );
+		edd_set_upgrade_complete( 'migrate_commissions' );
 
 	}
 }
