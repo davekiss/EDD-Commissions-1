@@ -303,7 +303,7 @@ function eddc_commissions_migration() {
 				 * Developers: keep in mind any custom meta data has already been migrated over, this is just for any further
 				 * customizations.
 				 */
-				do_action( 'eddc_migrate_commission_record', $old_commission->ID, $new_commission->id );
+				do_action( 'eddc_migrate_commission_record', $old_commission->ID, $new_commission );
 			}
 
 		}

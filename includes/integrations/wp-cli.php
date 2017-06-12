@@ -170,7 +170,8 @@ class EDD_Commissions_CLI extends EDD_CLI {
 					 * Developers: keep in mind any custom meta data has already been migrated over, this is just for any further
 					 * customizations.
 					 */
-					do_action( 'eddc_migrate_commission_record', $result->ID );
+					do_action( 'eddc_migrate_commission_record', $result->ID, $commission );
+
 				}
 
 				$progress->tick();
