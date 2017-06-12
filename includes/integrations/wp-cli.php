@@ -90,10 +90,10 @@ class EDD_Commissions_CLI extends EDD_CLI {
 					}
 				}
 
+				$cart_index = 0;
 				if ( ! empty( $post_meta['_edd_commission_payment_id'] ) ) {
 
 					$payment    = new EDD_Payment( $post_meta['_edd_commission_payment_id'] );
-					$cart_index = 0;
 					foreach ( $payment->cart_details as $index => $item ) {
 
 						if ( (int) $item['id'] !== (int) $download->ID ) {
@@ -128,7 +128,7 @@ class EDD_Commissions_CLI extends EDD_CLI {
 					'amount'        => $commission_info['amount'],
 					'status'        => $status,
 					'download_id'   => $download->ID,
-					'payment_id'    => $payment->ID,
+					'payment_id'    => ! empty( $payment->ID ) ? $payment->ID : 0,
 					'cart_index'    => $cart_index,
 					'price_id'      => $commission_price_id,
 					'dated_created' => $result->post_date,
