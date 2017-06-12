@@ -157,7 +157,11 @@ class EDD_Commissions_CLI extends EDD_CLI {
 
 					$commission->update_meta( 'legacy_id', $result->ID );
 
-					// Allow developers to hook into this upgrade routine for this result, so they can move any meta they want.
+					/**
+					 * Allow developers to hook into this upgrade routine for this result, so they can move any meta they want.
+					 * Developers: keep in mind any custom meta data has already been migrated over, this is just for any further
+					 * customizations.
+					 */
 					do_action( 'eddc_migrate_commission_record', $result->ID );
 				}
 
