@@ -68,6 +68,14 @@ class EDD_Commissions_CLI extends EDD_CLI {
 			$progress = new \cli\progress\Bar( 'Migrating Commissions', $total );
 
 			foreach ( $results as $result ) {
+
+				// Prevent an already migrated item from being migrated.
+				$migrated = $wpdb->get_var( "SELECT meta_id FROM {$wpdb->prefix}edd_commissionmeta WHERE meta_value = $result->ID" );
+				if ( ! empty( $migrated ) ) {
+					$progress->tick();
+					continue;
+				}
+
 				$meta_items = $wpdb->get_results( $wpdb->prepare( "SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id = %d", $result->ID ) );
 				$post_meta  = array();
 				foreach ( $meta_items as $meta_item ) {
