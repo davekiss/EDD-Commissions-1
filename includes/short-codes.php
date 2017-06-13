@@ -132,12 +132,16 @@ function eddc_user_commissions_overview( $user_id = 0 ) {
 
 	ob_start(); ?>
 		<div id="edd_user_commissions_overview">
+
+			<?php do_action( 'eddc_before_commissions_overview', $user_id ); ?>
+
 			<h3><?php _e( 'Commissions Overview', 'eddc' ); ?></h3>
 			<table>
 				<thead>
 					<th><?php _e( 'Unpaid Earnings', 'eddc' ); ?></th>
 					<th><?php _e( 'Paid Earnings', 'eddc' ); ?></th>
 					<th><?php _e( 'Revoked Earnings', 'eddc' ); ?></th>
+					<?php do_action( 'eddc_commissions_overview_table_head', $user_id ); ?>
 				</thead>
 				<tbody>
 					<?php if ( eddc_user_has_commissions( $user_id ) ) : ?>
@@ -145,6 +149,7 @@ function eddc_user_commissions_overview( $user_id = 0 ) {
 						<td><?php echo edd_currency_filter( edd_format_amount( $unpaid_commissions ) ); ?></td>
 						<td><?php echo edd_currency_filter( edd_format_amount( $paid_commissions ) ); ?></td>
 						<td><?php echo edd_currency_filter( edd_format_amount( $revoked_commissions ) ); ?></td>
+						<?php do_action( 'eddc_commissions_overview_table_row', $user_id ); ?>
 					</tr>
 					<?php else: ?>
 					<tr>
@@ -173,6 +178,9 @@ function eddc_user_commissions_overview( $user_id = 0 ) {
 					<?php endif; ?>
 				</tbody>
 			</table>
+
+			<?php do_action( 'eddc_after_commissions_overview', $user_id ); ?>
+
 		</div>
 	<?php
 
