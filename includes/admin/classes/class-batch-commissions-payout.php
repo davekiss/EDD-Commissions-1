@@ -89,22 +89,21 @@ class EDD_Batch_Commissions_Payout extends EDD_Batch_Export {
 			foreach ( $commissions as $commission ) {
 				$commission_meta = get_post_meta( $commission->ID, '_edd_commission_info', true );
 
-				$user_id       = $commission_meta['user_id'];
-				$user          = get_userdata( $user_id );
-				$custom_paypal = get_user_meta( $user_id, 'eddc_user_paypal', true );
+				$user          = get_userdata( $commission->user_id );
+				$custom_paypal = get_user_meta( $commission->user_id, 'eddc_user_paypal', true );
 				$email         = is_email( $custom_paypal ) ? $custom_paypal : $user->user_email;
-				$key           = md5( $email . $commission_meta['currency'] );
+				$key           = md5( $email . $commission->currency );
 
 				if ( array_key_exists( $key, $payouts ) ) {
-					$payouts[ $key ]['amount'] += $commission_meta['amount'];
-					$payouts[ $key ]['ids'][]   = $commission->ID;
+					$payouts[ $key ]['amount'] += $commission->amount;
+					$payouts[ $key ]['ids'][]   = $commission->id;
 				} else {
 					$payouts[ $key ] = array(
 						'email'      => $email,
-						'amount'     => $commission_meta['amount'],
-						'currency'   => $commission_meta['currency'],
-						'ids'        => array( $commission->ID ),
-						'user_id'    => $user_id
+						'amount'     => $commission->amount,
+						'currency'   => $commission->currency,
+						'ids'        => array( $commission->id ),
+						'user_id'    => $commission->user_id,
 					);
 				}
 			}

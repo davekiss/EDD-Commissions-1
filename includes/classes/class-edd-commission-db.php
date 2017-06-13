@@ -128,7 +128,8 @@ class EDDC_DB extends EDD_DB {
 
 		$cache_key = md5( 'edd_commissions_' . serialize( $args ) );
 
-		$commissions = wp_cache_get( $cache_key, 'commissions' );
+		//$commissions = wp_cache_get( $cache_key, 'commissions' );
+		$commissions = false;
 
 		$args['orderby'] = esc_sql( $args['orderby'] );
 		$args['order']   = esc_sql( $args['order'] );
@@ -308,9 +309,62 @@ class EDDC_DB extends EDD_DB {
 
 		}
 
+		if ( ! empty( $args['query_args']['date_query'] ) ) {
+			$after  = $args['query_args']['date_query']['after'];
+			$after_date  = false;
+			if ( ! empty( $after ) ) {
+				if ( is_array( $after ) ) {
+					$after_date = $after['year'] . '-' . $after['month'] . '-' . $after['day'] . ' 00:00:00';
+				} else {
+					$after_date = $after;
+				}
+			}
+
+			$before = $args['query_args']['date_query']['before'];
+			$before_date = false;
+			if ( ! empty( $before ) ) {
+				if ( is_array( $before ) ) {
+					$before_date = $before['year'] . '-' . $before['month'] . '-' . $before['day'] . ' 23:59:59';
+				} else {
+					$before_date = $before;
+				}
+			}
+
+			if ( ! empty( $after_date ) && ! empty( $before_date ) ) {
+				$where .= " AND date_created BETWEEN CAST('$after_date' AS DATE) AND CAST('$before_date' AS DATE)";
+			} else {
+				if ( ! empty( $after_date ) ) {
+					$where .= " AND date_created >= CAST('$after_date' AS DATE)";
+				}
+
+				if ( ! empty( $before_date ) ) {
+					$where .= " AND date_created <= CAST('$before_date' AS DATE)";
+				}
+			}
+		}
+
+
+
+		if ( ! empty( $args['hour'] ) ) {
+			$where .= " AND {$args['hour']} = HOUR( date_created )";
+		}
+
+		if ( ! empty( $args['day'] ) ) {
+			$where .= " AND {$args['day']} = DAY( date_created )";
+		}
+
+		if ( ! empty( $args['month'] ) ) {
+			$where .= " AND {$args['month']} = MONTH( date_created )";
+		}
+
+		if ( ! empty( $args['year'] ) ) {
+			$where .= " AND {$args['year']} = YEAR( date_created )";
+		}
+
 		if ( ! empty( $where ) ) {
 			$where = ' WHERE 1=1 ' . $where;
 		}
+
 		return $where;
 	}
 

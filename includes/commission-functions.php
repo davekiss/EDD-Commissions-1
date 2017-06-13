@@ -197,6 +197,9 @@ function eddc_set_commission_status( $commission_id = 0, $new_status = 'unpaid' 
 	do_action( 'eddc_pre_set_commission_status', $commission_id, $new_status, $old_status );
 
 	$commission->status = $new_status;
+	if ( 'paid' === $new_status ) {
+		$commission->date_paid = current_time( 'mysql' );
+	}
 	$commission->save();
 
 	do_action( 'eddc_set_commission_status', $commission_id, $new_status, $old_status );
@@ -618,47 +621,28 @@ function eddc_get_revoked_totals( $user_id = 0 ) {
  * @return      string The total of specified commissions
  */
 function edd_get_commissions_by_date( $day = null, $month = null, $year = null, $hour = null, $user = 0  ) {
-	$args = array(
-		'post_type'      => 'edd_commission',
-		'posts_per_page' => -1,
-		'year'           => $year,
-		'monthnum'       => $month,
-		'tax_query'      => array(
-			array(
-				'taxonomy' => 'edd_commission_status',
-				'terms'    => 'revoked',
-				'field'    => 'slug',
-				'operator' => 'NOT IN'
-			)
-		)
+	$commission_args = array(
+		'number' => -1,
+		'year'   => $year,
+		'month'  => $month,
+		'status' => array( 'paid', 'unpaid' ),
 	);
 
 	if ( ! empty( $day ) ) {
-		$args['day'] = $day;
+		$commission_args['day'] = $day;
 	}
 
 	if ( ! empty( $hour ) ) {
-		$args['hour'] = $hour;
+		$commission_args['hour'] = $hour;
 	}
 
 	if ( ! empty( $user ) ) {
-		$args['meta_key']   = '_user_id';
-		$args['meta_value'] = absint( $user );
+		$commission_args['user_id'] = absint( $user );
 	}
 
-	$args = apply_filters( 'edd_get_commissions_by_date', $args, $day, $month, $year, $user );
+	$commission_args = apply_filters( 'edd_get_commissions_by_date', $commission_args, $day, $month, $year, $user );
 
-	$commissions = get_posts( $args );
-
-	$total = 0;
-	if ( $commissions ) {
-		foreach ( $commissions as $commission ) {
-			$commission_meta = get_post_meta( $commission->ID, '_edd_commission_info', true );
-			$amount          = $commission_meta['amount'];
-			$total           = $total + $amount;
-		}
-	}
-
+	$total = edd_commissions()->commissions_db->sum( 'amount', $commission_args );
 	return edd_sanitize_amount( $total );
 }
 
