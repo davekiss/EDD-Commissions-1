@@ -43,6 +43,8 @@ function eddc_upgrade_notices() {
 			'<p style="display: none;">' .
 			__( '<strong>About this upgrade:</strong><br />This is a <strong><em>mandatory</em></strong> update that will migrate all commission records and their meta data to a new custom database table. This upgrade should provider better performance and scalability.', 'eddc' ) .
 			'<br /><br />' .
+			__( '<strong>Please backup your database before starting this upgrade.</strong> This upgrade routine will be making changes to the database that are not reversible.', 'eddc' ) .
+			'<br /><br />' .
 			__( '<strong>Advanced User?</strong><br />This upgrade can also be run via WPCLI with the following command:<br /><code>wp edd-commissions migrate_commissions</code>', 'eddc' ) .
 			'</p>' .
 			'</div>',
@@ -150,9 +152,9 @@ function eddc_upgrade_commission_statuses() {
 add_action( 'edd_upgrade_commission_statuses', 'eddc_upgrade_commission_statuses' );
 
 /**
- * Upgrades all commission records to use a taxonomy for tracking the status of the commission
+ * Migrates all commissions and their meta to the new custom table
  *
- * @since 2.8
+ * @since 3.4
  * @return void
  */
 function eddc_commissions_migration() {
@@ -204,7 +206,7 @@ function eddc_commissions_migration() {
 		foreach ( $commissions as $old_commission ) {
 
 			// Prevent an already migrated item from being migrated.
-			$migrated = $wpdb->get_var( "SELECT meta_id FROM {$wpdb->prefix}edd_commissionmeta WHERE meta_value = $old_commission->ID" );
+			$migrated = $wpdb->get_var( "SELECT meta_id FROM {$wpdb->prefix}edd_commissionmeta WHERE meta_key = '_edd_commission_legacy_id' AND meta_value = $old_commission->ID" );
 			if ( ! empty( $migrated ) ) {
 				continue;
 			}

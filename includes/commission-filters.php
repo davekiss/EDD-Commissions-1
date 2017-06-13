@@ -26,6 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return mixed               The value to return
  */
 function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
+	global $wpdb;
 
 	$meta_keys = array( '_edd_commission_info', '_edd_commission_payment_id', '_download_id' );
 
@@ -34,10 +35,17 @@ function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 	}
 
 	$edd_is_checkout = function_exists( 'edd_is_checkout' ) ? edd_is_checkout() : false;
+	$show_notice     = ( defined( 'WP_DEBUG' ) && WP_DEBUG && ! $edd_is_checkout );
 	$commission      = new EDD_Commission( $object_id );
 
-	if ( $commission->id < 1 ) {
-		return $value;
+	if ( empty( $commission->id ) ) {
+		// We didn't find a commission record with this ID...so let's check and see if it was a migrated one
+		$object_id = $wpdb->get_var( "SELECT commission_id FROM {$wpdb->prefix}edd_commissionmeta WHERE meta_key = '_edd_commission_legacy_id' AND meta_value = $object_id" );
+		if ( ! empty( $object_id ) ) {
+			$commission = new EDD_Commission( $object_id );
+		} else {
+			return $value;
+		}
 	}
 
 	switch( $meta_key ) {
@@ -52,7 +60,7 @@ function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 				'type'     => $commission->type,
 			);
 
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && ! $edd_is_checkout ) {
+			if ( $show_notice ) {
 				// Throw deprecated notice if WP_DEBUG is defined and on
 				trigger_error( __( 'The _edd_commission_info postmeta is <strong>deprecated</strong> since EDD Commissions 3.4! Use the EDD_Commission object to get the relevant data, instead.', 'edd_sl' ) );
 
@@ -66,7 +74,7 @@ function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 
 			$value = $commission->payment_id;
 
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && ! $edd_is_checkout ) {
+			if ( $show_notice ) {
 				// Throw deprecated notice if WP_DEBUG is defined and on
 				trigger_error( __( 'The _edd_commission_payment_id postmeta is <strong>deprecated</strong> since EDD Commissions 3.4! Use the EDD_Commission object to get the relevant data, instead.', 'edd_sl' ) );
 
@@ -80,7 +88,7 @@ function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 
 			$value = $commission->download_id;
 
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && ! $edd_is_checkout ) {
+			if ( $show_notice ) {
 				// Throw deprecated notice if WP_DEBUG is defined and on
 				trigger_error( __( 'The _download_id postmeta is <strong>deprecated</strong> since EDD Commissions 3.4! Use the EDD_Commission object to get the relevant data, instead.', 'edd_sl' ) );
 
@@ -92,14 +100,7 @@ function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 
 	}
 
-	// If the 'single' param is false, we need to make this a single item array with the value within it
-	if ( false === $single ) {
-		$value = array( $value );
-	}
-
-	return $value;
+	return array( $value );
 
 }
-/** TODO: Enable this and find a way to relate old commission IDs to the new ones **/
-/** TODO: Re-enable this filter once deve is complete so I can find all the places we're referencing the meta in Commissions core */
-add_filter( 'get_post_metadata', 'eddc_get_meta_backcompat', 10, 4 );
+add_filter( 'get_post_metadata', 'eddc_get_meta_backcompat', 99, 4 );

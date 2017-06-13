@@ -210,7 +210,9 @@ class EDD_Commission {
 		$id         = absint( $id );
 		$commission = edd_commissions()->commissions_db->get_by( 'id', $id );
 
-		$this->setup_commission( $commission );
+		if ( ! empty( $commission ) ) {
+			$this->setup_commission( $commission );
+		}
 	}
 
 

@@ -70,7 +70,7 @@ class EDD_Commissions_CLI extends EDD_CLI {
 			foreach ( $results as $result ) {
 
 				// Prevent an already migrated item from being migrated.
-				$migrated = $wpdb->get_var( "SELECT meta_id FROM {$wpdb->prefix}edd_commissionmeta WHERE meta_value = $result->ID" );
+				$migrated = $wpdb->get_var( "SELECT meta_id FROM {$wpdb->prefix}edd_commissionmeta WHERE meta_key = '_edd_commission_legacy_id' AND meta_value = $result->ID" );
 				if ( ! empty( $migrated ) ) {
 					$progress->tick();
 					continue;

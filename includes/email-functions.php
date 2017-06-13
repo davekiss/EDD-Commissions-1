@@ -102,7 +102,7 @@ function eddc_get_email_template_tags() {
  * @return      string $message The email body
  */
 function eddc_parse_template_tags( $message, $download_id, $commission_id, $commission_amount, $rate ) {
-	$commission = edd_commissions()->commissions_db->get_by( 'id', $commission_id );
+	$commission = new EDD_Commission( $commission_id );
 	$download   = new EDD_Download( $commission->download_id );
 	$item_purchased  = $download->get_name();
 	if ( $download->has_variable_prices() ) {
