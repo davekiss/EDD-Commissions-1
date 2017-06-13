@@ -28,7 +28,7 @@ function eddc_commissions_page() {
 
 	if ( $requested_view == 'add' ) {
 		eddc_render_add_commission_view();
-	} elseif ( array_key_exists( $requested_view, $default_views ) && function_exists( $default_views[$requested_view] ) ) {
+	} elseif ( array_key_exists( $requested_view, $default_views ) && is_callable( $default_views[$requested_view] ) ) {
 		eddc_render_commission_view( $requested_view, $default_views );
 	} else {
 		eddc_commissions_list();
@@ -341,7 +341,7 @@ function eddc_render_commission_view( $view, $callbacks ) {
 
 				<div id="edd-item-card-wrapper" class="eddc-commission-card" style="float: left">
 					<?php
-					if ( function_exists( $callbacks[ $view ] ) ) {
+					if ( is_callable( $callbacks[ $view ] ) ) {
 						$callbacks[ $view ]( $commission );
 					}
 					?>
