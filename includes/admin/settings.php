@@ -77,7 +77,7 @@ function eddc_settings_extensions( $settings ) {
 				'no'  => __( 'No, do not record zero value commissions', 'eddc' ),
 			),
 			'tooltip_title' => __( 'Allow zero value commissions', 'eddc' ),
-			'tooltip_desc'  => sprintf( __( 'By default, EDD records commissions even if the value of the commission is %s. While this may be useful for tracking purposes in some situations, some users may find it confusing. If you prefer not to see $0.00 commissions, disable theme here.', 'eddc' ), edd_currency_filter( edd_format_amount( 0.00 ) ) ),
+			'tooltip_desc'  => sprintf( __( 'By default, EDD records commissions even if the value of the commission is %s. While this may be useful for tracking purposes in some situations, some users may find it confusing. If you prefer not to see $0.00 commissions, disable them here.', 'eddc' ), edd_currency_filter( edd_format_amount( 0.00 ) ) ),
 		),
 		array(
 			'id'      => 'edd_commissions_autopay_pa',
