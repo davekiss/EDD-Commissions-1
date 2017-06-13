@@ -607,7 +607,7 @@ class EDD_Commission {
 			'date_created' => ! empty( $legacy_args['post_date'] ) ? $legacy_args['post_date'] : $payment->date,
 			'date_paid'    => ! empty( $this->date_paid ) ? $this->date_paid : '',
 			'rate'         => (float) $this->rate,
-			'type'         => $this->type,
+			'type'         => ! empty( $this->type ) ? $this->type : eddc_get_commission_type( $this->download_id ),
 			'currency'     => $this->currency,
 		), $this->id, $this->payment_id, $this->download_id );
 
