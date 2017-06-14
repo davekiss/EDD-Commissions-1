@@ -45,6 +45,19 @@ if ( ! class_exists( 'EDDC' ) ) {
 		 */
 		public $commission_meta_db;
 
+
+		private function __construct() {
+			if ( ! class_exists( 'Easy_Digital_Downloads' ) ){
+				return;
+			}
+
+			$this->setup_constants();
+			$this->includes();
+			$this->load_textdomain();
+			$this->hooks();
+			$this->commissions_db = new EDDC_DB();
+			$this->commission_meta_db = new EDDC_Meta_DB();
+		}
 		/**
 		 * Get active instance
 		 *
@@ -55,12 +68,6 @@ if ( ! class_exists( 'EDDC' ) ) {
 		public static function instance() {
 			if ( ! self::$instance ) {
 				self::$instance = new EDDC();
-				self::$instance->setup_constants();
-				self::$instance->includes();
-				self::$instance->load_textdomain();
-				self::$instance->hooks();
-				self::$instance->commissions_db = new EDDC_DB();
-				self::$instance->commission_meta_db = new EDDC_Meta_DB();
 			}
 
 			return self::$instance;
