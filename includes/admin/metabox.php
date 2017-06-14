@@ -87,13 +87,16 @@ function eddc_render_commissions_meta_box() {
 				// Filter in the types of commissions there could be.
 				$commission_types = apply_filters( 'eddc_commission_types', array(
 					'percentage' => __( 'Percentage', 'eddc' ),
-					'flat'		 => __( 'Flat', 'eddc' ),
+					'flat'       => __( 'Flat', 'eddc' ),
 				) );
 
-				foreach( $commission_types as $commission_type => $commission_pretty_string ){?>
-
-						<span id="eddc_type_<?php echo $commission_type; ?>_wrapper"><input id="eddc_type_<?php echo $commission_type; ?>" type="radio" name="edd_commission_settings[type]" value="<?php echo $commission_type; ?>" <?php checked( $type, $commission_type, true ); ?>/> <?php echo $commission_pretty_string;
-						?></span><br /><?php
+				foreach ( $commission_types as $commission_type => $commission_pretty_string ) {
+					?>
+					<span class="edd-commission-type-wrapper" id="eddc_type_<?php echo $commission_type; ?>_wrapper">
+						<input id="eddc_type_<?php echo $commission_type; ?>" type="radio" name="edd_commission_settings[type]" value="<?php echo $commission_type; ?>" <?php checked( $type, $commission_type, true ); ?>/>
+						<label for="eddc_type_<?php echo $commission_type; ?>"><?php echo $commission_pretty_string; ?></label>
+					</span>
+					<?php
 				}
 				?>
 				</p>
@@ -135,7 +138,7 @@ function eddc_render_commissions_meta_box() {
 								) ); ?>
 							</td>
 							<td>
-								<input type="text" name="edd_commission_settings[rates][<?php echo $key; ?>][amount]" id="edd_commission_amount_<?php echo $key; ?>" value="<?php echo $value['amount']; ?>" placeholder="<?php _e( 'Rate for this user', 'eddc' ); ?>"/>
+								<input type="text" class="edd-commissions-rate-field" name="edd_commission_settings[rates][<?php echo $key; ?>][amount]" id="edd_commission_amount_<?php echo $key; ?>" value="<?php echo $value['amount']; ?>" placeholder="<?php _e( 'Rate for this user', 'eddc' ); ?>"/>
 							</td>
 							<td>
 								<a href="#" class="edd_commissions_remove_repeatable"><span class="dashicons dashicons-dismiss"></a>

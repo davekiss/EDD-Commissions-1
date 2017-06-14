@@ -16,6 +16,10 @@
 	font-size: 13px;
 }
 
+#edd-commissions-export-wrap {
+	margin-top: 10px;
+}
+
 #edd-commissions-export-wrap .edd_datepicker {
 	height: 28px;
 }
@@ -50,9 +54,23 @@
 	display: none;
 }
 
+.edit-item-info .item-info td.row-title {
+	display: block;
+	width: 100%;
+}
+
 .edd-item-info.delete-commission {
 	text-align: center;
 	margin-top: 5px;
 	margin-bottom: 10px;
 	min-height: 185px;
+}
+
+.edd-commissions-rate-field {
+	width: 50px;
+}
+
+.edd-commission-type-wrapper {
+	display: block;
+	line-height: 2em;
 }

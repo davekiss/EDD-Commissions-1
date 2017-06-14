@@ -72,7 +72,7 @@ function eddc_commissions_list() {
 
 		<div id="icon-edit" class="icon32"><br/></div>
 		<h2>
-			<?php _e( 'Easy Digital Download Commissions', 'eddc' ); ?>
+			<?php _e( 'Commissions', 'eddc' ); ?>
 			<a href="<?php echo esc_url( add_query_arg( array( 'view' => 'add' ) ) ); ?>" class="add-new-h2"><?php _e( 'Add New', 'eddc' ); ?></a>
 		</h2>
 

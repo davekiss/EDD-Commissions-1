@@ -31,7 +31,11 @@ jQuery(document).ready(function($) {
 		var target  = $('.eddc_toggled_row');
 
 		if ( checked ) {
-			$('.edd_repeatable_row').find( '.edd-select-chosen' ).css( 'width', '300px' );
+			if ( $('body').hasClass('mobile')) {
+				$('.edd_repeatable_row').find('.edd-select-chosen').css('width', '100%');
+			} else {
+				$('.edd_repeatable_row').find('.edd-select-chosen').css('width', '300px');
+			}
 			target.show();
 		} else {
 			target.hide();
@@ -44,7 +48,11 @@ jQuery(document).ready(function($) {
 			var target  = $('.eddc_toggled_row');
 
 			if ( checked ) {
-				$('.edd_repeatable_row').find( '.edd-select-chosen' ).css( 'width', '300px' );
+				if ( $('body').hasClass('mobile')) {
+					$('.edd_repeatable_row').find('.edd-select-chosen').css('width', '100%');
+				} else {
+					$('.edd_repeatable_row').find('.edd-select-chosen').css('width', '300px');
+				}
 				target.show();
 			} else {
 				target.hide();
