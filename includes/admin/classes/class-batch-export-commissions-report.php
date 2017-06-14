@@ -211,44 +211,23 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 			return false;
 		}
 
-		$args['query_args'] = array(
-			'posts_per_page' => -1,
-			'date_query' => array(
-				array(
+		$args = array(
+			'number'     => -1,
+			'query_args' => array(
+				'date_query' => array(
 					'after'     => $start_date,
 					'before'    => $end_date,
-					'inclusive' => true
+					'inclusive' => true,
 				)
 			)
 		);
 
 		$unpaid        = eddc_get_unpaid_commissions( $args );
-		$unpaid_total  = (float) 0;
+		$unpaid_total  = edd_commissions()->commissions_db->sum( 'amount', array_merge( $args, array( 'status' => 'unpaid' ) ) );
 		$paid          = eddc_get_paid_commissions( $args );
-		$paid_total    = (float) 0;
+		$paid_total    = edd_commissions()->commissions_db->sum( 'amount', array_merge( $args, array( 'status' => 'paid' ) ) );
 		$revoked       = eddc_get_revoked_commissions( $args );
-		$revoked_total = (float) 0;
-
-		if ( $unpaid ) {
-			foreach ( $unpaid as $commission ) {
-				$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
-				$unpaid_total += $commission_info['amount'];
-			}
-		}
-
-		if ( $paid ) {
-			foreach ( $paid as $commission ) {
-				$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
-				$paid_total += $commission_info['amount'];
-			}
-		}
-
-		if ( $revoked ) {
-			foreach ( $revoked as $commission ) {
-				$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
-				$revoked_total += $commission_info['amount'];
-			}
-		}
+		$revoked_total = edd_commissions()->commissions_db->sum( 'amount', array_merge( $args, array( 'status' => 'revoked' ) ) );
 
 		$data = array(
 			'unpaid' => array(

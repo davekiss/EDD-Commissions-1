@@ -27,7 +27,7 @@ function eddc_get_email_default_body() {
 	$message   = __( 'Hello {name},', 'eddc' ) . "\n\n" . sprintf( __( 'You have made a new sale on %s!', 'eddc' ), stripslashes_deep( html_entity_decode( $from_name, ENT_COMPAT, 'UTF-8' ) ) ) . "\n\n";
 	$message  .= __( 'Item sold: ', 'eddc' ) . "{download}\n\n";
 	$message  .= __( 'Amount: ', 'eddc' ) . "{amount}\n\n";
-	$message  .= __( 'Commission Rate: ', 'eddc' ) . "{rate}%\n\n";
+	$message  .= __( 'Commission Rate: ', 'eddc' ) . "{rate}\n\n";
 	$message  .= __( 'Thank you', 'eddc' );
 
 	return apply_filters( 'eddc_email_default_body', $message );
@@ -102,12 +102,24 @@ function eddc_get_email_template_tags() {
  * @return      string $message The email body
  */
 function eddc_parse_template_tags( $message, $download_id, $commission_id, $commission_amount, $rate ) {
-	$meta      = get_post_meta( $commission_id, '_edd_commission_info', true );
-	$variation = get_post_meta( $commission_id, '_edd_commission_download_variation', true );
-	$download  = get_the_title( $download_id ) . ( ! empty( $variation ) ? ' - ' . $variation : '' );
-	$amount    = html_entity_decode( edd_currency_filter( edd_format_amount( $commission_amount ) ) );
-	$date      = date_i18n( get_option( 'date_format' ), strtotime( get_post_field( 'post_date', $commission_id ) ) );
-	$user      = get_userdata( $meta['user_id'] );
+	$commission = new EDD_Commission( $commission_id );
+	$download   = new EDD_Download( $commission->download_id );
+	$item_purchased  = $download->get_name();
+	if ( $download->has_variable_prices() ) {
+		$prices = $download->get_prices();
+		if ( isset( $prices[ $commission->price_id ] ) ) {
+			$item_purchased .= ' - ' . $prices[ $commission->price_id ]['name'];
+		}
+	}
+	$amount    = html_entity_decode( edd_currency_filter( edd_format_amount( $commission->amount ) ) );
+	$date      = date_i18n( get_option( 'date_format' ), strtotime( $commission->date_created ) );
+	$user      = get_userdata( $commission->user_id );
+
+	if ( 'percentage' === $commission->type ) {
+		$rate = $commission->rate . '%';
+	} else {
+		$rate = __( 'Flat rate', 'eddc' );
+	}
 
 	if ( ! empty( $user->first_name ) ) {
 		$name = $user->first_name;
@@ -122,7 +134,7 @@ function eddc_parse_template_tags( $message, $download_id, $commission_id, $comm
 		$fullname = $name;
 	}
 
-	$message = str_replace( '{download}', $download, $message );
+	$message = str_replace( '{download}', $item_purchased, $message );
 	$message = str_replace( '{amount}', $amount, $message );
 	$message = str_replace( '{date}', $date, $message );
 	$message = str_replace( '{rate}', $rate, $message );

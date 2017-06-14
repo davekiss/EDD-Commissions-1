@@ -3,8 +3,8 @@
  * Commission Object
  *
  * @package     Easy Digital Downloads - Commissions
- * @subpackage  Classes/Discount
- * @copyright   Copyright (c) 2017, Sunny Ratilal
+ * @subpackage  Classes/Commission
+ * @copyright   Copyright (c) 2017, Easy Digital Downloads, LLC
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       3.3
  */
@@ -31,7 +31,7 @@ class EDD_Commission {
 	 * @access      protected
 	 * @var         int
 	 */
-	protected $ID = 0;
+	protected $id = 0;
 
 
 	/**
@@ -41,7 +41,7 @@ class EDD_Commission {
 	 * @access      protected
 	 * @var         int
 	 */
-	protected $user_ID = 0;
+	protected $user_id = 0;
 
 
 	/**
@@ -52,6 +52,15 @@ class EDD_Commission {
 	 * @var         string
 	 */
 	protected $description = null;
+
+	/**
+	 * The Download Variation name
+	 *
+	 * @since 3.3
+	 * @access protected
+	 * @var string
+	 */
+	protected $download_variation = null;
 
 
 	/**
@@ -101,7 +110,7 @@ class EDD_Commission {
 	 * @access      protected
 	 * @var         int
 	 */
-	protected $download_ID = 0;
+	protected $download_id = 0;
 
 
 	/**
@@ -111,7 +120,7 @@ class EDD_Commission {
 	 * @access      protected
 	 * @var         int
 	 */
-	protected $payment_ID = 0;
+	protected $payment_id = 0;
 
 
 	/**
@@ -123,6 +132,15 @@ class EDD_Commission {
 	 */
 	protected $status = null;
 
+	/**
+	 * The position the item commissioned was in the cart
+	 *
+	 * @since   3.4
+	 * @access  protected
+	 * @var     string
+	 *
+	 */
+	protected $cart_index = 0;
 
 	/**
 	 * Is Renewal?
@@ -133,59 +151,45 @@ class EDD_Commission {
 	 */
 	protected $is_renewal = false;
 
-
 	/**
 	 * Download variation (if any).
 	 *
-	 * @since       3.3
+	 * @since       3.4
 	 * @access      protected
 	 * @var         string
 	 */
-	protected $download_variation = null;
+	protected $price_id = null;
+
+	/**
+	 * The date the commission was recorded
+	 *
+	 * @since   3.4
+	 * @access  protected
+	 * @var     string
+	 *
+	 */
+	protected $date_created = null;
+
+	/**
+	 * The date the commission was paid
+	 *
+	 * @since   3.4
+	 * @access  protected
+	 * @var     string
+	 *
+	 */
+	protected $date_paid = null;
 
 
 	/**
 	 * Array of items that have changed since the last save() was run.
-	 * This is for internal use, to allow fewer update_post_meta calls to be run.
+	 * This is for internal use, to allow fewer update calls to be run.
 	 *
 	 * @since       3.3
 	 * @access      private
 	 * @var         array
 	 */
 	private $pending;
-
-
-	/**
-	 * Declare the default properties in WP_Post as we can't extend it.
-	 *
-	 * @since       3.3
-	 * @access      protected
-	 * @var         mixed
-	 */
-	protected $post_author           = 0;
-	protected $post_date             = '0000-00-00 00:00:00';
-	protected $post_date_gmt         = '0000-00-00 00:00:00';
-	protected $post_content          = '';
-	protected $post_title            = '';
-	protected $post_excerpt          = '';
-	protected $post_status           = 'publish';
-	protected $comment_status        = 'open';
-	protected $ping_status           = 'open';
-	protected $post_password         = '';
-	protected $post_name             = '';
-	protected $to_ping               = '';
-	protected $pinged                = '';
-	protected $post_modified         = '0000-00-00 00:00:00';
-	protected $post_modified_gmt     = '0000-00-00 00:00:00';
-	protected $post_content_filtered = '';
-	protected $post_parent           = 0;
-	protected $guid                  = '';
-	protected $menu_order            = 0;
-	protected $post_mime_type        = '';
-	protected $comment_count         = 0;
-	protected $filter;
-	protected $post_type;
-
 
 	/**
 	 * Constructor.
@@ -199,10 +203,16 @@ class EDD_Commission {
 			return false;
 		}
 
-		$id         = absint( $id );
-		$commission = WP_Post::get_instance( $id );
+		if ( ! is_numeric( $id ) ) {
+			return false;
+		}
 
-		$this->setup_commission( $commission );
+		$id         = absint( $id );
+		$commission = edd_commissions()->commissions_db->get_by( 'id', $id );
+
+		if ( ! empty( $commission ) ) {
+			$this->setup_commission( $commission );
+		}
 	}
 
 
@@ -215,6 +225,8 @@ class EDD_Commission {
 	 * @return      mixed
 	 */
 	public function __get( $key ) {
+		$key = $this->sanitize_key( $key );
+
 		if ( method_exists( $this, 'get_' . $key ) ) {
 			return call_user_func( array( $this, 'get_' . $key ) );
 		} elseif ( property_exists( $this, $key ) ) {
@@ -232,8 +244,12 @@ class EDD_Commission {
 	 * @see         set()
 	 * @param       string $key Property name.
 	 * @param       mixed $value Property value.
+	 *
+	 * @return mixed
 	 */
 	public function __set( $key, $value ) {
+		$key = $this->sanitize_key( $key );
+
 		// Only real properties can be saved.
 		$keys = array_keys( get_class_vars( get_called_class() ) );
 
@@ -261,6 +277,8 @@ class EDD_Commission {
 	 * @return      boolean If the item is set or not
 	 */
 	public function __isset( $key ) {
+		$key = $this->sanitize_key( $key );
+
 		if ( property_exists( $this, $key ) ) {
 			return false === empty( $this->{$key} );
 		} else {
@@ -292,23 +310,7 @@ class EDD_Commission {
 	private function setup_commission( $commission = null ) {
 		$this->pending = array();
 
-		if ( null == $commission ) {
-			return false;
-		}
-
-		if ( ! is_object( $commission ) ) {
-			return false;
-		}
-
-		if ( is_wp_error( $commission ) ) {
-			return false;
-		}
-
-		if ( ! is_a( $commission, 'WP_Post' ) ) {
-			return false;
-		}
-
-		if ( 'edd_commission' !== $commission->post_type ) {
+		if ( empty( $commission ) ) {
 			return false;
 		}
 
@@ -325,18 +327,19 @@ class EDD_Commission {
 		/**
 		 * Setup all object variables
 		 */
-		$this->ID          = absint( $commission->ID );
-		$this->user_ID     = $this->setup_user_ID();
-		$this->description = $commission->post_title;
-		$this->rate        = $this->setup_rate();
-		$this->type        = $this->setup_type();
-		$this->amount      = $this->setup_amount();
-		$this->currency    = $this->setup_currency();
-		$this->download_ID = $this->setup_download_ID();
-		$this->payment_ID  = $this->setup_payment_ID();
-		$this->status      = $this->setup_status();
-		$this->is_renewal  = $this->setup_is_renewal();
+		$this->rate        = (float) $commission->rate;
+		$this->type        = $commission->type;
+		$this->amount      = (float) $commission->amount;
+		$this->currency    = $commission->currency;
+		$this->download_id = absint( $commission->download_id );
+		$this->payment_id  = absint( $commission->payment_id );
+		$this->user_id     = (int) $commission->user_id;
+		$this->status      = $commission->status;
+		$this->price_id    = absint( $commission->price_id );
+		$this->is_renewal  = (bool) $this->setup_is_renewal();
 		$this->download_variation = $this->setup_download_variation();
+		$this->description = $this->setup_description();
+		$this->cart_index  = absint( $commission->cart_index );
 
 		/**
 		 * Setup discount object vars with WP_Post vars
@@ -357,124 +360,9 @@ class EDD_Commission {
 		return true;
 	}
 
-
 	/**
 	 * Setup Functions
-	 */
-
-
-	/**
-	 * Setup commission user ID.
 	 *
-	 * @since       3.3
-	 * @access      private
-	 * @return      int User ID.
-	 */
-	private function setup_user_ID() {
-		$user_ID = $this->get_meta( 'user_id', true );
-		return $user_ID;
-	}
-
-
-	/**
-	 * Setup commission rate.
-	 *
-	 * @since       3.3
-	 * @access      private
-	 * @return      int User ID.
-	 */
-	private function setup_rate() {
-		$rate = $this->get_meta( 'rate', true );
-		return $rate;
-	}
-
-
-	/**
-	 * Setup commission type.
-	 *
-	 * @since       3.3
-	 * @access      private
-	 * @return      string Commission type.
-	 */
-	private function setup_type() {
-		$type = $this->get_meta( 'type', true );
-		return $type;
-	}
-
-
-	/**
-	 * Setup commission amount.
-	 *
-	 * @since       3.3
-	 * @access      private
-	 * @return      int User ID.
-	 */
-	private function setup_amount() {
-		$amount = $this->get_meta( 'amount', true );
-		return $amount;
-	}
-
-
-	/**
-	 * Setup commission currency.
-	 *
-	 * @since       3.3
-	 * @access      private
-	 * @return      int User ID.
-	 */
-	private function setup_currency() {
-		$currency = $this->get_meta( 'currency', true );
-		return $currency;
-	}
-
-
-	/**
-	 * Setup commission download ID.
-	 *
-	 * @since       3.3
-	 * @access      private
-	 * @return      int User ID.
-	 */
-	private function setup_download_ID() {
-		$download_ID = $this->get_meta( 'download_id', true );
-		return $download_ID;
-	}
-
-
-	/**
-	 * Setup commission payment ID.
-	 *
-	 * @since       3.3
-	 * @access      private
-	 * @return      int User ID.
-	 */
-	private function setup_payment_ID() {
-		$payment_ID = $this->get_meta( 'payment_id', true );
-		return $payment_ID;
-	}
-
-
-	/**
-	 * Setup the paid status of a commission.
-	 *
-	 * @since       3.3
-	 * @access      private
-	 * @return      string Status.
-	 */
-	private function setup_status() {
-		$status = 'unpaid';
-		$terms  = get_the_terms( $this->ID, 'edd_commission_status' );
-
-		if ( is_array( $terms ) ) {
-			foreach ( $terms as $term ) {
-				$status = $term->slug;
-				break;
-			}
-		}
-
-		return $status;
-	}
-
 
 	/**
 	 * Setup the property that determines whether the commission is a renewal or not.
@@ -488,50 +376,58 @@ class EDD_Commission {
 		return (bool) $is_renewal;
 	}
 
-
-	/**
-	 * Setup the download variation (if any).
-	 *
-	 * @since       3.3
-	 * @access      private
-	 * @return      string Download variation.
-	 */
 	private function setup_download_variation() {
-		$download_variation = $this->get_meta( 'download_variation', true );
-		return $download_variation;
+		$variation = '';
+		$download  = new EDD_Download( $this->download_id );
+		if ( $download->has_variable_prices() ) {
+			$variation = edd_get_price_option_name( $this->download_id, $this->price_id, $this->payment_id );
+		}
+
+		return $variation;
 	}
 
+	private function setup_description() {
+		$payment     = new EDD_Payment( $this->payment_id );
+		$download    = new EDD_Download( $this->download_id );
+		$description = $payment->user_info['email'] . ' - ' . $download->get_name();
+
+		return $description;
+	}
 
 	/**
 	 * Helper method to retrieve meta data associated with the commission.
 	 *
 	 * @since       3.3
+	 * @since       3.4 - Updated to look at custom table columns before going to meta table.
 	 * @access      public
 	 * @param       string $key Meta key.
 	 * @param       bool $single Return single item or array.
+	 *
+	 * @return mixed
 	 */
 	public function get_meta( $key = '', $single = true ) {
-		$commission_info = array( 'user_id', 'rate', 'amount', 'currency' );
 
-		if ( in_array( $key, $commission_info ) ) {
-			$meta = get_post_meta( $this->ID, '_edd_commission_info', true );
-			if ( isset( $meta[ $key ] ) ) {
-				return $meta[ $key ];
-			}
+		// Since 3.4, we've moved some of the meta into columns of the custom table, identify those and return.
+		$core_columns = edd_commissions()->commissions_db->get_column_labels();
+		if ( in_array( $key, $core_columns ) ) {
+			return $this->$key;
 		}
 
-		if ( 'download_id' == $key ) {
-			$download_ID = get_post_meta( $this->ID, '_download_id', true );
-			return $download_ID;
+		if ( 'description' === $key ) {
+			return $this->description;
 		}
 
-		if ( 'type' === $key ) {
-			$download_ID = get_post_meta( $this->ID, '_download_id', true );
-			return eddc_get_commission_type( $download_ID );
+		if ( '_' !== mb_substr( $key, 0, 1, 'utf-8') ) {
+			$key = '_edd_commission_' . $key;
 		}
 
-		$meta = get_post_meta( $this->ID, '_edd_commission_' . $key, $single );
+		$meta = edd_commissions()->commission_meta_db->get_meta( $this->id, $key, $single );
+
+		// Run a wildcard filter for any meta we're getting
+		$meta = apply_filters( 'eddc_commission_' . $key, $meta, $this->id );
+
 		return $meta;
+
 	}
 
 
@@ -550,7 +446,21 @@ class EDD_Commission {
 		 * @param       string $status Paid status of a commission.
 		 * @param       int $ID Commission ID.
 		 */
-		return apply_filters( 'eddc_get_commission_status', $this->status, $this->ID );
+		return apply_filters( 'eddc_get_commission_status', $this->status, $this->id );
+	}
+
+	/**
+	 * Returns the commission rate type, accounting for a time for when we did not store the commission type on the record
+	 *
+	 * @since 3.4
+	 * @return string
+	 */
+	public function get_type() {
+		if ( empty( $this->type ) ) {
+			$this->type = eddc_get_commission_type( $this->download_id );
+		}
+
+		return $this->type;
 	}
 
 
@@ -563,10 +473,14 @@ class EDD_Commission {
 	 * @return      void
 	 */
 	public function set_status( $new_status = 'unpaid' ) {
-		do_action( 'eddc_pre_set_commission_status', $this->ID, $new_status, $this->status );
-		wp_set_object_terms( $this->ID, $new_status, 'edd_commission_status', false );
-		$this->status = $new_status;
-		do_action( 'eddc_set_commission_status', $this->ID, $new_status, $this->status );
+		do_action( 'eddc_pre_set_commission_status', $this->id, $new_status, $this->status );
+
+		// Only run the update_status method if someone isn't using the save methods
+		if ( empty( $this->pending['status'] ) ) {
+			$this->update_status( $new_status );
+		}
+
+		do_action( 'eddc_set_commission_status', $this->id, $new_status, $this->status );
 	}
 
 
@@ -604,39 +518,21 @@ class EDD_Commission {
 		 * @param       string $description Commission description.
 		 * @param       int $ID Commission ID.
 		 */
-		return apply_filters( 'eddc_commission_description', $this->description, $this->ID );
+		return apply_filters( 'eddc_commission_description', $this->description, $this->id );
 	}
-
 
 	/**
-	 * Set the 'post_title' to be the same as the description for a commission.
+	 * When the post_date is requested, return the 'date_crated' property as that's the replacement in 3.4
 	 *
-	 * @since       3.3
-	 * @access      private
-	 * @param       string $key Class property.
-	 * @param       string $value Value for the class property.
-	 * @return      void
+	 * @since 3.4
+	 * @deprected     The 'post_date' is deprecated since 3.4, when we moved to custom tables and post_date was no longer relevant.
+	 * @return string
 	 */
-	private function set_description( $key, $value ) {
-		$this->post_title  = $value;
-		$this->description = $value;
+	private function get_post_date() {
+		$backtrace = debug_backtrace();
+		_edd_deprected_argument( 'post_date', 'EDD_Commission::$post_date', 3.4, 'date_created', $backtrace );
+		return $this->date_created;
 	}
-
-
-	/**
-	 * Set the 'description' to be the same as the post_title for a commission.
-	 *
-	 * @since       3.3
-	 * @access      private
-	 * @param       string $key Class property.
-	 * @param       string $value Value for the class property.
-	 * @return      void
-	 */
-	private function set_post_title( $key, $value ) {
-		$this->post_title  = $value;
-		$this->description = $value;
-	}
-
 
 	/**
 	 * Check if a commission exists.
@@ -646,7 +542,7 @@ class EDD_Commission {
 	 * @return      bool Commission exists.
 	 */
 	public function exists() {
-		if ( $this->ID > 0 ) {
+		if ( $this->id > 0 ) {
 			return true;
 		}
 
@@ -662,6 +558,27 @@ class EDD_Commission {
 	 * @return      mixed bool|int false if data isn't passed and class not instantiated for creation, or post ID for the new commission.
 	 */
 	private function add() {
+
+		/**
+		 * Allow the arguments passed to `wp_insert_post` to be filtered.
+		 *
+		 * @since       3.3
+		 * @param       array $legacy_args {
+		 *     @type string $post_title    Post title.
+		 *     @type string $post_status   Post status.
+		 *     @type string $post_type     Post type
+		 *     @type string $post_date     Post date.
+		 *     @type string $post_date_gmt Post date in the GMT timezone.
+		 * }
+		 */
+		$legacy_args = apply_filters( 'eddc_insert_commission_args', array(
+			'post_title'    => $this->description,
+			'post_status'   => 'publish',
+			'post_type'     => 'edd_commission',
+			'post_date'     => ! empty( $this->date ) ? $this->date : null,
+			'post_date_gmt' => ! empty( $this->date ) ? get_gmt_from_date( $this->date ) : null
+		) );
+
 		/**
 		 * Allow the commission information to be filtered.
 		 *
@@ -669,7 +586,7 @@ class EDD_Commission {
 		 * @param       array $args {
 		 *     Filterable metadata.
 		 *
-		 *     @type int             $user_ID  User ID.
+		 *     @type int             $user_id  User ID.
 		 *     @type mixed int|float $rate     Commission rate.
 		 *     @type mixed int|float $amount   Commission amount.
 		 *     @type string          $currency Currency (e.g. USD).
@@ -678,41 +595,38 @@ class EDD_Commission {
 		 * @param       int $payment_ID Payment ID linked to the commission.
 		 * @param       int $download_ID Download ID linked to the commission.
 		 */
+		$payment         = new EDD_Payment( $this->payment_id );
 		$commission_info = apply_filters( 'edd_commission_info', array(
-			'user_id'  => $this->user_ID,
-			'rate'     => $this->rate,
-			'amount'   => $this->amount,
-			'currency' => $this->currency,
-		), $this->ID, $this->payment_ID, $this->download_ID );
+			'user_id'      => (int) $this->user_id,
+			'amount'       => (float) $this->amount,
+			'status'       => ! empty( $this->status ) ? $this->status : 'unpaid',
+			'download_id'  => absint( $this->download_id ),
+			'payment_id'   => absint( $this->payment_id ),
+			'cart_index'   => absint( $this->cart_index ),
+			'price_id'     => absint( $this->price_id ),
+			'date_created' => ! empty( $legacy_args['post_date'] ) ? $legacy_args['post_date'] : $payment->date,
+			'date_paid'    => ! empty( $this->date_paid ) ? $this->date_paid : '',
+			'rate'         => (float) $this->rate,
+			'type'         => ! empty( $this->type ) ? $this->type : eddc_get_commission_type( $this->download_id ),
+			'currency'     => $this->currency,
+		), $this->id, $this->payment_id, $this->download_id );
 
-		/**
-		 * Allow the arguments passed to `wp_insert_post` to be filtered.
-		 *
-		 * @since       3.3
-		 * @param       array $args {
-		 *     @type string $post_title    Post title.
-		 *     @type string $post_status   Post status.
-		 *     @type string $post_type     Post type
-		 *     @type string $post_date     Post date.
-		 *     @type string $post_date_gmt Post date in the GMT timezone.
-		 * }
-		 */
-		$args = apply_filters( 'eddc_insert_commission_args', array(
-			'post_title'    => $this->post_title,
-			'post_status'   => 'publish',
-			'post_type'     => 'edd_commission',
-			'post_date'     => ! empty( $this->date ) ? $this->date : null,
-			'post_date_gmt' => ! empty( $this->date ) ? get_gmt_from_date( $this->date ) : null
-		) );
-
-		// Create a blank edd_commission post
-		$commission_id = wp_insert_post( $args );
-
-		if ( ! empty( $commission_id ) ) {
-			$this->ID  = $commission_id;
+		if ( empty( $commission_info['date_created'] ) ) {
+			$commission_info['date_created'] = current_time( 'mysql' );
 		}
 
-		return $this->ID;
+		if ( empty( $commission_info['date_paid'] ) && 'paid' === $commission_info['status'] ) {
+			$commission_info['date_paid'] = current_time( 'mysql' );
+		}
+
+		$commission_id = edd_commissions()->commissions_db->insert( $commission_info, 'commission' );
+
+		if ( ! empty( $commission_id ) ) {
+			$this->id  = $commission_id;
+		}
+
+		return $this->id;
+
 	}
 
 
@@ -726,40 +640,61 @@ class EDD_Commission {
 	public function save() {
 		$saved = false;
 
-		if ( empty( $this->ID ) ) {
+		if ( empty( $this->id ) ) {
 			$commission_id = $this->add();
 
 			if ( false === $commission_id ) {
 				$saved = false;
 			} else {
-				$this->ID = $commission_id;
+				$this->id = $commission_id;
 			}
 		}
 
 		/**
 		 * Save all the object variables that have been updated to the database.
 		 */
+
+		$base_columns = edd_commissions()->commissions_db->get_column_labels();
+		$base_values  = array();
+
 		if ( ! empty( $this->pending ) ) {
+
 			foreach ( $this->pending as $key => $value ) {
-				if ( 'status' == $key ) {
-					$this->update_status( $value );
+
+				// If the property being updated is a core column, collect those in order to make one update call.
+				if ( in_array( $key, $base_columns ) ) {
+
+					$base_values[ $key ] = $value;
+					do_action( 'eddc_pre_set_commission_' . $key, $this->id, $value, $this->$key );
+
+				} else {
+					$this->update_meta( $key, $value );
 				}
 
-				$this->update_meta( $key, $value );
+			}
 
-				if ( 'description' == $key ) {
-					wp_update_post( array(
-						'ID'         => $this->ID,
-						'post_title' => $value
-					) );
+			// If there were updates to core columns, update those in a single update statement
+			if ( ! empty( $base_values ) ) {
+
+				$updated = edd_commissions()->commissions_db->update( $this->id, $base_values );
+
+				if ( $updated ) {
+					$updated_columns = array_keys( $base_values );
+					foreach ( $updated_columns as $column ) {
+
+						// Run an action for each of the updated columns.
+						do_action( 'eddc_set_commission_' . $column, $this->id, $this->pending[ $column ], $this->$column );
+
+					}
 				}
+
 			}
 
 			$saved = true;
 		}
 
 		if ( true == $saved ) {
-			$this->setup_commission( WP_Post::get_instance( $this->ID ) );
+			$this->setup_commission( edd_commissions()->commissions_db->get_by( 'id', $this->id ) );
 
 			/**
 			 * Fires after each meta update allowing developers to hook their own items saved in $pending.
@@ -768,16 +703,36 @@ class EDD_Commission {
 			 * @param       object EDD_Commission Instance of EDD_Commission object.
 			 * @param       string $key Meta key.
 			 */
-			do_action( 'eddc_commission_save', $this->ID, $this );
+			do_action( 'eddc_commission_save', $this->id, $this );
+
+			$this->pending = array();
 		}
 
 		/**
 		 * Update the commission in the object cache.
 		 */
-		$cache_key = md5( 'eddc_commission' . $this->ID );
+		$cache_key = md5( 'eddc_commission' . $this->id );
 		wp_cache_set( $cache_key, $this, 'commissions' );
 
 		return $saved;
+	}
+
+	/**
+	 * Delete this commission record
+	 *
+	 * @since 3.4
+	 * @return bool
+	 */
+	public function delete() {
+		$deleted = edd_commissions()->commissions_db->delete( $this->id );
+
+		if ( $deleted ) {
+			$cache_key = md5( 'eddc_commission' . $this->id );
+			wp_cache_delete( $cache_key );
+		}
+
+
+		return $deleted;
 	}
 
 
@@ -792,53 +747,48 @@ class EDD_Commission {
 	 * @return      int|bool Meta ID if the key didn't exist, true on successful update, false on failure.
 	 */
 	public function update_meta( $key = '', $value = '', $prev_value = '' ) {
+
 		if ( empty( $key ) || '' == $key ) {
 			return false;
 		}
 
-		$key = sanitize_key( $key );
+		$key   = sanitize_key( $key );
+		$value = apply_filters( 'eddc_update_commission_meta_' . $key, $value, $this->id );
 
-		$value = apply_filters( 'eddc_update_commission_meta_' . $key, $value, $this->ID );
+		// Backwards compatibility check in case someone tries to update one of the items in the old commission info meta key.
+		$commission_columns = edd_commissions()->commissions_db->get_column_labels();
+		if ( in_array( $key, $commission_columns ) ) {
+			switch( $key ) {
 
-		$commission_info = apply_filters( 'eddc_update_commission_valid_meta_keys', array( 'user_id', 'type', 'rate', 'amount', 'currency' ) );
-
-		// User ID is stored in two meta keys
-		if ( 'user_id' == $key ) {
-			update_post_meta( $this->ID, '_user_id', absint( $value ) );
-		}
-
-		if ( in_array( $key, $commission_info ) ) {
-			$commission_data = $this->get_meta( 'info' );
-			if ( empty( $commission_data ) ) {
-				$commission_data = array();
-			}
-			switch ( $key ) {
-				case 'rate' :
+				case 'rate':
 				case 'amount':
-					$commission_data[ $key ] = (float) $value;
+					$value = (float) $value;
 					break;
-				case 'user_id' :
-					$commission_data[ $key ] = absint( $value );
+
+				case 'user_id':
+					$value = absint( $value );
 					break;
+
 				default:
-					$commission_data[ $key ] = apply_filters( 'eddc_update_commission_sanitize_meta_' . $key, $value, $key, $this->ID );
+					$value = sanitize_text_field( $value );
 					break;
+
 			}
 
-			return update_post_meta( $this->ID, '_edd_commission_info', $commission_data, $prev_value );
+			return edd_commissions()->commissions_db->update( array( $key => $value ) );
 		}
 
-		if ( 'download_id' == $key ) {
-			return update_post_meta( $this->ID, '_' . $key, $value, $prev_value );
+		if ( '_' !== mb_substr( $key, 0, 1, 'utf-8') ) {
+			$key = '_edd_commission_' . $key;
 		}
 
-		$updated = update_post_meta( $this->ID, '_edd_commission_' . $key, $value, $prev_value );
+		$updated = edd_commissions()->commission_meta_db->update_meta( $this->id, $key, $value, $prev_value );
 
 		if ( true == $updated ) {
 			/**
 			 * Update the commission in the object cache.
 			 */
-			$cache_key = md5( 'eddc_commission' . $this->ID );
+			$cache_key = md5( 'eddc_commission' . $this->id );
 			wp_cache_set( $cache_key, $this, 'commissions' );
 		}
 
@@ -852,41 +802,33 @@ class EDD_Commission {
 	 * @since       3.3
 	 * @access      public
 	 * @param       string $new_status New status
-	 * @return      void
+	 * @return      bool
 	 */
 	public function update_status( $new_status = '' ) {
 		if ( empty( $new_status ) ) {
 			return false;
 		}
 
-		/**
-		 * Fires before the status of the commission is updated.
-		 *
-		 * @since       2.7
-		 * @param       int $ID Commission ID.
-		 * @param       string $new_status New status.
-		 * @param       string $status Commission status.
-		 */
-		do_action( 'eddc_pre_set_commission_status', $this->ID, $new_status, $this->status );
+		$this->pending['status'] = $new_status;
+		$this->save();
 
-		$updated = wp_set_object_terms( $this->ID, $new_status, 'edd_commission_status', false );
-
-		if ( is_wp_error( $updated ) ) {
+		if ( $this->status !== $new_status ) {
 			return false;
 		}
 
-		$this->status = $new_status;
-
-		/**
-		 * Fires after the status of the commission is updated.
-		 *
-		 * @since       2.7
-		 * @param       int $ID Commission ID.
-		 * @param       string $new_status New status.
-		 * @param       string $status Commission status.
-		 */
-		do_action( 'eddc_set_commission_status', $this->ID, $new_status, $this->status );
-
 		return true;
 	}
+
+	/**
+	 * Sanitize the key so it's lower-case
+	 *
+	 * @since 3.4
+	 * @param $key
+	 *
+	 * @return string
+	 */
+	private function sanitize_key( $key ) {
+		return strtolower( $key );
+	}
+
 }

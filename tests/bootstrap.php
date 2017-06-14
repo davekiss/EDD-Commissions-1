@@ -25,7 +25,7 @@ activate_plugin( 'easy-digital-downloads/easy-digital-downloads.php' );
 edd_run_install();
 
 echo "Installing Commissions...\n";
-activate_plugin( 'EDD-Commissions/edd-commissions.php' );
+edd_commissions_install();
 
 // Install Commissions
 global $current_user, $edd_options;
@@ -37,5 +37,6 @@ wp_update_user( array( 'ID' => 1, 'first_name' => 'Admin', 'last_name' => 'User'
 
 
 // Include helpers
+require_once 'helpers/class-edd-commissions-unittestcase.php';
 require_once 'helpers/class-helper-download.php';
 require_once 'helpers/class-helper-payment.php';

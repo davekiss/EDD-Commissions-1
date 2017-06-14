@@ -1,6 +1,6 @@
 <?php
 
-class Tests_EDD_Commissions_Class extends WP_UnitTestCase {
+class Tests_EDD_Commissions_Class extends EDD_Commissions_Unitestcase {
 	protected $object;
 
 	public static $_payment_id;
@@ -114,6 +114,14 @@ class Tests_EDD_Commissions_Class extends WP_UnitTestCase {
 
 	public function test_download_variation() {
 		$this->assertEmpty( self::$_commission->download_variation );
+	}
+
+	public function test_price_id() {
+		$this->assertEmpty( self::$_commission->price_id );
+	}
+
+	public function test_cart_index() {
+		$this->assertEquals( 0, self::$_commission->cart_index );
 	}
 
 	public function test_update_status_success() {
