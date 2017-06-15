@@ -283,7 +283,7 @@ function eddc_get_recipient_rate( $download_id = 0, $user_id = 0 ) {
 	// Check for a rate specified on a specific product
 	if ( ! empty( $download_id ) ) {
 		$settings   = get_post_meta( $download_id, '_edd_commission_settings', true );
-		$rates      = ! empty( $settings['amount'] ) ? array_map( 'trim', explode( ',', $settings['amount'] ) ) : array();
+		$rates      = isset( $settings['amount'] ) ? array_map( 'trim', explode( ',', $settings['amount'] ) ) : array();
 		$recipients = array_map( 'trim', explode( ',', $settings['user_id'] ) );
 		$rate_key   = array_search( $user_id, $recipients );
 
