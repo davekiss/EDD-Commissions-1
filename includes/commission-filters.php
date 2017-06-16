@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 	global $wpdb;
 
-	$meta_keys = array( '_edd_commission_info', '_edd_commission_payment_id', '_download_id' );
+	$meta_keys = apply_filters( 'eddc_post_meta_backwards_compat_keys', array( '_edd_commission_info', '_edd_commission_payment_id', '_download_id', '_edd_all_access_info' ) );
 
 	if ( ! in_array( $meta_key, $meta_keys ) ) {
 		return $value;
