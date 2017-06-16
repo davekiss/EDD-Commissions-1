@@ -44,7 +44,7 @@ class EDD_C_List_Table extends WP_List_Table {
 	 *
 	 * @var null
 	 */
-	public $term_counts = null;
+	public $status_counts = null;
 
 
 	/**
@@ -74,21 +74,19 @@ class EDD_C_List_Table extends WP_List_Table {
 	function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 			case 'rate':
-				$download        = get_post_meta( $item['ID'], '_download_id', true );
-				$commission_info = get_post_meta( $item['ID'], '_edd_commission_info', true );
-				$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download ) );
+				$type = empty( $item[ 'type' ] ) ? $item[ 'type' ] : eddc_get_commission_type( $item['download'] );
 				return eddc_format_rate( $item[ $column_name ], $type );
 			case 'status':
 				return $item[ $column_name ];
 			case 'amount':
 				return edd_currency_filter( edd_format_amount( $item[ $column_name ] ) );
 			case 'date':
-				return date_i18n( get_option( 'date_format' ), strtotime( get_post_field( 'post_date', $item['ID'] ) ) );
+				return date_i18n( get_option( 'date_format' ), strtotime( $item['date'] ) );
 			case 'download':
 				$download = ! empty( $item['download'] ) ? $item['download'] : false;
 				return $download ? '<a href="' . esc_url( add_query_arg( 'download', $download ) ) . '" title="' . __( 'View all commissions for this item', 'eddc' ) . '">' . get_the_title( $download ) . '</a>' . (!empty($item['variation']) ? ' - ' . $item['variation'] : '') : '';
 			case 'payment':
-				$payment = get_post_meta( $item['ID'], '_edd_commission_payment_id', true );
+				$payment = $item[ $column_name ];
 				return $payment ? '<a href="' . esc_url( admin_url( 'edit.php?post_type=download&page=edd-payment-history&view=view-order-details&id=' . $payment ) ) . '" title="' . __( 'View payment details', 'eddc' ) . '">#' . $payment . '</a> - ' . edd_get_payment_status( get_post( $payment ), true  ) : '';
 			case 'actions':
 				echo '<a href="' . add_query_arg( array( 'view' => 'overview', 'commission' => $item['ID'] ) ) . '">' . __( 'View', 'eddc' ) . '</a>';
@@ -254,6 +252,10 @@ class EDD_C_List_Table extends WP_List_Table {
 		return ! empty( $user_id ) ? absint( $user_id ) : false;
 	}
 
+	private function get_status() {
+		return isset( $_GET['view'] ) ? strtolower( $_GET['view'] ) : '';
+	}
+
 
 	/**
 	 * Retrieves the ID of the download we're filtering commissions by
@@ -377,9 +379,11 @@ class EDD_C_List_Table extends WP_List_Table {
 		}
 
 		foreach ( $ids as $id ) {
+
 			// Detect when a bulk action is being triggered...
 			if ( 'delete' === $this->current_action() ) {
-				wp_delete_post( $id );
+				$commission = new EDD_Commission( $id );
+				$commission->delete();
 			}
 
 			if ( 'mark_as_paid' === $this->current_action() ) {
@@ -410,57 +414,55 @@ class EDD_C_List_Table extends WP_List_Table {
 	function commissions_data() {
 		$commissions_data = array();
 
-		$paged = $this->get_paged();
-		$user  = $this->get_filtered_user();
+		$paged      = $this->get_paged();
+		$user       = $this->get_filtered_user();
+		$status     = $this->get_status();
+		$download   = $this->get_filtered_download();
+		$payment_id = $this->get_filtered_payment();
+		$offset     = ( $this->per_page * ( $paged - 1 ) );
 
 		$commission_args = array(
-			'post_type'      => 'edd_commission',
-			'post_status'    => 'publish',
-			'posts_per_page' => $this->per_page,
-			'paged'          => $paged,
+			'status'  => $status,
+			'number'  => $this->per_page,
+			'offset'  => $offset,
+			'orderby' => 'date_created',
+			'order'   => 'DESC',
 		);
 
-		$meta_query = $this->get_meta_query();
-
-		if ( ! empty( $meta_query ) ) {
-			$commission_args['meta_query'] = $meta_query;
+		if ( ! empty( $user ) ) {
+			$commission_args[ 'user_id' ] = $user;
 		}
 
-		$tax_query = $this->get_tax_query();
-
-		if ( ! empty( $tax_query ) ) {
-			$commission_args['tax_query'] = $tax_query;
+		if ( ! empty( $download ) ) {
+			$commission_args[ 'download_id' ] = $download;
 		}
 
-		$commissions = new WP_Query( $commission_args );
+		if ( ! empty( $payment_id ) ) {
+			$commission_args[ 'payment_id' ] = $payment_id;
+		}
 
-		if ( $commissions->have_posts() ) :
-			while ( $commissions->have_posts() ) : $commissions->the_post();
-				$commission_id   = get_the_ID();
-				$commission_info = get_post_meta( $commission_id, '_edd_commission_info', true );
-				$download_id     = get_post_meta( $commission_id, '_download_id', true );
+		$commissions = edd_commissions()->commissions_db->get_commissions( $commission_args );
 
-				$variation           = '';
-				$has_variable_prices = edd_has_variable_prices( $download_id );
-
-				if ( $has_variable_prices ) {
-					$variation = get_post_meta( $commission_id, '_edd_commission_download_variation', true );
-				}
+		if ( $commissions ) {
+			foreach ( $commissions as $commission ) {
 
 				$commissions_data[] = array(
-					'ID'        => $commission_id,
-					'title'     => get_the_title( $commission_id ),
-					'amount'    => $commission_info['amount'],
-					'rate'      => $commission_info['rate'],
-					'user'      => $commission_info['user_id'],
-					'download'  => $download_id,
-					'variation' => $variation,
-					'status'    => eddc_get_commission_status( $commission_id ),
+					'ID'        => $commission->id,
+					'title'     => $commission->description,
+					'amount'    => $commission->amount,
+					'rate'      => $commission->rate,
+					'user'      => $commission->user_id,
+					'download'  => $commission->download_id,
+					'variation' => $commission->download_variation,
+					'status'    => $commission->status,
+					'payment'   => $commission->payment_id,
+					'date'      => $commission->date_created,
+					'type'      => $commission->type,
 				);
 
-			endwhile;
-			wp_reset_postdata();
-		endif;
+			}
+		}
+
 		return $commissions_data;
 	}
 
@@ -472,52 +474,42 @@ class EDD_C_List_Table extends WP_List_Table {
 	 * @return      array
 	 */
 	function get_commission_status_counts() {
-		if ( ! is_null( $this->term_counts ) ) {
-			return $this->term_counts;
+		if ( ! is_null( $this->status_counts ) ) {
+			return $this->status_counts;
 		}
 
-		$term_counts = array(
-			'paid'    => 0,
-			'unpaid'  => 0,
-			'revoked' => 0,
-			'all'     => 0,
+		$user       = $this->get_filtered_user();
+		$download   = $this->get_filtered_download();
+		$payment_id = $this->get_filtered_payment();
+
+		$base_args = array();
+		if ( ! empty( $user ) ) {
+			$base_args['user_id'] = $user;
+		}
+
+		if ( ! empty( $download ) ) {
+			$base_args['download_id'] = $download;
+		}
+
+		if ( ! empty( $payment_id ) ) {
+			$base_args['payment_id'] = $payment_id;
+		}
+
+		$paid    = edd_commissions()->commissions_db->count( array_merge( $base_args, array( 'status' => 'paid' ) ) );
+		$unpaid  = edd_commissions()->commissions_db->count( array_merge( $base_args, array( 'status' => 'unpaid' ) ) );
+		$revoked = edd_commissions()->commissions_db->count( array_merge( $base_args, array( 'status' => 'revoked' ) ) );
+
+		$status_counts = array(
+			'paid'    => $paid,
+			'unpaid'  => $unpaid,
+			'revoked' => $revoked,
 		);
 
-		$user = $this->get_filtered_user();
-		if ( ! empty( $user ) ) {
-			$args = array(
-				'number'  => -1,
-				'user_id' => $this->get_filtered_user(),
-			);
+		$status_counts['all'] = $status_counts['paid'] + $status_counts['unpaid'] + $status_counts['revoked'];
 
-			$paid    = eddc_get_paid_commissions( $args );
-			$unpaid  = eddc_get_unpaid_commissions( $args );
-			$revoked = eddc_get_revoked_commissions( $args );
+		$this->status_counts = $status_counts;
 
-			$term_counts = array(
-				'paid'    => ! empty( $paid )    ? count( $paid )    : 0,
-				'unpaid'  => ! empty( $unpaid )  ? count( $unpaid )  : 0,
-				'revoked' => ! empty( $revoked ) ? count( $revoked ) : 0,
-			);
-
-			$term_counts['all'] = $term_counts['paid'] + $term_counts['unpaid'] + $term_counts['revoked'];
-		} else {
-			$found_terms      = get_terms( 'edd_commission_status' );
-			$total_term_count = 0;
-
-			foreach ( $found_terms as $term ) {
-				if ( array_key_exists( $term->slug, $term_counts ) ) {
-					$term_counts[ $term->slug ] = $term->count;
-					$total_term_count += $term->count;
-				}
-			}
-
-			$term_counts['all'] = $total_term_count;
-		}
-
-		$this->term_counts = $term_counts;
-
-		return $this->term_counts;
+		return $this->status_counts;
 	}
 
 

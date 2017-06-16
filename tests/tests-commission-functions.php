@@ -1,6 +1,6 @@
 <?php
 
-class Tests_EDD_Commissions_Functions extends WP_UnitTestCase {
+class Tests_EDD_Commissions_Functions extends EDD_Commissions_Unitestcase {
 	protected $object;
 
 	protected static $_payment_id;

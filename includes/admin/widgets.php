@@ -49,14 +49,9 @@ function eddc_dashboard_commissions_widget() {
 
 	$unpaid_commissions = eddc_get_unpaid_commissions( array( 'user_id' => $user_ID, 'number' => $per_page, 'paged' => $unpaid_paged ) );
 	$paid_commissions   = eddc_get_paid_commissions( array( 'user_id' => $user_ID, 'number' => $per_page, 'paged' => $paid_paged ) );
-
 	$total_unpaid       = eddc_count_user_commissions( $user_ID, 'unpaid' );
 	$total_paid         = eddc_count_user_commissions( $user_ID, 'paid' );
-
-	$unpaid_offset      = $per_page * ( $unpaid_paged - 1 );
 	$unpaid_total_pages = ceil( $total_unpaid / $per_page );
-
-	$paid_offset        = $per_page * ( $paid_paged - 1 );
 	$paid_total_pages   = ceil( $total_paid / $per_page );
 
 	$stats              = '';
@@ -83,23 +78,18 @@ function eddc_dashboard_commissions_widget() {
 							<?php foreach( $unpaid_commissions as $commission ) : ?>
 								<tr class="edd_user_commission_row">
 									<?php
-									$download_id     = get_post_meta( $commission->ID, '_download_id', true ) ;
-									$item_name       = get_the_title( $download_id );
-									$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
-									$amount          = $commission_info['amount'];
-									$rate            = $commission_info['rate'];
-									$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download_id ) );
-									$total          += $amount;
+									$total          += $commission->amount;
+									$download        = new EDD_Download( $commission->download_id );
 									?>
-									<td class="edd_commission_item"><?php echo esc_html( $item_name ); ?></td>
+									<td class="edd_commission_item"><?php echo esc_html( $download->get_name() ); ?></td>
 									<td class="edd_commission_amount">
-										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $amount ) ) ); ?>
-										<?php if ( eddc_commission_is_renewal( $commission->ID ) ) : ?>
+										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $commission->amount ) ) ); ?>
+										<?php if ( $commission->get_meta( 'is_renewal' ) ) : ?>
 											&nbsp;&olarr;
 										<?php endif; ?>
 									</td>
-									<td class="edd_commission_rate"><?php echo eddc_format_rate( $rate, $type ); ?></td>
-									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->post_date ) ); ?></td>
+									<td class="edd_commission_rate"><?php echo eddc_format_rate( $commission->rate, $commission->type ); ?></td>
+									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->date_created ) ); ?></td>
 								</tr>
 							<?php endforeach; ?>
 						<?php else : ?>
@@ -144,21 +134,18 @@ function eddc_dashboard_commissions_widget() {
 							<?php foreach ( $paid_commissions as $commission ) : ?>
 								<tr class="edd_user_commission_row">
 									<?php
-									$item_name       = get_the_title( get_post_meta( $commission->ID, '_download_id', true ) );
-									$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
-									$amount          = $commission_info['amount'];
-									$rate            = $commission_info['rate'];
-									$total          += $amount;
+									$total          += $commission->amount;
+									$download        = new EDD_Download( $commission->download_id );
 									?>
-									<td class="edd_commission_item"><?php echo esc_html( $item_name ); ?></td>
+									<td class="edd_commission_item"><?php echo esc_html( $download->get_name() ); ?></td>
 									<td class="edd_commission_amount">
-										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $amount ) ) ); ?>
-										<?php if ( eddc_commission_is_renewal( $commission->ID ) ) : ?>
-											&nbsp;&olarr;
+										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $commission->amount ) ) ); ?>
+										<?php if ( $commission->get_meta( 'is_renewal' ) ) : ?>
+											&nbsp&olarr;
 										<?php endif; ?>
 									</td>
-									<td class="edd_commission_rate"><?php echo eddc_format_rate( $rate, $type ); ?></td>
-									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->post_date ) ); ?></td>
+									<td class="edd_commission_rate"><?php echo eddc_format_rate( $commission->rate, $commission->type ); ?></td>
+									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->date_created ) ); ?></td>
 								</tr>
 							<?php endforeach; ?>
 						<?php else : ?>

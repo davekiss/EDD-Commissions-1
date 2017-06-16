@@ -232,13 +232,8 @@ function eddc_user_commissions( $user_id = 0 ) {
 	$total_paid          = eddc_count_user_commissions( $user_id, 'paid' );
 	$total_revoked       = eddc_count_user_commissions( $user_id, 'revoked' );
 
-	$unpaid_offset       = $per_page * ( $unpaid_paged - 1 );
 	$unpaid_total_pages  = ceil( $total_unpaid / $per_page );
-
-	$paid_offset         = $per_page * ( $paid_paged - 1 );
 	$paid_total_pages    = ceil( $total_paid / $per_page );
-
-	$revoked_offset      = $per_page * ( $revoked_paged - 1 );
 	$revoked_total_pages = ceil( $total_revoked / $per_page );
 
 	$page_prefix         = false !== strpos( edd_get_current_page_url(), '?' ) ? '&' : '?';
@@ -263,28 +258,26 @@ function eddc_user_commissions( $user_id = 0 ) {
 							</tr>
 						</thead>
 						<tbody>
-						<?php $total = (float) 0; ?>
+						<?php $requested_downloads = array(); ?>
 						<?php if ( ! empty( $unpaid_commissions ) ) : ?>
 							<?php foreach ( $unpaid_commissions as $commission ) : ?>
 								<tr class="edd_user_commission_row">
 									<?php
+									if ( empty( $requested_downloads[ $commission->download_id ] ) ) {
+										$requested_downloads[ $commission->download_id ] = new EDD_Download( $commission->download_id );
+									}
+									$download = $requested_downloads[ $commission->download_id ];
 									do_action( 'eddc_user_commissions_unpaid_row_begin', $commission );
-									$download_id     = get_post_meta( $commission->ID, '_download_id', true ) ;
-									$item_name       = get_the_title( $download_id );
-									$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
-									$amount          = $commission_info['amount'];
-									$rate            = $commission_info['rate'];
-									$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download_id ) );
 									?>
-									<td class="edd_commission_item"><?php echo esc_html( $item_name ); ?></td>
+									<td class="edd_commission_item"><?php echo esc_html( $download->get_name() ); ?></td>
 									<td class="edd_commission_amount">
-										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $amount ) ) ); ?>
-										<?php if ( eddc_commission_is_renewal( $commission->ID ) ) : ?>
+										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $commission->amount ) ) ); ?>
+										<?php if ( $commission->get_meta( 'is_renewal' ) ) : ?>
 											&nbsp;&olarr;
 										<?php endif; ?>
 									</td>
-									<td class="edd_commission_rate"><?php echo eddc_format_rate( $rate, $type ); ?></td>
-									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->post_date ) ); ?></td>
+									<td class="edd_commission_rate"><?php echo eddc_format_rate( $commission->rate, $commission->type ); ?></td>
+									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->date_created ) ); ?></td>
 									<?php do_action( 'eddc_user_commissions_unpaid_row_end', $commission ); ?>
 								</tr>
 							<?php endforeach; ?>
@@ -333,23 +326,21 @@ function eddc_user_commissions( $user_id = 0 ) {
 							<?php foreach( $paid_commissions as $commission ) : ?>
 								<tr class="edd_user_commission_row">
 									<?php
+									if ( empty( $requested_downloads[ $commission->download_id ] ) ) {
+										$requested_downloads[ $commission->download_id ] = new EDD_Download( $commission->download_id );
+									}
+									$download = $requested_downloads[ $commission->download_id ];
 									do_action( 'eddc_user_commissions_paid_row_begin', $commission );
-									$download_id     = get_post_meta( $commission->ID, '_download_id', true ) ;
-									$item_name       = get_the_title( $download_id );
-									$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
-									$amount          = $commission_info['amount'];
-									$rate            = $commission_info['rate'];
-									$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download_id ) );
 									?>
-									<td class="edd_commission_item"><?php echo esc_html( $item_name ); ?></td>
+									<td class="edd_commission_item"><?php echo esc_html( $download->get_name() ); ?></td>
 									<td class="edd_commission_amount">
-										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $amount ) ) ); ?>
-										<?php if ( eddc_commission_is_renewal( $commission->ID ) ) : ?>
+										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $commission->amount ) ) ); ?>
+										<?php if ( eddc_commission_is_renewal( $commission->id ) ) : ?>
 											&nbsp;&olarr;
 										<?php endif; ?>
 									</td>
-									<td class="edd_commission_rate"><?php echo eddc_format_rate( $rate, $type ); ?></td>
-									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->post_date ) ); ?></td>
+									<td class="edd_commission_rate"><?php echo eddc_format_rate( $commission->rate, $commission->type ); ?></td>
+									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->date_created ) ); ?></td>
 									<?php do_action( 'eddc_user_commissions_paid_row_end', $commission ); ?>
 								</tr>
 							<?php endforeach; ?>
@@ -398,23 +389,21 @@ function eddc_user_commissions( $user_id = 0 ) {
 							<?php foreach( $revoked_commissions as $commission ) : ?>
 								<tr class="edd_user_commission_row">
 									<?php
+									if ( empty( $requested_downloads[ $commission->download_id ] ) ) {
+										$requested_downloads[ $commission->download_id ] = new EDD_Download( $commission->download_id );
+									}
+									$download = $requested_downloads[ $commission->download_id ];
 									do_action( 'eddc_user_commissions_revoked_row_begin', $commission );
-									$download_id     = get_post_meta( $commission->ID, '_download_id', true ) ;
-									$item_name       = get_the_title( $download_id );
-									$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
-									$amount          = $commission_info['amount'];
-									$rate            = $commission_info['rate'];
-									$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download_id ) );
 									?>
-									<td class="edd_commission_item"><?php echo esc_html( $item_name ); ?></td>
+									<td class="edd_commission_item"><?php echo esc_html( $download->get_name() ); ?></td>
 									<td class="edd_commission_amount">
-										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $amount ) ) ); ?>
-										<?php if ( eddc_commission_is_renewal( $commission->ID ) ) : ?>
+										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $commission->amount ) ) ); ?>
+										<?php if ( $commission->get_meta( 'is_renewal' ) ) : ?>
 											&nbsp;&olarr;
 										<?php endif; ?>
 									</td>
-									<td class="edd_commission_rate"><?php echo eddc_format_rate( $rate, $type ); ?></td>
-									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->post_date ) ); ?></td>
+									<td class="edd_commission_rate"><?php echo eddc_format_rate( $commission->rate, $commission->type ); ?></td>
+									<td class="edd_commission_date"><?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->date_created ) ); ?></td>
 									<?php do_action( 'eddc_user_commissions_revoked_row_end', $commission ); ?>
 								</tr>
 							<?php endforeach; ?>
@@ -454,7 +443,7 @@ function eddc_user_commissions( $user_id = 0 ) {
 					);
 
 					$first_commission = eddc_get_paid_commissions( $args );
-					$first_year       = date( 'Y', strtotime( $first_commission[0]->post_date ) );
+					$first_year       = date( 'Y', strtotime( $first_commission[0]->date_created ) );
 					$years_back       = date( 'Y', current_time( 'timestamp' ) ) - $first_year;
 					$url              = is_admin() ? admin_url( 'index.php' ) : home_url();
 					?>
@@ -575,15 +564,13 @@ function eddc_user_commissions_graph( $user_id = 0 ) {
 			$grouped_data = array();
 			if ( ! empty( $commissions ) ) {
 				foreach ( $commissions as $commission ) {
-					$key             = date( 'njY', strtotime( $commission->post_date ) );
-					$commission_meta = get_post_meta( $commission->ID, '_edd_commission_info', true );
-
+					$key = date( 'njY', strtotime( $commission->date_created ) );
 					if ( ! isset( $grouped_data[ $key ] ) ) {
 						$grouped_data[ $key ] = array();
-						$grouped_data[ $key ]['earnings'] = (float) $commission_meta['amount'];
+						$grouped_data[ $key ]['earnings'] = $commission->amount;
 						$grouped_data[ $key ]['sales']    = 1;
 					} else {
-						$grouped_data[ $key ]['earnings'] += (float) $commission_meta['amount'];
+						$grouped_data[ $key ]['earnings'] += (float) $commission->amount;
 						$grouped_data[ $key ]['sales']++;
 					}
 				}

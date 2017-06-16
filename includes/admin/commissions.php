@@ -199,7 +199,7 @@ function eddc_render_add_commission_view() {
 					<form id="add-item-info" method="post" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions' ); ?>">
 						<div class="item-info">
 							<table class="widefat striped">
-								<?php do_action( 'eddc_commission_edit_fields_top', $commission_id ); ?>
+								<?php do_action( 'eddc_commission_new_fields_top' ); ?>
 								<tr id="eddc-add-user-id-row">
 									<td class="row-title">
 										<label for="user_id"><?php _e('User ID', 'eddc'); ?></label>
@@ -256,7 +256,7 @@ function eddc_render_add_commission_view() {
 										<p class="description"><?php _e('The total amount of this commission.', 'eddc'); ?></p>
 									</td>
 								</tr>
-								<?php do_action( 'eddc_commission_edit_fields_bottom', $commission_id ); ?>
+								<?php do_action( 'eddc_commission_new_fields_bottom' ); ?>
 							</table>
 						</div>
 						<div id="item-edit-actions" class="edit-item" style="float: right; margin: 10px 0 0; display: block;">
@@ -295,7 +295,7 @@ function eddc_render_commission_view( $view, $callbacks ) {
 	}
 
 	$commission_id   = (int) $_GET['commission'];
-	$commission      = get_post( $commission_id );
+	$commission      = new EDD_Commission( $commission_id );
 	$commission_tabs = eddc_commission_tabs();
 	?>
 	<div class="wrap">
@@ -366,35 +366,13 @@ function eddc_commissions_view( $commission ) {
 		return;
 	}
 
-	$base            = admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission->ID );
+	$base            = admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission->id );
 	$base            = wp_nonce_url( $base, 'eddc_commission_nonce' );
-	$commission_id   = $commission->ID;
-	$commission_info = get_post_meta( $commission_id, '_edd_commission_info', true );
-	$user_data       = get_userdata( $commission_info['user_id'] );
-	$payment         = get_post_meta( $commission_id, '_edd_commission_payment_id', true );
-	$download        = get_post_meta( $commission_id, '_download_id', true );
-	$type            = ( array_key_exists( 'type', $commission_info ) ? $commission_info['type'] : eddc_get_commission_type( $download ) );
-	$status          = eddc_get_commission_status( $commission_id );
 
-	$child_args      = array(
-		'post_type'      => 'edd_commission',
-		'post_status'    => array( 'publish', 'future' ),
-		'posts_per_page' => -1,
-		'post_parent'    => $commission_id
-	);
-
-	$has_variable_prices = edd_has_variable_prices( $download );
-	$variation           = false;
-	if ( $has_variable_prices ) {
-		$variation = get_post_meta( $commission_id, '_edd_commission_download_variation', true );
-	}
-
-	$rate = eddc_format_rate( $commission_info['rate'], $type );
-
-	do_action( 'eddc_commission_card_top', $commission_id );
+	do_action( 'eddc_commission_card_top', $commission->id );
 	?>
 	<div class="info-wrapper item-section">
-		<form id="edit-item-info" method="post" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission_id ); ?>">
+		<form id="edit-item-info" method="post" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission->id ); ?>">
 			<div class="item-info">
 				<table class="widefat striped">
 					<tbody>
@@ -403,7 +381,7 @@ function eddc_commissions_view( $commission ) {
 								<label for="tablecell"><?php _e( 'Commission ID', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
-								<?php echo $commission_id; ?>
+								<?php echo $commission->id; ?>
 							</td>
 						</tr>
 						<tr>
@@ -411,7 +389,7 @@ function eddc_commissions_view( $commission ) {
 								<label for="tablecell"><?php _e( 'Payment', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
-								<?php echo $payment ? '<a href="' . esc_url( admin_url( 'edit.php?post_type=download&page=edd-payment-history&view=view-order-details&id=' . $payment ) ) . '" title="' . __( 'View payment details', 'eddc' ) . '">#' . $payment . '</a> - ' . edd_get_payment_status( get_post( $payment ), true  ) : ''; ?>
+								<?php echo $commission->payment_id ? '<a href="' . esc_url( admin_url( 'edit.php?post_type=download&page=edd-payment-history&view=view-order-details&id=' . $commission->payment_id ) ) . '" title="' . __( 'View payment details', 'eddc' ) . '">#' . $commission->payment_id . '</a> - ' . edd_get_payment_status( get_post( $commission->payment_id ), true  ) : ''; ?>
 							</td>
 						</tr>
 						<tr>
@@ -419,7 +397,7 @@ function eddc_commissions_view( $commission ) {
 								<label for="tablecell"><?php _e( 'Status', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
-								<?php echo ucfirst( $status ); ?>
+								<?php echo ucfirst( $commission->status ); ?>
 							</td>
 						</tr>
 						<tr>
@@ -427,7 +405,7 @@ function eddc_commissions_view( $commission ) {
 								<label for="tablecell"><?php _e( 'Create Date', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
-								<?php echo date_i18n( get_option( 'date_format' ), strtotime( get_post_field( 'post_date', $commission_id ) ) ); ?>
+								<?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->date_created ) ); ?>
 							</td>
 						</tr>
 						<tr>
@@ -436,13 +414,14 @@ function eddc_commissions_view( $commission ) {
 							</td>
 							<td style="word-wrap: break-word">
 								<?php
+								$user_data = get_userdata( $commission->user_id );
 								if ( false !== $user_data ) {
-									echo '<a href="' . esc_url( add_query_arg( 'user', $user_data->ID ) ) . '" title="' . __( 'View all commissions for this user', 'eddc' ) . '"">' . $user_data->display_name . '</a>&nbsp;(' . __( 'ID:', 'eddc' ) . ' ' . $commission_info['user_id'] . ')';
+									echo '<a href="' . esc_url( add_query_arg( 'user', $user_data->ID ) ) . '" title="' . __( 'View all commissions for this user', 'eddc' ) . '"">' . $user_data->display_name . '</a>&nbsp;(' . __( 'ID:', 'eddc' ) . ' ' . $commission->user_id . ')';
 								} else {
 									echo '<em>' . __( 'Invalid User', 'eddc' ) . '</em>';
 								}
 								?>
-								<?php echo EDD()->html->user_dropdown( array( 'class' => 'eddc-commission-user', 'id' => 'eddc_user', 'name' => 'eddc_user', 'selected' => esc_attr( $commission_info['user_id'] ) ) ); ?>
+								<?php echo EDD()->html->user_dropdown( array( 'class' => 'eddc-commission-user', 'id' => 'eddc_user', 'name' => 'eddc_user', 'selected' => esc_attr( $commission->user_id ) ) ); ?>
 							</td>
 						</tr>
 						<tr>
@@ -451,8 +430,12 @@ function eddc_commissions_view( $commission ) {
 							</td>
 							<td style="word-wrap: break-word">
 								<?php
-								$selected = ! empty( $download ) ? $download . ( ! empty( $variation ) ? '_' . $variation : '' ) : '';
-								echo ! empty( $download ) ? '<a href="' . esc_url( add_query_arg( 'download', $download ) ) . '" title="' . __( 'View all commissions for this item', 'eddc' ) . '">' . get_the_title( $download ) . '</a>' . ( ! empty( $variation ) ? ' - ' . $variation : '') : '';
+								$selected = ! empty( $commission->download_id ) ? $commission->download_id . ( ! empty( $commission->variation ) ? '_' . $commission->price_id : '' ) : '';
+								if ( ! empty( $commission->download_id ) ) {
+									$download = new EDD_Download( $commission->download_id );
+									echo '<a href="' . esc_url( add_query_arg( 'download', $commission->download_id ) ) . '" title="' . __( 'View all commissions for this item', 'eddc' ) . '">' . $download->get_name() . '</a>';
+									echo ( ! empty( $commission->variation ) ) ? ' - ' . $commission->variation : '';
+								}
 								echo EDD()->html->product_dropdown( array( 'class' => 'eddc-commission-download', 'id' => 'eddc_download', 'name' => 'eddc_download', 'chosen' => true, 'variations' => true, 'selected' => $selected ) );
 								?>
 							</td>
@@ -462,8 +445,8 @@ function eddc_commissions_view( $commission ) {
 								<label for="tablecell"><?php _e( 'Rate', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
-								<?php echo $rate; ?>
-								<input type="text" name="eddc_rate" class="hidden eddc-commission-rate" value="<?php echo esc_attr( $commission_info['rate'] ); ?>" />
+								<?php echo eddc_format_rate( $commission->rate, $commission->type ); ?>
+								<input type="text" name="eddc_rate" class="hidden eddc-commission-rate" value="<?php echo esc_attr( $commission->rate ); ?>" />
 							</td>
 						</tr>
 						<tr>
@@ -471,8 +454,8 @@ function eddc_commissions_view( $commission ) {
 								<label for="tablecell"><?php _e( 'Amount', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
-								<?php echo edd_currency_filter( edd_format_amount( $commission_info['amount'] ) ); ?>
-								<input type="text" name="eddc_amount" class="hidden eddc-commission-amount" value="<?php echo edd_format_amount( $commission_info['amount'] ); ?>" />
+								<?php echo edd_currency_filter( edd_format_amount( $commission->amount ) ); ?>
+								<input type="text" name="eddc_amount" class="hidden eddc-commission-amount" value="<?php echo edd_format_amount( $commission->amount ); ?>" />
 							</td>
 						</tr>
 						<tr>
@@ -480,7 +463,7 @@ function eddc_commissions_view( $commission ) {
 								<label for="tablecell"><?php _e( 'Currency', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
-								<?php echo $commission_info['currency']; ?>
+								<?php echo $commission->currency; ?>
 							</td>
 						<tr>
 							<td class="row-title">
@@ -491,19 +474,19 @@ function eddc_commissions_view( $commission ) {
 								$actions = array(
 									'edit' => '<a href="#" class="eddc-edit-commission">' . __( 'Edit Commission', 'eddc' ) . '</a>'
 								);
-								$base    = admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission_id );
+								$base    = admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission->id );
 								$base    = wp_nonce_url( $base, 'eddc_commission_nonce' );
 
-								if ( $status == 'revoked' ) {
+								if ( $commission->status == 'revoked' ) {
 									$actions['mark_as_accepted'] = sprintf( '<a href="%s&action=%s">' . __( 'Accept', 'eddc' ) . '</a>', $base, 'mark_as_accepted' );
-								} elseif ( $status == 'paid' ) {
+								} elseif ( $commission->status == 'paid' ) {
 									$actions['mark_as_unpaid'] = sprintf( '<a href="%s&action=%s">' . __( 'Mark as Unpaid', 'eddc' ) . '</a>', $base, 'mark_as_unpaid' );
 								} else {
 									$actions['mark_as_paid'] = sprintf( '<a href="%s&action=%s">' . __( 'Mark as Paid', 'eddc' ) . '</a>', $base, 'mark_as_paid' );
 									$actions['mark_as_revoked'] = sprintf( '<a href="%s&action=%s">' . __( 'Revoke', 'eddc' ) . '</a>', $base, 'mark_as_revoked' );
 								}
 
-								$actions = apply_filters( 'eddc_commission_details_actions', $actions, $commission_id );
+								$actions = apply_filters( 'eddc_commission_details_actions', $actions, $commission->id );
 
 								if ( ! empty( $actions ) ) {
 									$count = count( $actions );
@@ -529,14 +512,14 @@ function eddc_commissions_view( $commission ) {
 			<div id="item-edit-actions" class="edit-item" style="float: right; margin: 10px 0 0; display: block;">
 				<?php wp_nonce_field( 'eddc_update_commission', 'eddc_update_commission_nonce' ); ?>
 				<input type="submit" name="eddc_update_commission" id="eddc_update_commission" class="button button-primary" value="<?php _e( 'Update Commission', 'eddc' ); ?>" />
-				<input type="hidden" name="commission_id" value="<?php echo absint( $commission_id ); ?>" />
+				<input type="hidden" name="commission_id" value="<?php echo absint( $commission->id ); ?>" />
 			</div>
 			<div class="clear"></div>
 		</form>
 	</div>
 
 	<?php
-	do_action( 'eddc_commission_card_bottom', $commission_id );
+	do_action( 'eddc_commission_card_bottom', $commission->id );
 }
 
 
@@ -552,17 +535,15 @@ function eddc_commissions_delete_view( $commission ) {
 		echo '<div class="info-wrapper item-section">' . __( 'Invalid commission specified.', 'eddc' ) . '</div>';
 		return;
 	}
-
-	$commission_id = $commission->ID;
 	?>
 
 	<div class="eddc-commission-delete-header">
-		<span><?php printf( __( 'Commission ID: %s', 'eddc' ), $commission_id ); ?></span>
+		<span><?php printf( __( 'Commission ID: %s', 'eddc' ), $commission->id ); ?></span>
 	</div>
 
-	<?php do_action( 'eddc_commissions_before_commission_delete', $commission_id ); ?>
+	<?php do_action( 'eddc_commissions_before_commission_delete', $commission->id ); ?>
 
-	<form id="delete-commission" method="post" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions&view=delete&commission=' . $commission_id ); ?>">
+	<form id="delete-commission" method="post" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions&view=delete&commission=' . $commission->id ); ?>">
 		<div class="edd-item-info delete-commission">
 			<span class="delete-commission-options">
 				<p>
@@ -570,18 +551,18 @@ function eddc_commissions_delete_view( $commission ) {
 					<label for="eddc-commission-delete-comfirm"><?php _e( 'Are you sure you want to delete this commission?', 'eddc' ); ?></label>
 				</p>
 
-				<?php do_action( 'eddc_commissions_delete_inputs', $commission_id ); ?>
+				<?php do_action( 'eddc_commissions_delete_inputs', $commission->id ); ?>
 			</span>
 
 			<span id="commission-edit-actions">
-				<input type="hidden" name="commission_id" value="<?php echo $commission_id; ?>" />
+				<input type="hidden" name="commission_id" value="<?php echo $commission->id; ?>" />
 				<?php wp_nonce_field( 'delete-commission', '_wpnonce', false, true ); ?>
 				<input type="hidden" name="edd_action" value="delete_commission" />
 				<input type="submit" disabled="disabled" id="eddc-delete-commission" class="button-primary" value="<?php _e( 'Delete Commission', 'eddc' ); ?>" />
-				<a id="eddc-delete-commission-cancel" href="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission_id ); ?>" class="delete"><?php _e( 'Cancel', 'eddc' ); ?></a>
+				<a id="eddc-delete-commission-cancel" href="<?php echo admin_url( 'edit.php?post_type=download&page=edd-commissions&view=overview&commission=' . $commission->id ); ?>" class="delete"><?php _e( 'Cancel', 'eddc' ); ?></a>
 			</span>
 		</div>
 	</form>
 
-	<?php do_action( 'eddc_commissions_after_commission_delete', $commission_id );
+	<?php do_action( 'eddc_commissions_after_commission_delete', $commission->id );
 }
