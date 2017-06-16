@@ -276,7 +276,7 @@ function eddc_commissions_migration() {
 				'price_id'      => $commission_price_id,
 				'dated_created' => $old_commission->post_date,
 				'date_paid'     => '',
-				'type'          => $commission_info['type'],
+				'type'          => ! empty( $commission_info['type'] ) ? $commission_info['type'] : eddc_get_commission_type( $download->ID ),
 				'rate'          => $commission_info['rate'],
 				'currency'      => $commission_info['currency'],
 			);
