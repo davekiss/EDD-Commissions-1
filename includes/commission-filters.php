@@ -98,6 +98,11 @@ function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 
 			break;
 
+		case '_edd_all_access_info':
+			$commission = new EDD_Commission( $object_id );
+			$value      = $commission->get_meta( '_edd_all_access_info' );
+			break;
+
 	}
 
 	return array( $value );
