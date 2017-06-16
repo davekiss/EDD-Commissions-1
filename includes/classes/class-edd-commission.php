@@ -389,7 +389,7 @@ class EDD_Commission {
 	private function setup_description() {
 		$payment     = new EDD_Payment( $this->payment_id );
 		$download    = new EDD_Download( $this->download_id );
-		$description = $payment->user_info['email'] . ' - ' . $download->get_name();
+		$description = $payment->email . ' - ' . $download->get_name();
 
 		return $description;
 	}
