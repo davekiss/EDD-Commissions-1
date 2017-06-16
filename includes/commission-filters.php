@@ -103,6 +103,11 @@ function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 			$value      = $commission->get_meta( '_edd_all_access_info' );
 			break;
 
+		default:
+			// Developers can hook in here with add_action( 'eddc_post_meta_backwards_compat-meta_key... in order to
+			// Filter their own meta values for backwards compatibility calls to get_post_meta instead of EDD_Commission::get_meta
+			$value = apply_filters( 'eddc_post_meta_backwards_compat-' . $meta_key, $value, $object_id );
+			break;
 	}
 
 	return array( $value );
