@@ -139,7 +139,7 @@ class EDD_Commissions_CLI extends EDD_CLI {
 					'payment_id'    => ! empty( $payment->ID ) ? $payment->ID : 0,
 					'cart_index'    => $cart_index,
 					'price_id'      => $commission_price_id,
-					'dated_created' => $result->post_date,
+					'date_created' => $result->post_date,
 					'date_paid'     => '',
 					'type'          => ! empty( $commission_info['type'] ) ? $commission_info['type'] : eddc_get_commission_type( $download->ID ),
 					'rate'          => $commission_info['rate'],
