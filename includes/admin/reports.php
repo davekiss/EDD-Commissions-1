@@ -246,8 +246,32 @@ function eddc_add_reports_metabox() {
 				<?php echo _x( 'to', 'Date one to date two', 'eddc' ); ?>
 				<?php echo EDD()->html->month_dropdown( 'end_month' ); ?>
 				<?php echo EDD()->html->year_dropdown( 'end_year' ); ?>
+				<?php
+					$args = array(
+						'options' => array(
+							'EDD_Batch_Commissions_Report_Export' => __( 'Overview', 'eddc' ),
+							'EDD_Batch_Commissions_Report_Details_Export' => __( 'Detailed', 'eddc' ),
+						),
+						'name'             => 'edd-export-class',
+						'show_option_none' => false,
+						'show_option_all'  => false,
+						'selected'         => false,
+					);
+					echo EDD()->html->select( $args );
+
+					$args = array(
+						'options' => array(
+							'paid'    => __( 'Paid', 'eddc' ),
+							'unpaid'  => __( 'Unpaid', 'eddc' ),
+							'revoked' => __( 'Revoked', 'eddc' ),
+						),
+						'name'             => 'eddc-export-status',
+						'show_option_none' => false,
+						'selected'         => false,
+					);
+					echo EDD()->html->select( $args );
+				?>
 				<?php wp_nonce_field( 'edd_ajax_export', 'edd_ajax_export' ); ?>
-				<input type="hidden" name="edd-export-class" value="EDD_Batch_Commissions_Report_Export"/>
 				<span>
 					<input type="submit" value="<?php _e( 'Generate CSV', 'eddc' ); ?>" class="button-secondary"/>
 					<span class="spinner"></span>

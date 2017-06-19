@@ -19,15 +19,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 /**
-* Loads the commissions report batch process if needed
-*
-* @since       3.3
-* @param       string $class The class being requested to run for the batch export
-* @return      void
-*/
+ * Loads the commissions report batch process if needed
+ *
+ * @since       3.3
+ * @param       string $class The class being requested to run for the batch export
+ * @return      void
+ */
 function eddc_include_commissions_report_batch_processer( $class ) {
 	if ( 'EDD_Batch_Commissions_Report_Export' === $class ) {
 		require_once EDDC_PLUGIN_DIR . 'includes/admin/classes/class-batch-export-commissions-report.php';
+	}
+}
+
+/**
+ * Loads the commissions details report batch process if needed
+ *
+ * @since       3.4
+ * @param       string $class The class being requested to run for the batch export for details
+ * @return      void
+ */
+function eddc_include_commissions_details_report_batch_processer( $class ) {
+	if ( 'EDD_Batch_Commissions_Details_Report_Export' === $class ) {
+		require_once EDDC_PLUGIN_DIR . 'includes/admin/classes/class-batch-export-commissions-details-report.php';
 	}
 }
 

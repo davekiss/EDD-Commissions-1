@@ -1,12 +1,12 @@
 <?php
 /**
- * Batch Commissions Report Export Class.
+ * Batch Commissions Report Details Export Class.
  *
- * This class handles commissions report export.
+ * This class handles commissions details report export.
  *
  * @package     EDD
  * @subpackage  Admin/Reports
- * @copyright   Copyright (c) 2017, Pippin Williamson
+ * @copyright   Copyright (c) 2017, Chris Klosowski
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       3.3
  */
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 3.3
  */
-class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
+class EDD_Batch_Commissions_Report_Details_Export extends EDD_Batch_Export {
 
 
 	/**
