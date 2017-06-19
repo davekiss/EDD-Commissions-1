@@ -263,13 +263,19 @@ function eddc_user_commissions( $user_id = 0 ) {
 							<?php foreach ( $unpaid_commissions as $commission ) : ?>
 								<tr class="edd_user_commission_row">
 									<?php
-									if ( empty( $requested_downloads[ $commission->download_id ] ) ) {
+									if ( empty( $requested_downloads[ $commission->download_id ] ) && ! empty( $commission->download_id ) ) {
 										$requested_downloads[ $commission->download_id ] = new EDD_Download( $commission->download_id );
 									}
-									$download = $requested_downloads[ $commission->download_id ];
+									$download = ! empty( $requested_downloads[ $commission->download_id ] ) ? $requested_downloads[ $commission->download_id ] : false;
 									do_action( 'eddc_user_commissions_unpaid_row_begin', $commission );
 									?>
-									<td class="edd_commission_item"><?php echo esc_html( $download->get_name() ); ?></td>
+									<td class="edd_commission_item">
+										<?php if ( ! empty( $download ) ) : ?>
+											<?php echo esc_html( $download->get_name() ); ?>
+										<?php else: ?>
+											<?php printf( __( 'No %s specified', 'eddc' ), edd_get_label_singular() ); ?>
+										<?php endif; ?>
+									</td>
 									<td class="edd_commission_amount">
 										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $commission->amount ) ) ); ?>
 										<?php if ( $commission->get_meta( 'is_renewal' ) ) : ?>
@@ -326,13 +332,19 @@ function eddc_user_commissions( $user_id = 0 ) {
 							<?php foreach( $paid_commissions as $commission ) : ?>
 								<tr class="edd_user_commission_row">
 									<?php
-									if ( empty( $requested_downloads[ $commission->download_id ] ) ) {
+									if ( empty( $requested_downloads[ $commission->download_id ] ) && ! empty( $commission->download_id ) ) {
 										$requested_downloads[ $commission->download_id ] = new EDD_Download( $commission->download_id );
 									}
-									$download = $requested_downloads[ $commission->download_id ];
+									$download = ! empty( $requested_downloads[ $commission->download_id ] ) ? $requested_downloads[ $commission->download_id ] : false;
 									do_action( 'eddc_user_commissions_paid_row_begin', $commission );
 									?>
-									<td class="edd_commission_item"><?php echo esc_html( $download->get_name() ); ?></td>
+									<td class="edd_commission_item">
+										<?php if ( ! empty( $download ) ) : ?>
+											<?php echo esc_html( $download->get_name() ); ?>
+										<?php else: ?>
+											<?php printf( __( 'No %s specified', 'eddc' ), edd_get_label_singular() ); ?>
+										<?php endif; ?>
+									</td>
 									<td class="edd_commission_amount">
 										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $commission->amount ) ) ); ?>
 										<?php if ( eddc_commission_is_renewal( $commission->id ) ) : ?>
@@ -389,13 +401,19 @@ function eddc_user_commissions( $user_id = 0 ) {
 							<?php foreach( $revoked_commissions as $commission ) : ?>
 								<tr class="edd_user_commission_row">
 									<?php
-									if ( empty( $requested_downloads[ $commission->download_id ] ) ) {
+									if ( empty( $requested_downloads[ $commission->download_id ] ) && ! empty( $commission->download_id ) ) {
 										$requested_downloads[ $commission->download_id ] = new EDD_Download( $commission->download_id );
 									}
-									$download = $requested_downloads[ $commission->download_id ];
+									$download = ! empty( $requested_downloads[ $commission->download_id ] ) ? $requested_downloads[ $commission->download_id ] : false;
 									do_action( 'eddc_user_commissions_revoked_row_begin', $commission );
 									?>
-									<td class="edd_commission_item"><?php echo esc_html( $download->get_name() ); ?></td>
+									<td class="edd_commission_item">
+										<?php if ( ! empty( $download ) ) : ?>
+											<?php echo esc_html( $download->get_name() ); ?>
+										<?php else: ?>
+											<?php printf( __( 'No %s specified', 'eddc' ), edd_get_label_singular() ); ?>
+										<?php endif; ?>
+									</td>
 									<td class="edd_commission_amount">
 										<?php echo edd_currency_filter( edd_format_amount( edd_sanitize_amount( $commission->amount ) ) ); ?>
 										<?php if ( $commission->get_meta( 'is_renewal' ) ) : ?>
@@ -467,7 +485,7 @@ function eddc_user_commissions( $user_id = 0 ) {
 
 
 /**
- * Callback foro the edd_commissions_graph shortcode
+ * Callback for the edd_commissions_graph shortcode
  *
  * @since       3.2.1
  * @param       array $atts Array of shortcode attributes
