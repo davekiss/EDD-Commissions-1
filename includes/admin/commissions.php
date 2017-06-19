@@ -73,7 +73,8 @@ function eddc_commissions_list() {
 		<div id="icon-edit" class="icon32"><br/></div>
 		<h2>
 			<?php _e( 'Easy Digital Download Commissions', 'eddc' ); ?>
-			<a href="<?php echo esc_url( add_query_arg( array( 'view' => 'add' ) ) ); ?>" class="add-new-h2"><?php _e( 'Add New', 'eddc' ); ?></a>
+			<?php $base_url = 'edit.php?post_type=download&page=edd-commissions'; ?>
+			<a href="<?php echo esc_url( add_query_arg( array( 'view' => 'add' ), $base_url ) ); ?>" class="add-new-h2"><?php _e( 'Add New', 'eddc' ); ?></a>
 		</h2>
 
 		<?php if ( defined( 'EDD_VERSION' ) && version_compare( '2.4.2', EDD_VERSION, '<=' ) ) : ?>
@@ -214,8 +215,8 @@ function eddc_render_add_commission_view() {
 										<label for="download_id"><?php _e('Download ID', 'eddc'); ?></label>
 									</td>
 									<td style="word-wrap: break-word">
-										<?php echo EDD()->html->product_dropdown( array( 'id' => 'download_id', 'name' => 'download_id', 'chosen' => true, 'variations' => true ) ); ?>
-										<p class="description"><?php _e('The ID of the product this commission was for.', 'eddc'); ?></p>
+										<?php echo EDD()->html->product_dropdown( array( 'id' => 'download_id', 'name' => 'download_id', 'chosen' => true, 'variations' => true, 'class' => 'required' ) ); ?>
+										<p class="description"><?php _e('The ID of the product this commission was for (required).', 'eddc'); ?></p>
 									</td>
 								</tr>
 								<tr id="eddc-add-payment-id-row">

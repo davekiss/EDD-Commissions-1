@@ -206,6 +206,45 @@ jQuery(document).ready(function($) {
 
 	EDD_Commission_Configuration.init();
 
+	/**
+	 * Add Commission Configuration
+	 */
+	var EDD_Add_Commission_Configuration = {
+		init : function() {
+			this.verify();
+			this.type();
+		},
+		verify : function() {
+			$('#add-item-info').submit(function(event) {
+				$('div.alert').remove();
+				var required_fields = $(this).find('input.required,select.required');
+				var errors_detected = false;
+				required_fields.each(function() {
+					if (!$(this).val() || '' == $(this).val() || 0 == $(this).val()) {
+						errors_detected = true;
+					}
+				});
+
+				if ( errors_detected ) {
+					var notice = '<div class="alert error"><p>' + eddc_vars.required_fields + '</p></div>';
+					$('#edd-item-card-wrapper').before(notice);
+					event.preventDefault();
+				}
+			});
+		},
+		type : function() {
+			$('input[name="type"]').change(function() {
+				var type = $(this).val();
+				if ( 'percentage' === type ) {
+					$('#eddc-add-rate-row').attr('disabled', '');
+				} else {
+					$('#eddc-add-rate-row').attr('disabled', 'disabled');
+				}
+			});
+		},
+	};
+	EDD_Add_Commission_Configuration.init();
+
 	$('#eddc-commission-delete-comfirm').change( function() {
 		var submit_button = $('#eddc-delete-commission');
 

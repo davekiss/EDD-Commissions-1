@@ -71,7 +71,6 @@ function eddc_add_manual_commission() {
 	update_post_meta( $download_id, '_edd_has_commission', true );
 
 	$commission = new EDD_Commission;
-	$commission->description = $user_info->user_email . ' - ' . get_the_title( $download_id );
 	$commission->status      = 'unpaid';
 	$commission->user_ID     = absint( $_POST['user_id'] );
 	$commission->rate        = $rate;
