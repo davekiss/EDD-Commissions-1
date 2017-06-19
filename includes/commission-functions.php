@@ -93,6 +93,18 @@ function eddc_calculate_payment_commissions( $payment_id ) {
 
 		$recipients = eddc_get_recipients( $download_id );
 
+		// Do not allow someone to purchase their own item and make a commission.
+		$allow_self_commissions = apply_filters( 'eddc_should_allow_self_commissions', false, $download_id, $payment_id );
+		if ( false === $allow_self_commissions ) {
+			foreach ( $recipients as $key => $user_id ) {
+				if ( (int) $user_id !== (int) $payment->user_id ) {
+					continue;
+				}
+
+				unset( $recipients[ $key ] );
+			}
+		}
+
 		if ( empty( $recipients ) ) {
 			continue;
 		}
