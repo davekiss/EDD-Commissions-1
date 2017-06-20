@@ -33,7 +33,7 @@ class EDD_Batch_Commissions_Report_Details_Export extends EDD_Batch_Export {
 	 * @access      public
 	 * @var         string
 	 */
-	public $export_type = 'commissions_report';
+	public $export_type = 'commissions_report_details';
 
 
 	/**
@@ -68,12 +68,17 @@ class EDD_Batch_Commissions_Report_Details_Export extends EDD_Batch_Export {
 	 */
 	public function print_csv_cols() {
 		$cols = array(
-			__( 'Monthly Commissions Activity', 'eddc' ),
-			__( 'Unpaid', 'eddc' ),
-			__( 'Paid', 'eddc' ),
-			__( 'Revoked', 'eddc' ),
-			__( 'Gross Total', 'eddc' ),
-			__( 'Net Total', 'eddc' )
+			__( 'ID', 'eddc' ),
+			__( 'User ID', 'eddc' ),
+			printf( __( '%s ID', 'eddc' ), edd_get_label_singular() ),
+			printf( __( '%s Name', 'eddc' ), edd_get_label_singular() ),
+			__( 'Amount', 'eddc' ),
+			__( 'Currency', 'eddc' ),
+			__( 'Type', 'eddc' ),
+			__( 'Rate', 'eddc' ),
+			__( 'Status', 'eddc' ),
+			__( 'Date Created', 'eddc' ),
+			__( 'Date Paid', 'eddc' ),
 		);
 
 		$col_data = '';
@@ -222,12 +227,11 @@ class EDD_Batch_Commissions_Report_Details_Export extends EDD_Batch_Export {
 			)
 		);
 
-		$unpaid        = eddc_get_unpaid_commissions( $args );
-		$unpaid_total  = edd_commissions()->commissions_db->sum( 'amount', array_merge( $args, array( 'status' => 'unpaid' ) ) );
-		$paid          = eddc_get_paid_commissions( $args );
-		$paid_total    = edd_commissions()->commissions_db->sum( 'amount', array_merge( $args, array( 'status' => 'paid' ) ) );
-		$revoked       = eddc_get_revoked_commissions( $args );
-		$revoked_total = edd_commissions()->commissions_db->sum( 'amount', array_merge( $args, array( 'status' => 'revoked' ) ) );
+		if ( 'all' !== $this->status ) {
+			$args['status'] = $this->status;
+		}
+
+		$commissions = edd_commissions()->commissions_db->get_commissions( $args );
 
 		$data = array(
 			'unpaid' => array(
