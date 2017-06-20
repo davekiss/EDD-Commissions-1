@@ -14,6 +14,13 @@ jQuery(document).ready(function($) {
 		});
 	}
 
+	if ($('.edd_commission_datepicker').length > 0) {
+		var dateFormatMySQL = 'yy-mm-dd';
+		$('.edd_commission_datepicker').datepicker({
+			dateFormat: dateFormatMySQL
+		});
+	}
+
 	$('.eddc-commissions-export-toggle').click( function() {
 		$('.eddc-commissions-export-toggle').toggle();
 		$('#eddc-export-commissions').toggle();
@@ -213,6 +220,7 @@ jQuery(document).ready(function($) {
 		init : function() {
 			this.verify();
 			this.type();
+			this.status();
 		},
 		verify : function() {
 			$('#add-item-info').submit(function(event) {
@@ -242,6 +250,17 @@ jQuery(document).ready(function($) {
 				}
 			});
 		},
+		status : function() {
+			$('select[name="status"]').change(function() {
+				var status = $(this).val();
+				var target = $('#date_paid');
+				if ( 'paid' == status ) {
+					target.removeAttr('disabled');
+				} else {
+					target.attr('disabled', 'disabled');
+				}
+			});
+		}
 	};
 	EDD_Add_Commission_Configuration.init();
 

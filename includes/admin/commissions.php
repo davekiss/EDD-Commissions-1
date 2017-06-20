@@ -228,6 +228,45 @@ function eddc_render_add_commission_view() {
 										<p class="description"><?php _e('The payment ID this commission is related to (optional).', 'eddc'); ?></p>
 									</td>
 								</tr>
+								<tr id="eddc-add-status-row">
+									<td class="row-title">
+										<label for="status"><?php _e('Status', 'eddc'); ?></label>
+									</td>
+									<td style="word-wrap: break-word">
+										<?php
+										$args = array(
+											'options' => array(
+												'unpaid'  => __( 'Unpaid', 'eddc' ),
+												'paid'    => __( 'Paid', 'eddc' ),
+												'revoked' => __( 'Revoked', 'eddc' ),
+											),
+											'name'             => 'status',
+											'show_option_all'  => false,
+											'show_option_none' => false,
+										);
+										echo EDD()->html->select( $args );
+										?>
+										<p class="description"><?php _e('The status of the commission record.', 'eddc'); ?></p>
+									</td>
+								</tr>
+								<tr id="eddc-add-date-created-row">
+									<td class="row-title">
+										<label for="date_created"><?php _e('Date Created', 'eddc'); ?></label>
+									</td>
+									<td style="word-wrap: break-word">
+										<input type="text" class="edd_commission_datepicker" id="date_created" name="date_created" />
+										<p class="description"><?php _e('The date the commission should be recorded on. If blank, the payment date will be used. If no payment is defined, today\'s date will be used.', 'eddc'); ?></p>
+									</td>
+								</tr>
+								<tr id="eddc-add-date-paid-row">
+									<td class="row-title">
+										<label for="date_paid"><?php _e('Date Paid', 'eddc'); ?></label>
+									</td>
+									<td style="word-wrap: break-word">
+										<input type="text" disabled="disabled" class="edd_commission_datepicker" id="date_paid" name="date_paid" />
+										<p class="description"><?php _e('The date the commission should be marked as paid.', 'eddc'); ?></p>
+									</td>
+								</tr>
 								<tr id="eddc-add-type-row">
 									<td class="row-title">
 										<label for="type"><?php _e('Type', 'eddc'); ?></label>
@@ -403,12 +442,22 @@ function eddc_commissions_view( $commission ) {
 						</tr>
 						<tr>
 							<td class="row-title">
-								<label for="tablecell"><?php _e( 'Create Date', 'eddc' ); ?></label>
+								<label for="tablecell"><?php _e( 'Date Created', 'eddc' ); ?></label>
 							</td>
 							<td style="word-wrap: break-word">
 								<?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->date_created ) ); ?>
 							</td>
 						</tr>
+						<?php if ( ! empty( $commission->date_paid ) ) : ?>
+						<tr>
+							<td class="row-title">
+								<label for="tablecell"><?php _e( 'Date Paid', 'eddc' ); ?></label>
+							</td>
+							<td style="word-wrap: break-word">
+								<?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->date_paid ) ); ?>
+							</td>
+						</tr>
+						<?php endif; ?>
 						<tr>
 							<td class="row-title">
 								<label for="tablecell"><?php _e( 'User', 'eddc' ); ?></label>
