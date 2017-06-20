@@ -201,6 +201,14 @@ function eddc_update_commission() {
 
 	$amount = str_replace( '%', '', $_POST['eddc_amount'] );
 
+	if ( ! empty( $_POST['date_created'] ) ) {
+		$commission->date_created = date( 'Y-m-d H-i-s', strtotime( sanitize_text_field( $_POST['date_created'] ) ) );
+	}
+
+	if ( ! empty( $_POST['date_paid'] ) ) {
+		$commission->date_paid = date( 'Y-m-d H-i-s', strtotime( sanitize_text_field( $_POST['date_paid'] ) ) );
+	}
+
 	$commission->rate        = (float) $rate;
 	$commission->amount      = (float) $amount;
 	$commission->user_id     = (int) $_POST['eddc_user'];

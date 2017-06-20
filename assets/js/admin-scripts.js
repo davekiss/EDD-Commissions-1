@@ -288,25 +288,14 @@ jQuery(document).ready(function($) {
 			link.text(eddc_vars.action_edit);
 		}
 
+		$('#edit-item-info input.edd_commission_datepicker').toggle();
 		$('#eddc_user_chosen').toggle();
 		$('#eddc_download_chosen').toggle();
 		$('.eddc-commission-rate').toggle();
 		$('.eddc-commission-amount').toggle();
 	});
 
-	$('.eddc-commission-user').on('change', function() {
-		$('#eddc_update_commission').fadeIn('fast').css('display', 'inline-block');
-	});
-
-	$('.eddc-commission-download').on('change', function() {
-		$('#eddc_update_commission').fadeIn('fast').css('display', 'inline-block');
-	});
-
-	$('.eddc-commission-rate').on('change', function() {
-		$('#eddc_update_commission').fadeIn('fast').css('display', 'inline-block');
-	});
-
-	$('.eddc-commission-amount').on('change', function() {
+	$('body').on( 'change', '.eddc-commission-card input', function(){
 		$('#eddc_update_commission').fadeIn('fast').css('display', 'inline-block');
 	});
 });

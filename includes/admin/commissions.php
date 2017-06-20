@@ -446,6 +446,9 @@ function eddc_commissions_view( $commission ) {
 							</td>
 							<td style="word-wrap: break-word">
 								<?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->date_created ) ); ?>
+								<p>
+									<input type="text" class="edd_commission_datepicker" name="date_created" />
+								</p>
 							</td>
 						</tr>
 						<?php if ( ! empty( $commission->date_paid ) ) : ?>
@@ -455,6 +458,9 @@ function eddc_commissions_view( $commission ) {
 							</td>
 							<td style="word-wrap: break-word">
 								<?php echo date_i18n( get_option( 'date_format' ), strtotime( $commission->date_paid ) ); ?>
+								<p>
+									<input type="text" class="edd_commission_datepicker" name="date_paid" />
+								</p>
 							</td>
 						</tr>
 						<?php endif; ?>
