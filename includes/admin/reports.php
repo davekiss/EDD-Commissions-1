@@ -265,9 +265,11 @@ function eddc_add_reports_metabox() {
 							'unpaid'  => __( 'Unpaid', 'eddc' ),
 							'revoked' => __( 'Revoked', 'eddc' ),
 						),
-						'name'             => 'eddc-export-status',
+						'name'             => 'status',
+						'id'               => 'eddc-export-status',
 						'show_option_none' => false,
 						'selected'         => false,
+						'disabled'         => true,
 					);
 					echo EDD()->html->select( $args );
 				?>

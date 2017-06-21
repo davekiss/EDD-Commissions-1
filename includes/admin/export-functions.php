@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param       string $class The class being requested to run for the batch export
  * @return      void
  */
-function eddc_include_commissions_report_batch_processer( $class ) {
+function eddc_include_commissions_report_batch_processor( $class ) {
 	if ( 'EDD_Batch_Commissions_Report_Export' === $class ) {
 		require_once EDDC_PLUGIN_DIR . 'includes/admin/classes/class-batch-export-commissions-report.php';
 	}
@@ -38,9 +38,9 @@ function eddc_include_commissions_report_batch_processer( $class ) {
  * @param       string $class The class being requested to run for the batch export for details
  * @return      void
  */
-function eddc_include_commissions_details_report_batch_processer( $class ) {
-	if ( 'EDD_Batch_Commissions_Details_Report_Export' === $class ) {
-		require_once EDDC_PLUGIN_DIR . 'includes/admin/classes/class-batch-export-commissions-details-report.php';
+function eddc_include_commissions_report_details_batch_processor( $class ) {
+	if ( 'EDD_Batch_Commissions_Report_Details_Export' === $class ) {
+		require_once EDDC_PLUGIN_DIR . 'includes/admin/classes/class-batch-export-commissions-report-details.php';
 	}
 }
 
@@ -52,7 +52,7 @@ function eddc_include_commissions_details_report_batch_processer( $class ) {
  * @param       string $class The class being requested to run for the batch export
  * @return      void
  */
-function eddc_include_payouts_batch_processer( $class ) {
+function eddc_include_payouts_batch_processor( $class ) {
 	if ( 'EDD_Batch_Commissions_Payout' === $class ) {
 		require_once EDDC_PLUGIN_DIR . 'includes/admin/classes/class-batch-commissions-payout.php';
 	}
@@ -67,7 +67,7 @@ function eddc_include_payouts_batch_processer( $class ) {
  * @param       string $class The class being requested to run for the batch export
  * @return      void
  */
-function eddc_include_paid_batch_processer( $class ) {
+function eddc_include_paid_batch_processor( $class ) {
 	if ( 'EDD_Batch_Commissions_Mark_Paid' === $class ) {
 		require_once EDDC_PLUGIN_DIR . 'includes/admin/classes/class-batch-commissions-mark-paid.php';
 	}

@@ -251,4 +251,23 @@ jQuery(document).ready(function($) {
 	$('.eddc-commission-amount').on('change', function() {
 		$('#eddc_update_commission').fadeIn('fast').css('display', 'inline-block');
 	});
+
+	var EDD_Commission_Reports_Configuration = {
+		init : function() {
+			this.type();
+		},
+		type : function() {
+			$('select[name="edd-export-class"]').change( function(e) {
+				var value = $(this).val();
+				if ( 'EDD_Batch_Commissions_Report_Export' == value) {
+					$('#eddc_export_status').attr('disabled','disabled');
+				} else {
+					$('#eddc_export_status').removeAttr('disabled');
+				}
+			});
+		},
+
+	};
+
+	EDD_Commission_Reports_Configuration.init();
 });
