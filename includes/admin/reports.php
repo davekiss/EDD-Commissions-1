@@ -247,11 +247,13 @@ function eddc_add_reports_metabox() {
 				<?php echo EDD()->html->month_dropdown( 'end_month' ); ?>
 				<?php echo EDD()->html->year_dropdown( 'end_year' ); ?>
 				<?php
+					$options = apply_filters( 'eddc_export_classes', array(
+						'EDD_Batch_Commissions_Report_Export'         => __( 'Overview', 'eddc' ),
+						'EDD_Batch_Commissions_Report_Details_Export' => __( 'Detailed', 'eddc' ),
+					) );
+
 					$args = array(
-						'options' => array(
-							'EDD_Batch_Commissions_Report_Export' => __( 'Overview', 'eddc' ),
-							'EDD_Batch_Commissions_Report_Details_Export' => __( 'Detailed', 'eddc' ),
-						),
+						'options'          => $options,
 						'name'             => 'edd-export-class',
 						'show_option_none' => false,
 						'show_option_all'  => false,

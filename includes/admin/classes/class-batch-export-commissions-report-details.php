@@ -72,6 +72,7 @@ class EDD_Batch_Commissions_Report_Details_Export extends EDD_Batch_Export {
 		$cols = array(
 			__( 'ID', 'eddc' ),
 			__( 'User ID', 'eddc' ),
+			__( 'User', 'eddc' ),
 			sprintf( __( '%s ID', 'eddc' ), edd_get_label_singular() ),
 			sprintf( __( '%s Name', 'eddc' ), edd_get_label_singular() ),
 			__( 'Payment ID', 'eddc' ),
@@ -114,9 +115,12 @@ class EDD_Batch_Commissions_Report_Details_Export extends EDD_Batch_Export {
 					}
 				}
 
+				$user = get_userdata( $commission->user_id );
+
 				$row_data_array = array(
 					'id'            => $commission->id,
 					'user_id'       => $commission->user_id,
+					'user_name'     => $user->display_name,
 					'download_id'   => ! empty( $download ) ? $commission->download_id : __( 'N/A', 'eddc' ),
 					'download_name' => ! empty( $download ) ? $download_name : __( 'N/A', 'eddc' ),
 					'payment_id'    => $commission->payment_id,
