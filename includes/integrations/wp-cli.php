@@ -99,24 +99,27 @@ class EDD_Commissions_CLI extends EDD_CLI {
 				}
 
 				$cart_index = 0;
+				$payment    = false;
 				if ( ! empty( $post_meta['_edd_commission_payment_id'] ) ) {
 
-					$payment    = new EDD_Payment( $post_meta['_edd_commission_payment_id'] );
-					foreach ( $payment->cart_details as $index => $item ) {
+					$payment    = edd_get_payment( $post_meta['_edd_commission_payment_id'] );
+					if ( false !== $payment ) {
+						foreach ( $payment->cart_details as $index => $item ) {
 
-						if ( (int) $item['id'] !== (int) $download->ID ) {
-							continue;
-						}
-
-						if ( false !== $commission_price_id ) {
-							if ( (int) $item['item_number']['options']['price_id'] !== (int) $commission_price_id ) {
+							if ( (int) $item[ 'id' ] !== (int) $download->ID ) {
 								continue;
 							}
+
+							if ( false !== $commission_price_id ) {
+								if ( (int) $item[ 'item_number' ][ 'options' ][ 'price_id' ] !== (int) $commission_price_id ) {
+									continue;
+								}
+							}
+
+							$cart_index = $index;
+							break;
+
 						}
-
-						$cart_index = $index;
-						break;
-
 					}
 
 				}
@@ -136,14 +139,14 @@ class EDD_Commissions_CLI extends EDD_CLI {
 					'amount'        => $commission_info['amount'],
 					'status'        => $status,
 					'download_id'   => $download->ID,
-					'payment_id'    => ! empty( $payment->ID ) ? $payment->ID : 0,
+					'payment_id'    => false !== $payment && ! empty( $payment->ID ) ? $payment->ID : 0,
 					'cart_index'    => $cart_index,
 					'price_id'      => $commission_price_id,
 					'date_created' => $result->post_date,
 					'date_paid'     => '',
 					'type'          => ! empty( $commission_info['type'] ) ? $commission_info['type'] : eddc_get_commission_type( $download->ID ),
 					'rate'          => $commission_info['rate'],
-					'currency'      => $commission_info['currency'],
+					'currency'      => ! empty( $commission_info['currency'] ) ? $commission_info['currency'] : edd_get_currency(),
 				);
 
 				$commission_id = edd_commissions()->commissions_db->insert( $commission_data, 'commission' );

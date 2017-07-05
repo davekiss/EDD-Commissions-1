@@ -184,11 +184,16 @@ class EDD_C_List_Table extends WP_List_Table {
 	 * @return      void
 	 */
 	function get_views() {
-		$base    = admin_url( 'edit.php?post_type=download&page=edd-commissions' );
-		$user_id = $this->get_filtered_user();
+		$base        = admin_url( 'edit.php?post_type=download&page=edd-commissions' );
+		$user_id     = $this->get_filtered_user();
+		$download_id = $this->get_filtered_download();
 
 		if ( ! empty( $user_id ) ) {
-			$base = add_query_arg( array( 'user' => $user_id, $base ) );
+			$base = add_query_arg( array( 'user' => $user_id ), $base );
+		}
+
+		if ( ! empty( $download_id ) ) {
+			$base = add_query_arg( array( 'download' => $download_id ), $base );
 		}
 
 		$current       = isset( $_GET['view'] ) ? $_GET['view'] : '';
@@ -292,78 +297,6 @@ class EDD_C_List_Table extends WP_List_Table {
 	function get_filtered_view() {
 		return ! empty( $_GET['view'] ) ? sanitize_text_field( $_GET['view'] ) : 'all';
 	}
-
-
-	/**
-	 * Gets the meta query for the log query
-	 *
-	 * This is used to return log entries that match our search query, user query, or download query
-	 *
-	 * @access      private
-	 * @since       1.7
-	 * @return      array
-	 */
-	function get_meta_query() {
-		$meta_query = array();
-
-		$user     = $this->get_filtered_user();
-		$download = $this->get_filtered_download();
-		$payment  = $this->get_filtered_payment();
-
-		if ( $user ) {
-			// Show only commissions from a specific user
-			$meta_query[] = array(
-				'key'   => '_user_id',
-				'value' => $user
-			);
-
-		}
-
-		if ( $download ) {
-			// Show only commissions from a specific download
-			$meta_query[] = array(
-				'key'   => '_download_id',
-				'value' => $download
-			);
-		}
-
-		if ( $payment ) {
-			// Show only commissions from a specific payment
-			$meta_query[] = array(
-				'key'   => '_edd_commission_payment_id',
-				'value' => $payment
-			);
-		}
-
-		return $meta_query;
-	}
-
-
-	/**
-	 * Gets the tax query
-	 *
-	 * This is used to return commissions of a specific status
-	 *
-	 * @access      private
-	 * @since       2.8
-	 * @return      array
-	 */
-	function get_tax_query() {
-		$tax_query = array();
-		$view      = isset( $_GET['view'] ) ? $_GET['view'] : false;
-
-		if ( $view ) {
-			// Show only commissions of a specific status
-			$tax_query[] = array(
-				'taxonomy' => 'edd_commission_status',
-				'terms'    => $view,
-				'field'    => 'slug'
-			);
-		}
-
-		return $tax_query;
-	}
-
 
 	/**
 	 * Process bulk actions
