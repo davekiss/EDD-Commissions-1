@@ -25,10 +25,20 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return      void
  */
 function eddc_register_commissions_report_batch_export() {
-	add_action( 'edd_batch_export_class_include', 'eddc_include_commissions_report_batch_processer', 11, 1 );
+	add_action( 'edd_batch_export_class_include', 'eddc_include_commissions_report_batch_processor', 11, 1 );
 }
 add_action( 'edd_register_batch_exporter', 'eddc_register_commissions_report_batch_export', 11 );
 
+/**
+ * Register the commissions report details batch exporter
+ *
+ * @since       3.4
+ * @return      void
+ */
+function eddc_register_commissions_report_details_batch_export() {
+	add_action( 'edd_batch_export_class_include', 'eddc_include_commissions_report_details_batch_processor', 11, 1 );
+}
+add_action( 'edd_register_batch_exporter', 'eddc_register_commissions_report_details_batch_export', 11 );
 
 /**
  * Register the payouts batch exporter
@@ -37,7 +47,7 @@ add_action( 'edd_register_batch_exporter', 'eddc_register_commissions_report_bat
  * @return      void
  */
 function eddc_register_payouts_batch_export() {
-	add_action( 'edd_batch_export_class_include', 'eddc_include_payouts_batch_processer', 10, 1 );
+	add_action( 'edd_batch_export_class_include', 'eddc_include_payouts_batch_processor', 10, 1 );
 }
 add_action( 'edd_register_batch_exporter', 'eddc_register_payouts_batch_export', 10 );
 
@@ -49,6 +59,6 @@ add_action( 'edd_register_batch_exporter', 'eddc_register_payouts_batch_export',
  * @return      void
  */
 function eddc_register_mark_paid_batch_export() {
-	add_action( 'edd_batch_export_class_include', 'eddc_include_paid_batch_processer', 10, 1 );
+	add_action( 'edd_batch_export_class_include', 'eddc_include_paid_batch_processor', 10, 1 );
 }
 add_action( 'edd_register_batch_exporter', 'eddc_register_mark_paid_batch_export', 10 );

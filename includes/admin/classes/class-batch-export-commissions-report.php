@@ -46,7 +46,7 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 	public function headers() {
 		ignore_user_abort( true );
 
-		if ( ! edd_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
+		if ( ! edd_is_func_disabled( 'set_time_limit' ) ) {
 			set_time_limit( 0 );
 		}
 
@@ -298,5 +298,6 @@ class EDD_Batch_Commissions_Report_Export extends EDD_Batch_Export {
 	public function set_properties( $request ) {
 		$this->start = ( isset( $request['start_month'] ) && isset( $request['start_year'] ) ) ? sanitize_text_field( $request['start_year'] ) . '-' . sanitize_text_field( $request['start_month'] ) . '-1' : '';
 		$this->end   = ( isset( $request['end_month'] ) && isset( $request['end_year'] ) ) ? sanitize_text_field( $request['end_year'] ) . '-' . sanitize_text_field( $request['end_month'] ) . '-' . cal_days_in_month( CAL_GREGORIAN, sanitize_text_field( $request['end_month'] ), sanitize_text_field( $request['end_year'] ) ) : '';
+		$this->status = ( isset( $request['status'] ) ) && 'all' !== $request['status'] ? sanitize_text_field( $request['status'] ) : 'all';
 	}
 }

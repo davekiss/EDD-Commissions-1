@@ -246,10 +246,45 @@ function eddc_add_reports_metabox() {
 				<?php echo _x( 'to', 'Date one to date two', 'eddc' ); ?>
 				<?php echo EDD()->html->month_dropdown( 'end_month' ); ?>
 				<?php echo EDD()->html->year_dropdown( 'end_year' ); ?>
+				<?php
+					$options = apply_filters( 'eddc_export_classes', array(
+						'EDD_Batch_Commissions_Report_Export'         => __( 'Overview', 'eddc' ),
+						'EDD_Batch_Commissions_Report_Details_Export' => __( 'Detailed', 'eddc' ),
+					) );
+
+					$args = array(
+						'options'          => $options,
+						'name'             => 'edd-export-class',
+						'show_option_none' => false,
+						'show_option_all'  => false,
+						'selected'         => false,
+					);
+					echo EDD()->html->select( $args );
+
+					$args = array(
+						'options' => array(
+							'paid'    => __( 'Paid', 'eddc' ),
+							'unpaid'  => __( 'Unpaid', 'eddc' ),
+							'revoked' => __( 'Revoked', 'eddc' ),
+						),
+						'name'             => 'status',
+						'id'               => 'eddc-export-status',
+						'show_option_none' => false,
+						'selected'         => false,
+						'disabled'         => true,
+					);
+					echo EDD()->html->select( $args );
+				?>
 				<?php wp_nonce_field( 'edd_ajax_export', 'edd_ajax_export' ); ?>
-				<input type="hidden" name="edd-export-class" value="EDD_Batch_Commissions_Report_Export"/>
 				<span>
 					<input type="submit" value="<?php _e( 'Generate CSV', 'eddc' ); ?>" class="button-secondary"/>
+					<?php
+					$tooltip_title  = __( 'Report Types', 'eddc' );
+					$tooltip_desc   = __( '<p><strong>Overview Report</strong><br />Exports cumulative totals for the selected months including paid, unpaid, revoked, and pending commissions.</p>', 'eddc' );
+					$tooltip_desc  .= __( '<p><strong>Detailed Report</strong><br />Provides a list of all commission records for the dates and status selected.</p>', 'eddc' );
+					$tooltip_desc   = apply_filters( 'eddc_report_types_tooltip_desc', $tooltip_desc );
+					?>
+					<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong><?php echo $tooltip_title; ?></strong>: <?php echo $tooltip_desc; ?>"></span>
 					<span class="spinner"></span>
 				</span>
 			</form>

@@ -179,7 +179,7 @@ class EDDC_DB extends EDD_DB {
 
 	}
 
-	public function sum ( $column = '', $args ) {
+	public function sum( $column = '', $args ) {
 
 		global $wpdb;
 

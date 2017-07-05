@@ -31,6 +31,7 @@ function eddc_admin_scripts() {
 	$allowed_screens = array(
 		'download_page_edd-commissions',
 		'download',
+		'download_page_edd-reports',
 	);
 
 	$allowed_screens = apply_filters( 'eddc-admin-script-screens', $allowed_screens );
