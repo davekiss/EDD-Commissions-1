@@ -278,6 +278,13 @@ function eddc_add_reports_metabox() {
 				<?php wp_nonce_field( 'edd_ajax_export', 'edd_ajax_export' ); ?>
 				<span>
 					<input type="submit" value="<?php _e( 'Generate CSV', 'eddc' ); ?>" class="button-secondary"/>
+					<?php
+					$tooltip_title  = __( 'Report Types', 'eddc' );
+					$tooltip_desc   = __( '<p><strong>Overview Report</strong><br />Exports cumulative totals for the selected months including paid, unpaid, revoked, and pending commissions.</p>', 'eddc' );
+					$tooltip_desc  .= __( '<p><strong>Detailed Report</strong><br />Provides a list of all commission records for the dates and status selected.</p>', 'eddc' );
+					$tooltip_desc   = apply_filters( 'eddc_report_types_tooltip_desc', $tooltip_desc );
+					?>
+					<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong><?php echo $tooltip_title; ?></strong>: <?php echo $tooltip_desc; ?>"></span>
 					<span class="spinner"></span>
 				</span>
 			</form>
