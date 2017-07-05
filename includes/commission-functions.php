@@ -96,13 +96,18 @@ function eddc_calculate_payment_commissions( $payment_id ) {
 		// Do not allow someone to purchase their own item and make a commission.
 		$allow_self_commissions = apply_filters( 'eddc_should_allow_self_commissions', false, $download_id, $payment_id );
 		if ( false === $allow_self_commissions ) {
+
+			$download = new EDD_Download( $download_id );
+
 			foreach ( $recipients as $key => $user_id ) {
 				if ( (int) $user_id !== (int) $payment->user_id ) {
 					continue;
 				}
 
 				unset( $recipients[ $key ] );
+				$payment->add_note( sprintf( __( 'No commission was recorded for %s on %s. Self commissions are disabled.', 'eddc' ), get_userdata( $user_id )->display_name, $download->get_name() ) );
 			}
+
 		}
 
 		if ( empty( $recipients ) ) {
