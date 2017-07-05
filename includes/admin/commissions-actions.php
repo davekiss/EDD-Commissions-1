@@ -83,8 +83,8 @@ function eddc_add_manual_commission() {
 	$commission->rate         = $rate;
 	$commission->amount       = $amount;
 	$commission->currency     = edd_get_option( 'currency', 'USD' );
-	$commission->download_ID  = $download_id;
-	$commission->payment_ID   = $payment_id;
+	$commission->download_id  = $download_id;
+	$commission->payment_id   = $payment_id;
 	$commission->type         = $type;
 	$commission->status       = $status;
 	$commission->date_created = $date_created;
@@ -99,14 +99,14 @@ function eddc_add_manual_commission() {
 	$commission->save();
 
 	$args = array(
-		'user_id'  => $commission->user_ID,
+		'user_id'  => $commission->user_id,
 		'rate'     => $commission->rate,
 		'amount'   => $commission->amount,
 		'currency' => $commission->currency,
 		'type'     => $commission->type,
 	);
 
-	$commission_info = apply_filters( 'edd_commission_info', $args, $commission->ID, $commission->payment_ID, $commission->download_ID );
+	$commission_info = apply_filters( 'edd_commission_info', $args, $commission->ID, $commission->payment_id, $commission->download_id );
 	$items_changed   = false;
 	foreach ( $commission_info as $key => $value ) {
 		if ( $value === $args[ $key ] ) {
@@ -121,7 +121,7 @@ function eddc_add_manual_commission() {
 		$commission->save();
 	}
 
-	do_action( 'eddc_insert_commission', $commission->user_ID, $commission->amount, $commission->rate, $commission->download_ID, $commission->ID, $payment_id );
+	do_action( 'eddc_insert_commission', $commission->user_id, $commission->amount, $commission->rate, $commission->download_id, $commission->ID, $payment_id );
 
 	wp_redirect( add_query_arg( array( 'view' => false, 'edd-message' => 'add' ) ) );
 	exit;
