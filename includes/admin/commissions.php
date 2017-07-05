@@ -72,7 +72,7 @@ function eddc_commissions_list() {
 
 		<div id="icon-edit" class="icon32"><br/></div>
 		<h2>
-			<?php _e( 'Easy Digital Download Commissions', 'eddc' ); ?>
+			<?php _e( 'Commissions', 'eddc' ); ?>
 			<?php $base_url = 'edit.php?post_type=download&page=edd-commissions'; ?>
 			<a href="<?php echo esc_url( add_query_arg( array( 'view' => 'add' ), $base_url ) ); ?>" class="add-new-h2"><?php _e( 'Add New', 'eddc' ); ?></a>
 		</h2>
@@ -133,7 +133,7 @@ function eddc_commissions_list() {
 			$commissions_table = new edd_C_List_Table();
 			$commissions_table->prepare_items();
 			$commissions_table->views();
-			
+
 			$user_id      = $commissions_table->get_filtered_user();
 			$total_unpaid = edd_currency_filter( edd_format_amount( eddc_get_unpaid_totals( $user_id ) ) );
 			?>
