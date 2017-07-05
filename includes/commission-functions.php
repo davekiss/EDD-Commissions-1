@@ -105,7 +105,7 @@ function eddc_calculate_payment_commissions( $payment_id ) {
 				}
 
 				unset( $recipients[ $key ] );
-				$payment->add_note( sprintf( __( 'No commission was recorded for %s on %s. Self commissions are disabled.', 'eddc' ), get_userdata( $user_id )->display_name, $download->get_name() ) );
+				$payment->add_note( sprintf( __( 'Commission for %s skipped because %s made purchase and self commissions are disabled.', 'eddc' ), $download->get_name(), get_userdata( $user_id )->display_name ) );
 			}
 
 		}
