@@ -661,32 +661,6 @@ function eddc_get_default_rate() {
 	return apply_filters( 'eddc_default_rate', $rate );
 }
 
-
-/**
- * Filters get_post_meta() to ensure old commission status checks don't fail
- *
- * The status for commission records used to be stored in postmeta, now it's stored in a taxonomy
- *
- * @since       2.8
- * @return      mixed
- */
-function eddc_filter_post_meta_for_status( $check, $object_id, $meta_key, $single ) {
-	if ( defined( 'EDDC_DOING_UPGRADES' ) ) {
-		return $check;
-	}
-
-	if ( '_commission_status' === $meta_key ) {
-		if ( has_term( 'paid', 'edd_commission_status', $object_id ) ) {
-			return 'paid';
-		} else {
-			return 'unpaid';
-		}
-	}
-
-	return $check;
-}
-add_filter( 'get_post_metadata', 'eddc_filter_post_meta_for_status', 10, 4 );
-
 /**
  * This will take a rate and a commission type and format it correctly for output.
  * For example, if the rate is 5 and the commission type is "percentage", it will return "5%" as a string.

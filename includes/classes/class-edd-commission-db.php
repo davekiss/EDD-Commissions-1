@@ -40,7 +40,7 @@ class EDDC_DB extends EDD_DB {
 		return array(
 			'id'           => '%d',
 			'user_id'      => '%d',
-			'amount'       => '%d',
+			'amount'       => '%f',
 			'status'       => '%s',
 			'download_id'  => '%d',
 			'payment_id'   => '%d',
@@ -49,7 +49,7 @@ class EDDC_DB extends EDD_DB {
 			'date_created' => '%s',
 			'date_paid'    => '%s',
 			'type'         => '%s',
-			'rate'         => '%d',
+			'rate'         => '%f',
 			'currency'     => '%s',
 		);
 	}

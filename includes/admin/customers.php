@@ -160,12 +160,25 @@ function eddc_customer_commissions_view( $customer ) {
 			</thead>
 			<tbody>
 				<?php if ( ! empty( $commissions ) ) : ?>
-					<?php foreach ( $commissions as $commission ) : ?>
-						<?php $commission_meta = get_post_meta( $commission->ID, '_edd_commission_info', true ); ?>
+					<?php $requested_downloads = array(); ?>
+					<?php foreach ( $commissions as $commission ) :
+						if ( empty( $requested_downloads[ $commission->download_id ] ) ) {
+							$requested_downloads[ $commission->download_id ] = new EDD_Download( $commission->download_id );
+						}
+						$download = ! empty( $commission->download_id ) ? $requested_downloads[ $commission->download_id ] : false;
+						?>
 						<tr>
 							<td><?php echo $commission->ID; ?></td>
-							<td><?php echo get_the_title( get_post_meta( $commission->ID, '_download_id', true ) ) ?></td>
-							<td><?php echo edd_currency_filter( edd_sanitize_amount( $commission_meta['amount'] ) ); ?></td>
+							<td>
+								<?php
+								if ( ! empty( $download ) ) {
+									echo $download->get_name();
+								} else {
+									printf( __( 'No %s specified', 'eddc' ), edd_get_label_singular() );
+								}
+								?>
+							</td>
+							<td><?php echo edd_currency_filter( edd_sanitize_amount( $commission->amount ) ); ?></td>
 						</tr>
 					<?php endforeach; ?>
 				<?php else: ?>

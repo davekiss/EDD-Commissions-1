@@ -58,9 +58,17 @@ function eddc_add_manual_commission() {
 	}
 
 	$payment_id  = isset( $_POST['payment_id'] ) ? absint( $_POST['payment_id'] ) : 0;
-	$type        = sanitize_text_field( $_POST['type'] );
-	$amount      = edd_sanitize_amount( $_POST['amount'] );
-	$rate        = ! empty( $_POST['rate'] ) ? sanitize_text_field( $_POST['rate'] ) : $amount;
+	$type         = sanitize_text_field( $_POST['type'] );
+	$amount       = edd_sanitize_amount( $_POST['amount'] );
+	$rate         = ! empty( $_POST['rate'] ) ? sanitize_text_field( $_POST['rate'] ) : $amount;
+	$status       = ! empty( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : 'unpaid';
+	$date_created = ! empty( $_POST['date_created'] ) ? $_POST['date_created'] . ' 00:00:00' : null;
+	$date_paid    = ! empty( $_POST['date_paid'] ) ? $_POST['date_paid'] . ' 00:00:00' : null;
+
+	$statuses    = array( 'unpaid', 'paid', 'revoked' );
+	if ( ! in_array( $status, $statuses ) ) {
+		$status = 'unpaid';
+	}
 
 	$types = array( 'percentage', 'flat' );
 	if ( ! in_array( $type, $types ) ) {
@@ -71,15 +79,17 @@ function eddc_add_manual_commission() {
 	update_post_meta( $download_id, '_edd_has_commission', true );
 
 	$commission = new EDD_Commission;
-	$commission->description = $user_info->user_email . ' - ' . get_the_title( $download_id );
-	$commission->status      = 'unpaid';
-	$commission->user_ID     = absint( $_POST['user_id'] );
-	$commission->rate        = $rate;
-	$commission->amount      = $amount;
-	$commission->currency    = edd_get_option( 'currency', 'USD' );
-	$commission->download_ID = $download_id;
-	$commission->payment_ID  = $payment_id;
-	$commission->type        = $type;
+	$commission->user_ID      = absint( $_POST['user_id'] );
+	$commission->rate         = $rate;
+	$commission->amount       = $amount;
+	$commission->currency     = edd_get_option( 'currency', 'USD' );
+	$commission->download_id  = $download_id;
+	$commission->payment_id   = $payment_id;
+	$commission->type         = $type;
+	$commission->status       = $status;
+	$commission->date_created = $date_created;
+	$commission->date_paid    = $date_paid;
+
 
 	// If we are dealing with a variation, then save variation info
 	if ( false !== $price_id ) {
@@ -89,14 +99,14 @@ function eddc_add_manual_commission() {
 	$commission->save();
 
 	$args = array(
-		'user_id'  => $commission->user_ID,
+		'user_id'  => $commission->user_id,
 		'rate'     => $commission->rate,
 		'amount'   => $commission->amount,
 		'currency' => $commission->currency,
 		'type'     => $commission->type,
 	);
 
-	$commission_info = apply_filters( 'edd_commission_info', $args, $commission->ID, $commission->payment_ID, $commission->download_ID );
+	$commission_info = apply_filters( 'edd_commission_info', $args, $commission->ID, $commission->payment_id, $commission->download_id );
 	$items_changed   = false;
 	foreach ( $commission_info as $key => $value ) {
 		if ( $value === $args[ $key ] ) {
@@ -111,7 +121,7 @@ function eddc_add_manual_commission() {
 		$commission->save();
 	}
 
-	do_action( 'eddc_insert_commission', $commission->user_ID, $commission->amount, $commission->rate, $commission->download_ID, $commission->ID, $payment_id );
+	do_action( 'eddc_insert_commission', $commission->user_id, $commission->amount, $commission->rate, $commission->download_id, $commission->ID, $payment_id );
 
 	wp_redirect( add_query_arg( array( 'view' => false, 'edd-message' => 'add' ) ) );
 	exit;
@@ -190,6 +200,14 @@ function eddc_update_commission() {
 	}
 
 	$amount = str_replace( '%', '', $_POST['eddc_amount'] );
+
+	if ( ! empty( $_POST['date_created'] ) ) {
+		$commission->date_created = date( 'Y-m-d H-i-s', strtotime( sanitize_text_field( $_POST['date_created'] ) ) );
+	}
+
+	if ( ! empty( $_POST['date_paid'] ) ) {
+		$commission->date_paid = date( 'Y-m-d H-i-s', strtotime( sanitize_text_field( $_POST['date_paid'] ) ) );
+	}
 
 	$commission->rate        = (float) $rate;
 	$commission->amount      = (float) $amount;

@@ -62,7 +62,7 @@ function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 
 			if ( $show_notice ) {
 				// Throw deprecated notice if WP_DEBUG is defined and on
-				trigger_error( __( 'The _edd_commission_info postmeta is <strong>deprecated</strong> since EDD Commissions 3.4! Use the EDD_Commission object to get the relevant data, instead.', 'edd_sl' ) );
+				trigger_error( __( 'The _edd_commission_info postmeta is <strong>deprecated</strong> since EDD Commissions 3.4! Use the EDD_Commission object to get the relevant data, instead.', 'eddc' ) );
 
 				$backtrace = debug_backtrace();
 				trigger_error( print_r( $backtrace, 1 ) );
@@ -70,13 +70,28 @@ function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 
 			break;
 
+		case '_commission_status' :
+
+			$value = $commission->status;
+
+			if ( $show_notice ) {
+				// Throw deprecated notice if WP_DEBUG is defined and on
+				trigger_error( __( 'The _commission_status postmeta is <strong>deprecated</strong> since EDD Commissions 3.4! Use the EDD_Commission object to get the relevant data, instead.', 'eddc' ) );
+
+				$backtrace = debug_backtrace();
+				trigger_error( print_r( $backtrace, 1 ) );
+			}
+
+			break;
+
+
 		case '_edd_commission_payment_id':
 
 			$value = $commission->payment_id;
 
 			if ( $show_notice ) {
 				// Throw deprecated notice if WP_DEBUG is defined and on
-				trigger_error( __( 'The _edd_commission_payment_id postmeta is <strong>deprecated</strong> since EDD Commissions 3.4! Use the EDD_Commission object to get the relevant data, instead.', 'edd_sl' ) );
+				trigger_error( __( 'The _edd_commission_payment_id postmeta is <strong>deprecated</strong> since EDD Commissions 3.4! Use the EDD_Commission object to get the relevant data, instead.', 'eddc' ) );
 
 				$backtrace = debug_backtrace();
 				trigger_error( print_r( $backtrace, 1 ) );
@@ -90,7 +105,7 @@ function eddc_get_meta_backcompat( $value, $object_id, $meta_key, $single ) {
 
 			if ( $show_notice ) {
 				// Throw deprecated notice if WP_DEBUG is defined and on
-				trigger_error( __( 'The _download_id postmeta is <strong>deprecated</strong> since EDD Commissions 3.4! Use the EDD_Commission object to get the relevant data, instead.', 'edd_sl' ) );
+				trigger_error( __( 'The _download_id postmeta is <strong>deprecated</strong> since EDD Commissions 3.4! Use the EDD_Commission object to get the relevant data, instead.', 'eddc' ) );
 
 				$backtrace = debug_backtrace();
 				trigger_error( print_r( $backtrace, 1 ) );

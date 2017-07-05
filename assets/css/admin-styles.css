@@ -50,7 +50,8 @@
 	display: none;
 }
 
-#eddc_user_chosen, #eddc_download_chosen {
+#eddc_user_chosen, #eddc_download_chosen,
+#edit-item-info input.edd_commission_datepicker {
 	display: none;
 }
 

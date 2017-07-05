@@ -176,18 +176,18 @@ if ( ! class_exists( 'EDDC' ) ) {
 		 * @return      void
 		 */
 		private function hooks() {
-			add_action( 'fes_load_fields_require', array( $this, 'eddc_add_fes_functionality' ) );
+			add_action( 'fes_load_fields_require', array( $this, 'add_fes_functionality' ) );
 		}
 		
 		
 		/**
 		 * Run action and filter hooks
 		 *
-		 * @access      private
+		 * @access      public
 		 * @since       3.4.0
 		 * @return      void
 		 */
-		private function add_fes_functionality() {
+		public function add_fes_functionality() {
 			if ( class_exists( 'EDD_Front_End_Submissions' ) ) {
 				if ( version_compare( fes_plugin_version, '2.3', '>=' ) ) {
 					require_once( EDDC_PLUGIN_DIR . 'includes/integrations/fes-commissions-email-field.php' );
