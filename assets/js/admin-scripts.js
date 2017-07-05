@@ -14,6 +14,13 @@ jQuery(document).ready(function($) {
 		});
 	}
 
+	if ($('.edd_commission_datepicker').length > 0) {
+		var dateFormatMySQL = 'yy-mm-dd';
+		$('.edd_commission_datepicker').datepicker({
+			dateFormat: dateFormatMySQL
+		});
+	}
+
 	$('.eddc-commissions-export-toggle').click( function() {
 		$('.eddc-commissions-export-toggle').toggle();
 		$('#eddc-export-commissions').toggle();
@@ -206,6 +213,57 @@ jQuery(document).ready(function($) {
 
 	EDD_Commission_Configuration.init();
 
+	/**
+	 * Add Commission Configuration
+	 */
+	var EDD_Add_Commission_Configuration = {
+		init : function() {
+			this.verify();
+			this.type();
+			this.status();
+		},
+		verify : function() {
+			$('#add-item-info').submit(function(event) {
+				$('div.alert').remove();
+				var required_fields = $(this).find('input.required,select.required');
+				var errors_detected = false;
+				required_fields.each(function() {
+					if (!$(this).val() || '' == $(this).val() || 0 == $(this).val()) {
+						errors_detected = true;
+					}
+				});
+
+				if ( errors_detected ) {
+					var notice = '<div class="alert error"><p>' + eddc_vars.required_fields + '</p></div>';
+					$('#edd-item-card-wrapper').before(notice);
+					event.preventDefault();
+				}
+			});
+		},
+		type : function() {
+			$('input[name="type"]').change(function() {
+				var type = $(this).val();
+				if ( 'percentage' === type ) {
+					$('#eddc-add-rate-row').attr('disabled', '');
+				} else {
+					$('#eddc-add-rate-row').attr('disabled', 'disabled');
+				}
+			});
+		},
+		status : function() {
+			$('select[name="status"]').change(function() {
+				var status = $(this).val();
+				var target = $('#date_paid');
+				if ( 'paid' == status ) {
+					target.removeAttr('disabled');
+				} else {
+					target.attr('disabled', 'disabled');
+				}
+			});
+		}
+	};
+	EDD_Add_Commission_Configuration.init();
+
 	$('#eddc-commission-delete-comfirm').change( function() {
 		var submit_button = $('#eddc-delete-commission');
 
@@ -230,25 +288,14 @@ jQuery(document).ready(function($) {
 			link.text(eddc_vars.action_edit);
 		}
 
+		$('#edit-item-info input.edd_commission_datepicker').toggle();
 		$('#eddc_user_chosen').toggle();
 		$('#eddc_download_chosen').toggle();
 		$('.eddc-commission-rate').toggle();
 		$('.eddc-commission-amount').toggle();
 	});
 
-	$('.eddc-commission-user').on('change', function() {
-		$('#eddc_update_commission').fadeIn('fast').css('display', 'inline-block');
-	});
-
-	$('.eddc-commission-download').on('change', function() {
-		$('#eddc_update_commission').fadeIn('fast').css('display', 'inline-block');
-	});
-
-	$('.eddc-commission-rate').on('change', function() {
-		$('#eddc_update_commission').fadeIn('fast').css('display', 'inline-block');
-	});
-
-	$('.eddc-commission-amount').on('change', function() {
+	$('body').on( 'change', '.eddc-commission-card input', function(){
 		$('#eddc_update_commission').fadeIn('fast').css('display', 'inline-block');
 	});
 });

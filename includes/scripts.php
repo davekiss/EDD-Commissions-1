@@ -47,9 +47,10 @@ function eddc_admin_scripts() {
 	wp_register_script( 'eddc-admin-scripts', EDDC_PLUGIN_URL . 'assets/js/admin-scripts' . $suffix . '.js', array( 'jquery' ), EDD_COMMISSIONS_VERSION );
 	wp_enqueue_script( 'eddc-admin-scripts' );
 	wp_localize_script( 'eddc-admin-scripts', 'eddc_vars', array(
-		'action_edit'   => __( 'Edit Commission', 'eddc' ),
-		'action_cancel' => __( 'Cancel Edit', 'eddc' ),
-		'confirm_payout' => __( 'Generating a payout file will mark all unpaid commissions as paid. Do you want to continue?', 'eddc' )
+		'action_edit'     => __( 'Edit Commission', 'eddc' ),
+		'action_cancel'   => __( 'Cancel Edit', 'eddc' ),
+		'confirm_payout'  => __( 'Generating a payout file will mark all unpaid commissions as paid. Do you want to continue?', 'eddc' ),
+		'required_fields' => __( 'Please fill out all required fields.', 'eddc' ),
 	));
 
 	$ui_style = ( 'classic' == get_user_option( 'admin_color' ) ) ? 'classic' : 'fresh';

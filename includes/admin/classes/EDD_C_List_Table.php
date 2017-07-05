@@ -74,7 +74,7 @@ class EDD_C_List_Table extends WP_List_Table {
 	function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 			case 'rate':
-				$type = empty( $item[ 'type' ] ) ? $item[ 'type' ] : eddc_get_commission_type( $item['download'] );
+				$type = ! empty( $item[ 'type' ] ) ? $item[ 'type' ] : eddc_get_commission_type( $item['download'] );
 				return eddc_format_rate( $item[ $column_name ], $type );
 			case 'status':
 				return $item[ $column_name ];
