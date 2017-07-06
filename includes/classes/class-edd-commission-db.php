@@ -221,6 +221,19 @@ class EDDC_DB extends EDD_DB {
 
 		}
 
+		if ( ! empty( $args['payment_id'] ) ) {
+
+			if( is_array( $args['payment_id'] ) ) {
+				$ids = implode( ',', array_map('intval', $args['payment_id'] ) );
+			} else {
+				$ids = intval( $args['payment_id'] );
+			}
+
+			$where .= " AND `payment_id` IN( {$ids} ) ";
+
+		}
+
+
 		// Specific Downloads
 		if ( ! empty( $args['download_id'] ) ) {
 			if ( is_array( $args['download_id'] ) ) {
