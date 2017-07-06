@@ -83,7 +83,19 @@ function eddc_get_email_template_tags() {
 		array(
 			'tag'         => 'fullname',
 			'description' => __( 'The full name of the user', 'eddc' ),
-		)
+		),
+		array(
+			'tag'         => 'commission_id',
+			'description' => __( 'The ID of the commission record', 'eddc' ),
+		),
+		array(
+			'tag'         => 'item_price',
+			'description' => __( 'The final price of the item sold', 'eddc' ),
+		),
+		array(
+			'tag'         => 'item_tax',
+			'description' => __( 'The amount of tax calculated for the item', 'eddc' ),
+		),
 	);
 
 	return apply_filters( 'eddc_email_template_tags', $tags );
@@ -104,6 +116,12 @@ function eddc_get_email_template_tags() {
 function eddc_parse_template_tags( $message, $download_id, $commission_id, $commission_amount, $rate ) {
 	$commission = new EDD_Commission( $commission_id );
 	$download   = new EDD_Download( $commission->download_id );
+
+	$payment    = false;
+	if ( ! empty( $commission->payment_id ) ) {
+		$payment = edd_get_payment( $commission->payment_id );
+	}
+
 	$item_purchased  = $download->get_name();
 	if ( $download->has_variable_prices() ) {
 		$prices = $download->get_prices();
@@ -134,12 +152,25 @@ function eddc_parse_template_tags( $message, $download_id, $commission_id, $comm
 		$fullname = $name;
 	}
 
+	$item_price = '';
+	$item_tax   = '';
+	if ( false !== $payment ) {
+		$cart_item = isset( $payment->cart_details[ $commission->cart_index ] ) ? $payment->cart_details[ $commission->cart_index ] : false;
+		if ( $cart_item ) {
+			$item_price = html_entity_decode( edd_currency_filter( edd_format_amount( $cart_item['item_price'] ) ) );
+			$item_tax   = html_entity_decode( edd_currency_filter( edd_format_amount( $cart_item['tax'] ) ) );
+		}
+	}
+
 	$message = str_replace( '{download}', $item_purchased, $message );
 	$message = str_replace( '{amount}', $amount, $message );
 	$message = str_replace( '{date}', $date, $message );
 	$message = str_replace( '{rate}', $rate, $message );
 	$message = str_replace( '{name}', $name, $message );
 	$message = str_replace( '{fullname}', $fullname, $message );
+	$message = str_replace( '{commission_id}', $commission->id, $message );
+	$message = str_replace( '{item_price}', $item_price, $message );
+	$message = str_replace( '{item_tax}', $item_tax, $message );
 
 	return $message;
 }
