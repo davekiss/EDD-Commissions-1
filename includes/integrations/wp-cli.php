@@ -186,6 +186,10 @@ class EDD_Commissions_CLI extends EDD_CLI {
 			$old_count = $wpdb->get_col( "SELECT count(ID) FROM $wpdb->posts WHERE post_type ='edd_commission'", 0 );
 			WP_CLI::line( __( 'Old Records: ', 'eddc' ) . $old_count[0] );
 			WP_CLI::line( __( 'New Records: ', 'eddc' ) . $new_count );
+
+			edd_set_upgrade_complete( 'migrate_commissions' );
+			update_option( 'eddc_version', preg_replace( '/[^0-9.].*/', '', EDD_COMMISSIONS_VERSION ) );
+
 			WP_CLI::confirm( __( 'Remove legacy commission records?', 'eddc' ), $remove_args = array() );
 			WP_CLI::line( __( 'Removing old commission data.', 'eddc' ) );
 
@@ -198,12 +202,12 @@ class EDD_Commissions_CLI extends EDD_CLI {
 
 			$delete_postmeta_query = "DELETE FROM $wpdb->postmeta WHERE post_id IN ({$commission_ids})";
 			$wpdb->query( $delete_postmeta_query );
+			edd_set_upgrade_complete( 'remove_legacy_commissions' );
 		} else {
 			WP_CLI::line( __( 'No commission records found.', 'eddc' ) );
+			edd_set_upgrade_complete( 'migrate_commissions' );
+			edd_set_upgrade_complete( 'remove_legacy_commissions' );
 		}
-
-		update_option( 'eddc_version', preg_replace( '/[^0-9.].*/', '', EDD_COMMISSIONS_VERSION ) );
-		edd_set_upgrade_complete( 'migrate_commissions' );
 
 	}
 }
