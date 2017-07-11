@@ -93,8 +93,8 @@ function eddc_calculate_payment_commissions( $payment_id ) {
 
 		$recipients = eddc_get_recipients( $download_id );
 
-		// Do not allow someone to purchase their own item and make a commission unless they are an admin.
-		$allow_self_commissions = apply_filters( 'eddc_should_allow_self_commissions', user_can( $payment->user_id, 'manage_options' ), $download_id, $payment_id );
+		// Do not allow someone to purchase their own item and make a commission unless they are a shop accountant.
+		$allow_self_commissions = apply_filters( 'eddc_should_allow_self_commissions', user_can( $payment->user_id, 'edit_shop_payments' ), $download_id, $payment_id );
 		if ( false === $allow_self_commissions ) {
 
 			$download = new EDD_Download( $download_id );
