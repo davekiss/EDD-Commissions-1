@@ -79,7 +79,7 @@ function eddc_add_manual_commission() {
 	update_post_meta( $download_id, '_edd_has_commission', true );
 
 	$commission = new EDD_Commission;
-	$commission->user_ID      = absint( $_POST['user_id'] );
+	$commission->user_id      = absint( $_POST['user_id'] );
 	$commission->rate         = $rate;
 	$commission->amount       = $amount;
 	$commission->currency     = edd_get_option( 'currency', 'USD' );
@@ -89,7 +89,6 @@ function eddc_add_manual_commission() {
 	$commission->status       = $status;
 	$commission->date_created = $date_created;
 	$commission->date_paid    = $date_paid;
-
 
 	// If we are dealing with a variation, then save variation info
 	if ( false !== $price_id ) {

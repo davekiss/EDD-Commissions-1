@@ -93,6 +93,23 @@ function eddc_calculate_payment_commissions( $payment_id ) {
 
 		$recipients = eddc_get_recipients( $download_id );
 
+		// Do not allow someone to purchase their own item and make a commission unless they are a shop accountant.
+		$allow_self_commissions = apply_filters( 'eddc_should_allow_self_commissions', user_can( $payment->user_id, 'edit_shop_payments' ), $download_id, $payment_id );
+		if ( false === $allow_self_commissions ) {
+
+			$download = new EDD_Download( $download_id );
+
+			foreach ( $recipients as $key => $user_id ) {
+				if ( (int) $user_id !== (int) $payment->user_id ) {
+					continue;
+				}
+
+				unset( $recipients[ $key ] );
+				$payment->add_note( sprintf( __( 'Commission for %s skipped because %s made purchase and self commissions are disabled.', 'eddc' ), $download->get_name(), get_userdata( $user_id )->display_name ) );
+			}
+
+		}
+
 		if ( empty( $recipients ) ) {
 			continue;
 		}
@@ -677,12 +694,12 @@ function eddc_get_default_rate() {
 function eddc_format_rate( $unformatted_rate, $commission_type ){
 
 	// If the commission type is "percentage"
-	if ( 'percentage' == $commission_type ){
+	if ( 'percentage' == $commission_type ) {
 
 		// Format the rate to have the percentage sign after it.
 		$formatted_rate = $unformatted_rate . '%';
 
-	}else{
+	} else {
 
 		// If the rate is anything else, format it as if it were a flat rate, or "dollar" amount. We add the currency symbol before it. For example, "$5".
 		$formatted_rate = edd_currency_filter( edd_sanitize_amount( $unformatted_rate ) );
