@@ -109,7 +109,7 @@ function eddc_calculate_payment_commissions( $payment_id ) {
 				break;
 		}
 
-		if ( ! empty( $cart_item['fees'] ) ) {
+		if ( 'subtotal' != $calc_base && ! empty( $cart_item['fees'] ) ) {
 			foreach ( $cart_item['fees'] as $fee ) {
 				$fee_amt = (float) $fee['amount'];
 				if ( $fee_amt > 0 ) {
