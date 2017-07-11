@@ -62,7 +62,7 @@ function eddc_settings_extensions( $settings ) {
 		array(
 			'id'      => 'edd_commissions_calc_base',
 			'name'    => __( 'Calculation Base', 'eddc' ),
-			'desc'    => __( 'Should commissions be calculated from the subtotal (before taxes and discounts) or from the total purchase amount (after taxes and discounts)? ', 'eddc' ),
+			'desc'    => __( 'Should commissions be calculated from the item subtotal (before taxes and discounts) or from the item total (after taxes and discounts)?', 'eddc' ),
 			'type'    => 'select',
 			'options' => $calc_options,
 		),
