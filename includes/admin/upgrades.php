@@ -38,7 +38,7 @@ function eddc_upgrade_notices() {
 		printf(
 			'<div class="updated">' .
 			'<p>' .
-			__( 'Easy Digital Downloads - Commissions needs to upgrade the commission records database, click <a href="%s">here</a> to start the upgrade. <a href="#" onClick="jQuery(this).parent().next(\'p\').slideToggle()">Learn more about this upgrade</a>', 'eddc' ) .
+			__( 'Easy Digital Downloads - Commissions needs to upgrade the commission records database, click <a href="%s">here</a> to start the upgrade. <a href="#" onClick="jQuery(this).parent().next(\'p\').slideToggle()">Learn more about this upgrade</a>.', 'eddc' ) .
 			'</p>' .
 			'<p style="display: none;">' .
 			__( '<strong>About this upgrade:</strong><br />This is a <strong><em>mandatory</em></strong> update that will migrate all commission records and their meta data to a new custom database table. This upgrade should provider better performance and scalability.', 'eddc' ) .
@@ -56,7 +56,7 @@ function eddc_upgrade_notices() {
 		printf(
 			'<div class="updated">' .
 			'<p>' .
-			__( 'Easy Digital Downloads - Commissions has finished migrating commission records, click <a href="%s">here</a> to remove the legacy data. <a href="#" onClick="jQuery(this).parent().next(\'p\').slideToggle()">Learn more about this process</a>', 'eddc' ) .
+			__( 'Easy Digital Downloads - Commissions has finished migrating commission records, click <a href="%s">here</a> to remove the legacy data. <a href="#" onClick="jQuery(this).parent().next(\'p\').slideToggle()">Learn more about this process</a>.', 'eddc' ) .
 			'</p>' .
 			'<p style="display: none;">' .
 			__( '<strong>Removing legacy data:</strong><br />All commissions records have been migrated to their own custom table. Now all data needs to be removed.', 'eddc' ) .
