@@ -378,11 +378,15 @@ function eddc_remove_legacy_commissions() {
 	$commission_ids = wp_list_pluck( $commission_ids, 'ID' );
 	$commission_ids = implode( ', ', $commission_ids );
 
-	$delete_posts_query = "DELETE FROM $wpdb->posts WHERE ID IN ({$commission_ids})";
-	$wpdb->query( $delete_posts_query );
+	if( ! empty( $commission_ids ) ) {
 
-	$delete_postmeta_query = "DELETE FROM $wpdb->postmeta WHERE post_id IN ({$commission_ids})";
-	$wpdb->query( $delete_postmeta_query );
+		$delete_posts_query = "DELETE FROM $wpdb->posts WHERE ID IN ({$commission_ids})";
+		$wpdb->query( $delete_posts_query );
+
+		$delete_postmeta_query = "DELETE FROM $wpdb->postmeta WHERE post_id IN ({$commission_ids})";
+		$wpdb->query( $delete_postmeta_query );
+
+	}
 
 	// No more commissions found, finish up
 	edd_set_upgrade_complete( 'remove_legacy_commissions' );
