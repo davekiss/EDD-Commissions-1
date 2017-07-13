@@ -51,6 +51,22 @@ function eddc_upgrade_notices() {
 			esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=commissions_migration' ) )
 		);
 	}
+
+	if ( edd_has_upgrade_completed( 'migrate_commissions' ) && ! edd_has_upgrade_completed( 'remove_legacy_commissions' ) ) {
+		printf(
+			'<div class="updated">' .
+			'<p>' .
+			__( 'Easy Digital Downloads - Commissions has finished migrating commission records, click <a href="%s">here</a> to remove the legacy data. <a href="#" onClick="jQuery(this).parent().next(\'p\').slideToggle()">Learn more about this process</a>', 'eddc' ) .
+			'</p>' .
+			'<p style="display: none;">' .
+			__( '<strong>Removing legacy data:</strong><br />All commissions records have been migrated to their own custom table. Now all data needs to be removed.', 'eddc' ) .
+			'<br /><br />' .
+			__( '<strong>If you have not already, back up your database</strong> as this upgrade routine will be making changes to the database that are not reversible.', 'eddc' ) .
+			'</p>' .
+			'</div>',
+			esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=remove_legacy_commissions' ) )
+		);
+	}
 }
 add_action( 'admin_notices', 'eddc_upgrade_notices' );
 
@@ -234,24 +250,27 @@ function eddc_commissions_migration() {
 			}
 
 			$cart_index = 0;
+			$payment    = false;
 			if ( ! empty( $post_meta['_edd_commission_payment_id'] ) ) {
 
-				$payment    = new EDD_Payment( $post_meta['_edd_commission_payment_id'] );
-				foreach ( $payment->cart_details as $index => $item ) {
+				$payment    = edd_get_payment( $post_meta['_edd_commission_payment_id'] );
+				if ( false !== $payment ) {
+					foreach ( $payment->cart_details as $index => $item ) {
 
-					if ( (int) $item['id'] !== (int) $download->ID ) {
-						continue;
-					}
-
-					if ( false !== $commission_price_id ) {
-						if ( (int) $item['item_number']['options']['price_id'] !== (int) $commission_price_id ) {
+						if ( (int) $item['id'] !== (int) $download->ID ) {
 							continue;
 						}
+
+						if ( false !== $commission_price_id ) {
+							if ( (int) $item['item_number']['options']['price_id'] !== (int) $commission_price_id ) {
+								continue;
+							}
+						}
+
+						$cart_index = $index;
+						break;
+
 					}
-
-					$cart_index = $index;
-					break;
-
 				}
 
 			}
@@ -271,14 +290,14 @@ function eddc_commissions_migration() {
 				'amount'        => $commission_info['amount'],
 				'status'        => $status,
 				'download_id'   => $download->ID,
-				'payment_id'    => ! empty( $payment->ID ) ? $payment->ID : 0,
+				'payment_id'    => false !== $payment && ! empty( $payment->ID ) ? $payment->ID : 0,
 				'cart_index'    => $cart_index,
 				'price_id'      => $commission_price_id,
 				'date_created' => $old_commission->post_date,
 				'date_paid'     => '',
 				'type'          => ! empty( $commission_info['type'] ) ? $commission_info['type'] : eddc_get_commission_type( $download->ID ),
 				'rate'          => $commission_info['rate'],
-				'currency'      => $commission_info['currency'],
+				'currency'      => ! empty( $commission_info['currency'] ) ? $commission_info['currency'] : edd_get_currency(),
 			);
 
 			$commission_id = edd_commissions()->commissions_db->insert( $commission_data, 'commission' );
@@ -328,17 +347,6 @@ function eddc_commissions_migration() {
 		update_option( 'eddc_version', EDD_COMMISSIONS_VERSION );
 		edd_set_upgrade_complete( 'migrate_commissions' );
 
-		// Delete all the commission IDs
-		$commission_ids = $wpdb->get_results( "SELECT ID FROM $wpdb->posts WHERE post_type = 'edd_commission'" );
-		$commission_ids = wp_list_pluck( $commission_ids, 'ID' );
-		$commission_ids = implode( ', ', $commission_ids );
-
-		$delete_posts_query = "DELETE FROM $wpdb->posts WHERE ID IN ({$commission_ids})";
-		$wpdb->query( $delete_posts_query );
-
-		$delete_postmeta_query = "DELETE FROM $wpdb->postmeta WHERE post_id IN ({$commission_ids})";
-		$wpdb->query( $delete_postmeta_query );
-
 		delete_option( 'edd_doing_upgrade' );
 
 		wp_redirect( admin_url() );
@@ -347,3 +355,42 @@ function eddc_commissions_migration() {
 	}
 }
 add_action( 'edd_commissions_migration', 'eddc_commissions_migration' );
+
+/**
+ * Removes legacy commission date
+ *
+ * @since 3.4
+ * @return void
+ */
+function eddc_remove_legacy_commissions() {
+	global $wpdb;
+
+	if ( ! current_user_can( 'manage_shop_settings' ) ) {
+		return;
+	}
+
+	define( 'EDDC_DOING_UPGRADES', true );
+
+	ignore_user_abort( true );
+	set_time_limit( 0 );
+
+	$commission_ids = $wpdb->get_results( "SELECT ID FROM $wpdb->posts WHERE post_type = 'edd_commission'" );
+	$commission_ids = wp_list_pluck( $commission_ids, 'ID' );
+	$commission_ids = implode( ', ', $commission_ids );
+
+	$delete_posts_query = "DELETE FROM $wpdb->posts WHERE ID IN ({$commission_ids})";
+	$wpdb->query( $delete_posts_query );
+
+	$delete_postmeta_query = "DELETE FROM $wpdb->postmeta WHERE post_id IN ({$commission_ids})";
+	$wpdb->query( $delete_postmeta_query );
+
+	// No more commissions found, finish up
+	edd_set_upgrade_complete( 'remove_legacy_commissions' );
+
+	delete_option( 'edd_doing_upgrade' );
+
+	wp_redirect( admin_url() );
+	exit;
+
+}
+add_action( 'edd_remove_legacy_commissions', 'eddc_remove_legacy_commissions' );
