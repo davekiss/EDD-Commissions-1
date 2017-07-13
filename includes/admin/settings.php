@@ -39,9 +39,9 @@ add_filter( 'edd_settings_sections_extensions', 'eddc_settings_section_extension
  */
 function eddc_settings_extensions( $settings ) {
 	$calc_options = array(
-		'subtotal'      => __( 'Subtotal (default)', 'eddc' ),
-		'total'         => __( 'Total with Taxes', 'eddc' ),
-		'total_pre_tax' => __( 'Total without Taxes', 'eddc' ),
+		'subtotal'      => __( 'Item Subtotal (default)', 'eddc' ),
+		'total'         => __( 'Item Total with Taxes', 'eddc' ),
+		'total_pre_tax' => __( 'Item Total without Taxes', 'eddc' ),
 	);
 
 	$commission_settings = array(
