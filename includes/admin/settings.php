@@ -39,9 +39,9 @@ add_filter( 'edd_settings_sections_extensions', 'eddc_settings_section_extension
  */
 function eddc_settings_extensions( $settings ) {
 	$calc_options = array(
-		'subtotal'      => __( 'Subtotal (default)', 'eddc' ),
-		'total'         => __( 'Total with Taxes', 'eddc' ),
-		'total_pre_tax' => __( 'Total without Taxes', 'eddc' ),
+		'subtotal'      => __( 'Item Subtotal (default)', 'eddc' ),
+		'total'         => __( 'Item Total with Taxes', 'eddc' ),
+		'total_pre_tax' => __( 'Item Total without Taxes', 'eddc' ),
 	);
 
 	$commission_settings = array(
@@ -62,7 +62,7 @@ function eddc_settings_extensions( $settings ) {
 		array(
 			'id'      => 'edd_commissions_calc_base',
 			'name'    => __( 'Calculation Base', 'eddc' ),
-			'desc'    => __( 'Should commissions be calculated from the subtotal (before taxes and discounts) or from the total purchase amount (after taxes and discounts)? ', 'eddc' ),
+			'desc'    => __( 'Should commissions be calculated from the item subtotal (before taxes and discounts) or from the item total (after taxes and discounts)?', 'eddc' ),
 			'type'    => 'select',
 			'options' => $calc_options,
 		),

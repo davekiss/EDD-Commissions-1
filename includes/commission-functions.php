@@ -126,6 +126,17 @@ function eddc_calculate_payment_commissions( $payment_id ) {
 				break;
 		}
 
+		if ( 'subtotal' != $calc_base && ! empty( $cart_item['fees'] ) ) {
+			foreach ( $cart_item['fees'] as $fee ) {
+				$fee_amt = (float) $fee['amount'];
+				if ( $fee_amt > 0 ) {
+					continue;
+				}
+
+				$price = $price + $fee_amt;
+			}
+		}
+
 		// If we need to award a commission, and the price is greater than zero
 		if ( ! floatval( $price ) > '0' && edd_get_option( 'edd_commissions_allow_zero_value', 'yes' ) == 'no' ) {
 			continue;
