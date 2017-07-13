@@ -59,7 +59,7 @@ function eddc_upgrade_notices() {
 			__( 'Easy Digital Downloads - Commissions has finished migrating commission records, click <a href="%s">here</a> to remove the legacy data. <a href="#" onClick="jQuery(this).parent().next(\'p\').slideToggle()">Learn more about this process</a>.', 'eddc' ) .
 			'</p>' .
 			'<p style="display: none;">' .
-			__( '<strong>Removing legacy data:</strong><br />All commissions records have been migrated to their own custom table. Now all data needs to be removed.', 'eddc' ) .
+			__( '<strong>Removing legacy data:</strong><br />All commissions records have been migrated to their own custom table. Now all old data needs to be removed.', 'eddc' ) .
 			'<br /><br />' .
 			__( '<strong>If you have not already, back up your database</strong> as this upgrade routine will be making changes to the database that are not reversible.', 'eddc' ) .
 			'</p>' .
