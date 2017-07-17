@@ -71,7 +71,7 @@ function eddc_record_commission( $payment_id, $new_status, $old_status ) {
 		if ( (float) $commission_calculated['commission_amount'] === (float) 0 && edd_get_option( 'edd_commissions_allow_zero_value', 'yes' ) == 'no' ) {
 			continue;
 		}
-		
+
 		$default_commission_calculated = array(
 			'recipient'             => 0,
 			'commission_amount'     => 0,
@@ -191,19 +191,16 @@ function eddc_generate_payout_file( $data ) {
 
 			foreach ( $commissions as $commission ) {
 
-				$commission_meta = get_post_meta( $commission->ID, '_edd_commission_info', true );
-
-				$user_id       = $commission_meta['user_id'];
-				$user          = get_userdata( $user_id );
-				$custom_paypal = get_user_meta( $user_id, 'eddc_user_paypal', true );
+				$user          = get_userdata( $commission->user_id );
+				$custom_paypal = get_user_meta( $commission->user_id, 'eddc_user_paypal', true );
 				$email         = is_email( $custom_paypal ) ? $custom_paypal : $user->user_email;
 
 				if ( array_key_exists( $email, $payouts ) ) {
-					$payouts[$email]['amount'] += $commission_meta['amount'];
+					$payouts[$email]['amount'] += $commission->amount;
 				} else {
 					$payouts[$email] = array(
-						'amount'     => $commission_meta['amount'],
-						'currency'   => $commission_meta['currency']
+						'amount'     => $commission->amount,
+						'currency'   => $commission->currency
 					);
 				}
 
