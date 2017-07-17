@@ -87,7 +87,6 @@ class EDD_Batch_Commissions_Payout extends EDD_Batch_Export {
 			$payouts = array();
 
 			foreach ( $commissions as $commission ) {
-				$commission_meta = get_post_meta( $commission->ID, '_edd_commission_info', true );
 
 				$user          = get_userdata( $commission->user_id );
 				$custom_paypal = get_user_meta( $commission->user_id, 'eddc_user_paypal', true );
