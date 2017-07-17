@@ -296,12 +296,12 @@ function eddc_revoke_on_refund( $payment ) {
 
 	if ( ! empty( $commissions ) ) {
 		foreach ( $commissions as $commission ) {
-			eddc_set_commission_status( $commission->ID, 'revoked' );
 
-			$recipient = get_post_meta( $commission->ID, '_user_id', true );
-			$note      = sprintf(
+			$commission->set_status( 'revoked' );
+
+			$note  = sprintf(
 				__( 'Commission revoked for %s due to refunded payment &ndash; <a href="%s">View</a>', 'eddc' ),
-				get_userdata( $recipient )->display_name,
+				get_userdata( $commission->user_id )->display_name,
 				admin_url( 'edit.php?post_type=download&page=edd-commissions&payment=' . $payment->ID )
 			);
 
