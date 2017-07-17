@@ -144,12 +144,11 @@ class EDD_Commissions_Export extends EDD_Export {
 
 		if ( $commissions ) {
 			foreach ( $commissions as $commission ) {
-				$commission_info = get_post_meta( $commission->ID, '_edd_commission_info', true );
 
 				$data[]        = array(
-					'download' => get_the_title( get_post_meta( $commission->ID, '_download_id', true ) ),
-					'amount'   => $commission_info['amount'],
-					'date'     => $commission->post_date
+					'download' => get_the_title( $commission->download_id ),
+					'amount'   => $commission->amount,
+					'date'     => $commission->date_created
 				);
 			}
 		}
