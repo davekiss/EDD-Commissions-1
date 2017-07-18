@@ -451,7 +451,7 @@ function eddc_commissions_view( $commission ) {
 								</p>
 							</td>
 						</tr>
-						<?php if ( ! empty( $commission->date_paid ) ) : ?>
+						<?php if ( 'paid' === $commission->status && '0000-00-00 00:00:00' !== $commission->date_paid ) : ?>
 						<tr>
 							<td class="row-title">
 								<label for="tablecell"><?php _e( 'Date Paid', 'eddc' ); ?></label>
@@ -470,9 +470,10 @@ function eddc_commissions_view( $commission ) {
 							</td>
 							<td style="word-wrap: break-word">
 								<?php
+								$base_url  = admin_url( 'edit.php?post_type=download&page=edd-commissions' );
 								$user_data = get_userdata( $commission->user_id );
 								if ( false !== $user_data ) {
-									echo '<a href="' . esc_url( add_query_arg( 'user', $user_data->ID ) ) . '" title="' . __( 'View all commissions for this user', 'eddc' ) . '"">' . $user_data->display_name . '</a>&nbsp;(' . __( 'ID:', 'eddc' ) . ' ' . $commission->user_id . ')';
+									echo '<a href="' . esc_url( add_query_arg( array( 'user' => $user_data->ID ), $base_url ) ) . '" title="' . __( 'View all commissions for this user', 'eddc' ) . '"">' . $user_data->display_name . '</a>&nbsp;(' . __( 'ID:', 'eddc' ) . ' ' . $commission->user_id . ')';
 								} else {
 									echo '<em>' . __( 'Invalid User', 'eddc' ) . '</em>';
 								}
@@ -486,10 +487,11 @@ function eddc_commissions_view( $commission ) {
 							</td>
 							<td style="word-wrap: break-word">
 								<?php
-								$selected = ! empty( $commission->download_id ) ? $commission->download_id . ( ! empty( $commission->variation ) ? '_' . $commission->price_id : '' ) : '';
+								$base_url  = admin_url( 'edit.php?post_type=download&page=edd-commissions' );
+								$selected  = ! empty( $commission->download_id ) ? $commission->download_id . ( ! empty( $commission->variation ) ? '_' . $commission->price_id : '' ) : '';
 								if ( ! empty( $commission->download_id ) ) {
 									$download = new EDD_Download( $commission->download_id );
-									echo '<a href="' . esc_url( add_query_arg( 'download', $commission->download_id ) ) . '" title="' . __( 'View all commissions for this item', 'eddc' ) . '">' . $download->get_name() . '</a>';
+									echo '<a href="' . esc_url( add_query_arg( array( 'download' => $commission->download_id ), $base_url ) ) . '" title="' . __( 'View all commissions for this item', 'eddc' ) . '">' . $download->get_name() . '</a>';
 									echo ( ! empty( $commission->variation ) ) ? ' - ' . $commission->variation : '';
 								}
 								echo EDD()->html->product_dropdown( array( 'class' => 'eddc-commission-download', 'id' => 'eddc_download', 'name' => 'eddc_download', 'chosen' => true, 'variations' => true, 'selected' => $selected ) );
