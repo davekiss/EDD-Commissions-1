@@ -115,7 +115,17 @@ class Tests_EDD_Commissions_Functions extends EDD_Commissions_Unitestcase {
 
 		$this->assertEquals( 3, eddc_get_recipient_rate( self::$_download_id, self::$_user->ID ) );
 
-		// Set a product level rate, non-zero
+	}
+
+	public function test_get_recipient_rate_product_level_zero() {
+		global $edd_options;
+
+		// Set a global rate
+		$edd_options['edd_commissions_default_rate'] = 1;
+
+		$edd_options['edd_commissions_allow_zero_value'] = 1;
+
+		// Set a product level rate, zero
 		$commissions_config = array(
 			'type'    => 'flat',
 			'amount'  => '0',
@@ -125,7 +135,6 @@ class Tests_EDD_Commissions_Functions extends EDD_Commissions_Unitestcase {
 		update_post_meta( self::$_download_id, '_edd_commission_settings', $commissions_config );
 
 		$this->assertEquals( 0, eddc_get_recipient_rate( self::$_download_id, self::$_user->ID ) );
-
 	}
 
 	public function test_get_recipient_rate_user_level() {

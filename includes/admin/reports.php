@@ -171,7 +171,7 @@ function edd_show_commissions_graph() {
 				}
 			}
 		} else {
-			foreach ( $commissions_data as $years => $months ) {
+			foreach ( $commissions_data as $year => $months ) {
 				$month_keys = array_keys( $months );
 				$last_month = end( $month_keys );
 
