@@ -258,6 +258,8 @@ add_action( 'plugins_loaded', 'edd_commissions', 1 );
  */
 function edd_commissions_install() {
 
+	global $wpdb;
+
 	// We need the main Commissions plugin loaded to add the table.
 	edd_commissions();
 
@@ -272,8 +274,17 @@ function edd_commissions_install() {
 		$version = get_option( 'eddc_version' );
 
 		if ( empty( $version ) ) {
-			// This is a new install or an update from pre 3.4.0
-			// Once the 'new' install stuff is tested, we'll have to add upgrade routines here
+			if ( ! function_exists( 'edd_set_upgrade_complete' ) ) {
+				require_once trailingslashit( EDD_PLUGIN_DIR ) . 'includes/admin/upgrades/upgrade-functions.php';
+			}
+
+			$results         = $wpdb->get_row( "SELECT count(ID) has_commissions from FROM $wpdb->posts WHERE post_type = 'edd_commission' LIMIT 1", 0 );
+			$has_commissions = ! empty( $results->has_commissions ) ? true : false;
+
+			if ( ! $has_commissions ) {
+				edd_set_upgrade_complete( 'migrate_commissions' );
+				edd_set_upgrade_complete( 'remove_legacy_commissions' );
+			}
 		}
 
 		update_option( 'eddc_version', EDD_COMMISSIONS_VERSION );

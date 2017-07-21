@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return      void
  */
 function eddc_upgrade_notices() {
+	global $wpdb;
+
 	if ( ! current_user_can( 'manage_shop_settings' ) ) {
 		return;
 	}
@@ -35,21 +37,31 @@ function eddc_upgrade_notices() {
 	}
 
 	if ( ! edd_has_upgrade_completed( 'migrate_commissions' ) ) {
-		printf(
-			'<div class="updated">' .
-			'<p>' .
-			__( 'Easy Digital Downloads - Commissions needs to upgrade the commission records database, click <a href="%s">here</a> to start the upgrade. <a href="#" onClick="jQuery(this).parent().next(\'p\').slideToggle()">Learn more about this upgrade</a>.', 'eddc' ) .
-			'</p>' .
-			'<p style="display: none;">' .
-			__( '<strong>About this upgrade:</strong><br />This is a <strong><em>mandatory</em></strong> update that will migrate all commission records and their meta data to a new custom database table. This upgrade should provider better performance and scalability.', 'eddc' ) .
-			'<br /><br />' .
-			__( '<strong>Please backup your database before starting this upgrade.</strong> This upgrade routine will be making changes to the database that are not reversible.', 'eddc' ) .
-			'<br /><br />' .
-			__( '<strong>Advanced User?</strong><br />This upgrade can also be run via WPCLI with the following command:<br /><code>wp edd-commissions migrate_commissions</code>', 'eddc' ) .
-			'</p>' .
-			'</div>',
-			esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=commissions_migration' ) )
-		);
+
+		// Check to see if we have commissions in the Database
+		$results         = $wpdb->get_row( "SELECT count(ID) has_commissions from FROM $wpdb->posts WHERE post_type = 'edd_commission' LIMIT 1", 0 );
+		$has_commissions = ! empty( $results->has_commissions ) ? true : false;
+
+		if ( ! $has_commissions ) {
+			edd_set_upgrade_complete( 'migrate_commissions' );
+			edd_set_upgrade_complete( 'remove_legacy_commissions' );
+		} else {
+			printf(
+				'<div class="updated">' .
+				'<p>' .
+				__( 'Easy Digital Downloads - Commissions needs to upgrade the commission records database, click <a href="%s">here</a> to start the upgrade. <a href="#" onClick="jQuery(this).parent().next(\'p\').slideToggle()">Learn more about this upgrade</a>.', 'eddc' ) .
+				'</p>' .
+				'<p style="display: none;">' .
+				__( '<strong>About this upgrade:</strong><br />This is a <strong><em>mandatory</em></strong> update that will migrate all commission records and their meta data to a new custom database table. This upgrade should provider better performance and scalability.', 'eddc' ) .
+				'<br /><br />' .
+				__( '<strong>Please backup your database before starting this upgrade.</strong> This upgrade routine will be making changes to the database that are not reversible.', 'eddc' ) .
+				'<br /><br />' .
+				__( '<strong>Advanced User?</strong><br />This upgrade can also be run via WPCLI with the following command:<br /><code>wp edd-commissions migrate_commissions</code>', 'eddc' ) .
+				'</p>' .
+				'</div>',
+				esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=commissions_migration' ) )
+			);
+		}
 	}
 
 	if ( edd_has_upgrade_completed( 'migrate_commissions' ) && ! edd_has_upgrade_completed( 'remove_legacy_commissions' ) ) {
