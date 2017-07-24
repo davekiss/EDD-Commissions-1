@@ -38,8 +38,9 @@ function eddc_upgrade_notices() {
 
 	if ( ! edd_has_upgrade_completed( 'migrate_commissions' ) ) {
 
+
 		// Check to see if we have commissions in the Database
-		$results         = $wpdb->get_row( "SELECT count(ID) has_commissions from FROM $wpdb->posts WHERE post_type = 'edd_commission' LIMIT 1", 0 );
+		$results         = $wpdb->get_row( "SELECT count(ID) as has_commissions FROM $wpdb->posts WHERE post_type = 'edd_commission' LIMIT 0, 1" );
 		$has_commissions = ! empty( $results->has_commissions ) ? true : false;
 
 		if ( ! $has_commissions ) {
