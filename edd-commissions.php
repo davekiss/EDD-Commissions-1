@@ -5,7 +5,7 @@ Plugin URI: http://easydigitaldownloads.com/extension/commissions
 Description: Record commisions automatically for users in your site when downloads are sold
 Author: Easy Digital Downloads
 Author URI: https://easydigitaldownloads.com
-Version: 3.3.3
+Version: 3.4-beta1
 Text Domain: eddc
 Domain Path: languages
 */
@@ -82,8 +82,8 @@ if ( ! class_exists( 'EDDC' ) ) {
 		 */
 		private function setup_constants() {
 			// Plugin version
-			define( 'EDD_COMMISSIONS_VERSION', '3.3.3' );
-			
+			define( 'EDD_COMMISSIONS_VERSION', '3.4-beta1' );
+
 			// Plugin folder url
 			define( 'EDDC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
@@ -141,7 +141,7 @@ if ( ! class_exists( 'EDDC' ) ) {
 				if ( class_exists( 'EDD_License' ) ) {
 					$eddc_license = new EDD_License( __FILE__, 'Commissions', EDD_COMMISSIONS_VERSION, 'Pippin Williamson' );
 				}
-				
+
 				// These are no longer used... do they still need to be here?
 				//require_once(EDDC_PLUGIN_DIR . 'includes/scheduled-payouts.php');
 				//require_once(EDDC_PLUGIN_DIR . 'includes/masspay/class-paypal-masspay.php');
@@ -177,8 +177,8 @@ if ( ! class_exists( 'EDDC' ) ) {
 		private function hooks() {
 			add_action( 'fes_load_fields_require', array( $this, 'add_fes_functionality' ) );
 		}
-		
-		
+
+
 		/**
 		 * Run action and filter hooks
 		 *
@@ -190,9 +190,9 @@ if ( ! class_exists( 'EDDC' ) ) {
 			if ( class_exists( 'EDD_Front_End_Submissions' ) ) {
 				if ( version_compare( fes_plugin_version, '2.3', '>=' ) ) {
 					require_once( EDDC_PLUGIN_DIR . 'includes/integrations/fes-commissions-email-field.php' );
-					
+
 					add_filter(  'fes_load_fields_array', 'eddc_add_commissions_email', 10, 1 );
-					
+
 					function eddc_add_commissions_email( $fields ) {
 						$fields['eddc_user_paypal'] = 'FES_Commissions_Email_Field';
 						return $fields;
