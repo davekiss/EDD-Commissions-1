@@ -69,7 +69,7 @@ function eddc_upgrade_notices() {
 		printf(
 			'<div class="updated">' .
 			'<p>' .
-			__( 'Easy Digital Downloads - Commissions has finished migrating commission records, click <a href="%s">here</a> to remove the legacy data. <a href="#" onClick="jQuery(this).parent().next(\'p\').slideToggle()">Learn more about this process</a>.', 'eddc' ) .
+			__( 'Easy Digital Downloads - Commissions has <strong>finished migrating commission</strong> records, next step is to <a href="%s">remove the legacy data</a>. <a href="#" onClick="jQuery(this).parent().next(\'p\').slideToggle()">Learn more about this process</a>.', 'eddc' ) .
 			'</p>' .
 			'<p style="display: none;">' .
 			__( '<strong>Removing legacy data:</strong><br />All commissions records have been migrated to their own custom table. Now all old data needs to be removed.', 'eddc' ) .
