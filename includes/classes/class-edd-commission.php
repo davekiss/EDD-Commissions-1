@@ -430,7 +430,6 @@ class EDD_Commission {
 
 	}
 
-
 	/**
 	 * Retrieve the paid status of a commission.
 	 *

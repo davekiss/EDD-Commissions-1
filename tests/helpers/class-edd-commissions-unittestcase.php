@@ -18,9 +18,8 @@ class EDD_Commissions_Unitestcase extends WP_UnitTestCase {
 			$commission_db->table_name,
 			$commissions_meta_db->table_name,
 		) as $table ) {
-			$wpdb->query( "DELETE FROM {$table}" );
+			$wpdb->query( "TRUNCATE TABLE {$table}" );
 		}
-
 
 	}
 }
