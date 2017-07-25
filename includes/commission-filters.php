@@ -493,7 +493,7 @@ function eddc_delete_meta_backcompat( $check, $object_id, $meta_key, $meta_value
 		default:
 			// Developers can hook in here with add_action( 'eddc_update_post_meta_backwards_compat-meta_key... in order to
 			// Filter their own meta values for backwards compatibility calls to get_post_meta instead of EDD_Commission::get_meta
-			$check = apply_filters( 'eddc_update_post_meta_backwards_compat-' . $meta_key, $check, $object_id, $meta_value, $meta_value, $delete_all );
+			$check = apply_filters( 'eddc_delete_post_meta_backwards_compat-' . $meta_key, $check, $object_id, $meta_value, $meta_value, $delete_all );
 			break;
 	}
 
