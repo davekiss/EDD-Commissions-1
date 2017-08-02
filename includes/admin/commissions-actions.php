@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function eddc_add_commissions_link() {
 	global $eddc_commissions_page;
 
-	$eddc_commissions_page = add_submenu_page( 'edit.php?post_type=download', __( 'Easy Digital Download Commissions', 'eddc' ), __( 'Commissions', 'eddc' ), 'edit_products', 'edd-commissions', 'eddc_commissions_page' );
+	$eddc_commissions_page = add_submenu_page( 'edit.php?post_type=download', __( 'Easy Digital Download Commissions', 'eddc' ), __( 'Commissions', 'eddc' ), 'edit_shop_payments', 'edd-commissions', 'eddc_commissions_page' );
 }
 add_action( 'admin_menu', 'eddc_add_commissions_link', 10 );
 
