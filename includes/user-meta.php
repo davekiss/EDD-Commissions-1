@@ -43,6 +43,14 @@ function eddc_user_paypal_email( $user ) {
 			</td>
 		</tr>
 		<?php endif; ?>
+
+		<tr>
+			<th><label><?php _e('Disable Sale Notification Emails', 'eddc'); ?></label></th>
+			<td>
+				<input name="eddc_disable_user_sale_alerts" type="checkbox" id="eddc_disable_user_sale_alerts" value="1"<?php checked( get_user_meta( $user->ID, 'eddc_disable_user_sale_alerts', true ) ); ?> />
+				<span class="description"><?php _e( 'Check this box if you wish to prevent sale notifications from being sent to this user.', 'easy-digital-downloads' ); ?></span>
+			</td>
+		</tr>
 	</table>
 	<?php
 }
@@ -59,6 +67,12 @@ function eddc_save_user_paypal( $user_id ) {
 		update_user_meta( $user_id, 'eddc_user_paypal', sanitize_text_field( $_POST['eddc_user_paypal'] ) );
 	} else {
 		delete_user_meta( $user_id, 'eddc_user_paypal' );
+	}
+
+	if ( isset( $_POST['eddc_disable_user_sale_alerts'] ) ) {
+		update_user_meta( $user_id, 'eddc_disable_user_sale_alerts', true );
+	} else {
+		delete_user_meta( $user_id, 'eddc_disable_user_sale_alerts' );
 	}
 
 	if ( current_user_can( 'manage_shop_settings' ) ) {
