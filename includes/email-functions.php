@@ -146,6 +146,10 @@ function eddc_email_alert( $user_id, $commission_amount, $rate, $download_id, $c
 		return;
 	}
 
+	if ( get_user_meta( $user->ID, 'eddc_disable_user_sale_alerts', true ) ) {
+		return;
+	}
+
 	/* send an email alert of the sale */
 	$user    = get_userdata( $user_id );
 	$email   = $user->user_email; // set address here
